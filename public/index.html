@@ -60,6 +60,7 @@
           <button class="btn ghost" id="toFuzzerBtn" title="Send this request to the Fuzzer">→ Fuzz</button>
           <button class="btn ghost" id="toMatrixBtn" title="Send this request to the Access Matrix">→ Matrix</button>
           <button class="btn ghost" id="copyCurlBtn" title="Copy as cURL">cURL</button>
+          <button class="btn ghost" id="codeBtn" title="Copy as code (fetch / Python / HTTPie)">&lt;/&gt;</button>
         </div>
         <div class="req-summary" id="reqSummary"></div>
 
@@ -303,6 +304,24 @@
       <div class="modal-actions">
         <button class="btn primary" id="saveIdentities">Save</button>
         <button class="btn ghost" id="closeIdentities">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Code snippet modal -->
+  <div class="modal-backdrop" id="codeModal" hidden>
+    <div class="modal">
+      <h2>Copy as code <span class="muted">— current request</span></h2>
+      <div class="subtabs" id="codeLangs">
+        <button class="subtab active" data-lang="curl">cURL</button>
+        <button class="subtab" data-lang="fetch">fetch</button>
+        <button class="subtab" data-lang="python">Python</button>
+        <button class="subtab" data-lang="httpie">HTTPie</button>
+      </div>
+      <textarea id="codeOut" class="code" spellcheck="false" readonly style="min-height:200px;margin-top:10px"></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="codeCopy">Copy</button>
+        <button class="btn ghost" id="closeCode">Close</button>
       </div>
     </div>
   </div>

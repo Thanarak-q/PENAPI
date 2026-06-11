@@ -5,6 +5,7 @@ import { state, identityHeaders, pushHistory } from './state.js';
 import { sendProxy, buildCurl } from './api.js';
 import { analyzeResponse } from './analyze.js';
 import { goTab } from './util.js';
+import { toFetch, toPython, toHttpie } from './codegen.js';
 
 // --- URL helpers (shared) ----------------------------------------------
 
@@ -219,11 +220,39 @@ export function initRequest() {
     const { curl } = await buildCurl({ ...req, insecure: true });
     copy(curl);
   });
+  wireCodeModal();
 
   // request-editor subtabs
   wireSubtabs('.req-editor', 'sub', 'subpanel');
   // response subtabs
   wireSubtabs('.res-view', 'res', 'respanel');
+}
+
+function wireCodeModal() {
+  let lang = 'curl';
+  const render = async () => {
+    const req = getCurrentRequest();
+    let out = '';
+    if (lang === 'curl') out = (await buildCurl({ ...req, insecure: true })).curl;
+    else if (lang === 'fetch') out = toFetch(req);
+    else if (lang === 'python') out = toPython(req);
+    else out = toHttpie(req);
+    $('#codeOut').value = out;
+  };
+  $('#codeBtn').addEventListener('click', () => {
+    $('#codeModal').hidden = false;
+    render();
+  });
+  $('#closeCode').addEventListener('click', () => ($('#codeModal').hidden = true));
+  $('#codeCopy').addEventListener('click', () => copy($('#codeOut').value));
+  $$('#codeLangs .subtab').forEach((t) => {
+    t.addEventListener('click', () => {
+      $$('#codeLangs .subtab').forEach((x) => x.classList.remove('active'));
+      t.classList.add('active');
+      lang = t.dataset.lang;
+      render();
+    });
+  });
 }
 
 function wireSubtabs(scope, dataKey, panelKey) {

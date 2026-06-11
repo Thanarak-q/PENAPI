@@ -3,6 +3,13 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.5.0] — 2026-06-11
+
+### Added
+- **Copy as code** — `</>` button on the request line generates the current
+  request as `fetch`, Python `requests`, or HTTPie (alongside cURL) in a tabbed
+  dialog, for reproducing findings outside PenAPI.
+
 ## [1.4.0] — 2026-06-11
 
 ### Changed
