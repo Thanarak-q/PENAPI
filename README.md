@@ -1,6 +1,6 @@
 # PENAPI
 
-**Version 1.3.0** · MIT · Node ≥ 18
+**Version 1.4.0** · MIT · Node ≥ 18
 
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
@@ -50,6 +50,18 @@ node server.js                                      # auto-detect swagger.json/o
 
 Then open **http://127.0.0.1:7331**. You can also load or switch specs at
 runtime from the **Load Spec** button (URL / file / paste) — no restart needed.
+
+### Keyboard shortcuts
+
+| Key | Action |
+|---|---|
+| `Ctrl/Cmd + Enter` | Send the current request (from anywhere) |
+| `/` | Focus the endpoint filter |
+| `Alt + 1…8` | Jump to a tab |
+| `Esc` | Close any open dialog |
+
+Use **→ Fuzz** / **→ Matrix** on the request line to push the current request
+straight into the Fuzzer or Access Matrix.
 
 | Source | How |
 |---|---|

@@ -7,8 +7,17 @@ import { textToHeaders } from './util.js';
 import { getCurrentRequest } from './request.js';
 import { runMatrix } from './api.js';
 import { attachExport } from './export.js';
+import { goTab } from './util.js';
 
 let lastResults = [];
+
+// Load the current request into the matrix and switch to it (cross-tab UX).
+export function sendToMatrix() {
+  const req = getCurrentRequest({ withIdentity: false });
+  $('#matrixMethod').value = req.method;
+  $('#matrixUrl').value = req.url;
+  goTab('matrix');
+}
 
 export function initMatrix() {
   $('#matrixLoad').addEventListener('click', () => {

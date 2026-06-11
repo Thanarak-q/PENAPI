@@ -18,7 +18,17 @@ export function renderExplorer() {
 function render(filter) {
   const list = $('#endpointList');
   list.innerHTML = '';
-  if (!state.spec) return;
+  if (!state.spec) {
+    list.appendChild(
+      el('div', { class: 'empty-state' }, [
+        el('div', { class: 'empty-icon', text: '◇' }),
+        el('div', { text: 'No spec loaded' }),
+        el('div', { class: 'empty-hint', html: 'Click <b>Load Spec</b> above to point PenAPI at an OpenAPI/Swagger document.' }),
+      ])
+    );
+    $('#endpointCount').textContent = '';
+    return;
+  }
   const q = filter.trim().toLowerCase();
 
   const groups = {};

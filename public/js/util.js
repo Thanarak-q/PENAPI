@@ -82,3 +82,10 @@ export async function copy(text) {
     toast('Copy failed', true);
   }
 }
+
+// Switch to a top-level tab by name, firing its click handler so per-tab
+// render hooks run. Single source of truth for in-app navigation.
+export function goTab(name) {
+  const tab = document.querySelector(`.tab[data-tab="${name}"]`);
+  if (tab) tab.click();
+}

@@ -4,6 +4,7 @@ import { $, $$, el, statusClass, fmtBytes, prettyJson, headersToText, copy } fro
 import { state, identityHeaders, pushHistory } from './state.js';
 import { sendProxy, buildCurl } from './api.js';
 import { analyzeResponse } from './analyze.js';
+import { goTab } from './util.js';
 
 // --- URL helpers (shared) ----------------------------------------------
 
@@ -88,8 +89,7 @@ export function loadEndpoint(ep) {
     : '';
 
   renderSummary(ep);
-  $$('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === 'request'));
-  $$('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === 'request'));
+  goTab('request');
 }
 
 function renderSummary(ep) {

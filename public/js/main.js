@@ -1,12 +1,12 @@
 // Entry point: load spec, wire top bar / tabs / modals, init each tab module.
 
-import { $, $$, toast } from './util.js';
+import { $, $$, toast, goTab } from './util.js';
 import { state, save } from './state.js';
 import { fetchSpec, parseCurl } from './api.js';
 import { initExplorer, renderExplorer } from './explorer.js';
-import { initRequest, loadEndpoint } from './request.js';
-import { initFuzzer } from './fuzzer.js';
-import { initMatrix } from './matrix.js';
+import { initRequest, loadEndpoint, sendCurrent } from './request.js';
+import { initFuzzer, sendToFuzzer } from './fuzzer.js';
+import { initMatrix, sendToMatrix } from './matrix.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -30,6 +30,8 @@ async function boot() {
   wireTopbar();
   wireTabs();
   wireCurlModal();
+  wireCrossTab();
+  wireShortcuts();
 
   await loadSpec();
   populateSelect();
@@ -92,6 +94,46 @@ function wireTabs() {
       if (tab.dataset.tab === 'history') renderHistory();
       if (tab.dataset.tab === 'recon') renderRecon();
     });
+  });
+}
+
+function wireCrossTab() {
+  $('#toFuzzerBtn').addEventListener('click', sendToFuzzer);
+  $('#toMatrixBtn').addEventListener('click', sendToMatrix);
+}
+
+// Keyboard shortcuts for a faster workflow.
+function wireShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName);
+
+    // Ctrl/Cmd+Enter — send the current request from anywhere.
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      goTab('request');
+      sendCurrent();
+      return;
+    }
+    // Esc — close any open modal.
+    if (e.key === 'Escape') {
+      $$('.modal-backdrop').forEach((m) => (m.hidden = true));
+      return;
+    }
+    // "/" — focus the endpoint filter (when not already typing).
+    if (e.key === '/' && !typing) {
+      e.preventDefault();
+      $('#endpointSearch').focus();
+      return;
+    }
+    // Alt+1..8 — jump to a tab.
+    if (e.altKey && /^[1-8]$/.test(e.key)) {
+      const tabs = $$('.tab');
+      const t = tabs[Number(e.key) - 1];
+      if (t) {
+        e.preventDefault();
+        t.click();
+      }
+    }
   });
 }
 

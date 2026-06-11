@@ -55,8 +55,10 @@
         <div class="req-line">
           <select id="reqMethod" class="method-select"></select>
           <input id="reqUrl" type="text" class="url-input" placeholder="/path or full URL" spellcheck="false" />
-          <button class="btn primary" id="sendBtn">Send ▸</button>
+          <button class="btn primary" id="sendBtn" title="Send  (Ctrl/Cmd+Enter)">Send ▸</button>
           <button class="btn ghost" id="quickAttackBtn" title="Run one-click attack variants">⚡ Attacks</button>
+          <button class="btn ghost" id="toFuzzerBtn" title="Send this request to the Fuzzer">→ Fuzz</button>
+          <button class="btn ghost" id="toMatrixBtn" title="Send this request to the Access Matrix">→ Matrix</button>
           <button class="btn ghost" id="copyCurlBtn" title="Copy as cURL">cURL</button>
         </div>
         <div class="req-summary" id="reqSummary"></div>

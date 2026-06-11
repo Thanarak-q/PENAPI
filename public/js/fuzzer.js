@@ -6,6 +6,7 @@ import { getCurrentRequest, currentUrl } from './request.js';
 import { textToHeaders } from './util.js';
 import { fetchPayloadSets, startFuzz } from './api.js';
 import { attachExport } from './export.js';
+import { goTab } from './util.js';
 
 let results = [];
 let abortFn = null;
@@ -195,7 +196,12 @@ function replay(r) {
   $('#reqUrl').value = url;
   $('#reqMethod').value = template.method;
   $('#reqBody').value = (template.body || '').replace(/§[^§]*§/g, r.payload).replace(/\bFUZZ\b/g, r.payload);
-  $$('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === 'request'));
-  $$('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === 'request'));
+  goTab('request');
   toast('Loaded payload #' + r.idx + ' into Request tab');
+}
+
+// Load the current request into the fuzzer and switch to it (cross-tab UX).
+export function sendToFuzzer() {
+  loadFromRequest();
+  goTab('fuzzer');
 }

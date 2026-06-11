@@ -1,6 +1,6 @@
 // History tab: list of every sent request, replayable.
 
-import { $, $$, el, statusClass, methodClass } from './util.js';
+import { $, $$, el, statusClass, methodClass, goTab } from './util.js';
 import { state, save } from './state.js';
 import { renderResponse } from './request.js';
 import { sendProxy } from './api.js';
@@ -41,6 +41,5 @@ async function replay(h) {
   if (!h.request) return;
   const { result } = await sendProxy({ ...h.request, followRedirects: false });
   renderResponse(result);
-  $$('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === 'request'));
-  $$('.panel').forEach((p) => p.classList.toggle('active', p.dataset.panel === 'request'));
+  goTab('request');
 }

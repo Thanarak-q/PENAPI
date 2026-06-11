@@ -3,6 +3,22 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] — 2026-06-11
+
+### Changed
+- **Dark-luxury UI redesign** — warm near-black palette with a champagne-gold
+  accent, serif wordmark, layered panels with soft shadows, refined badges,
+  jewel-tone status colours, gold focus rings, and a glass top bar — kept
+  high-contrast for readability.
+
+### Added (UX)
+- **Cross-tab actions** — **→ Fuzz** / **→ Matrix** buttons push the current
+  request straight into those tabs.
+- **Keyboard shortcuts** — Ctrl/Cmd+Enter to send, `/` to focus the endpoint
+  filter, Alt+1…8 to switch tabs, Esc to close dialogs.
+- **Empty state** for the endpoint list when no spec is loaded.
+- Unified in-app navigation through a single `goTab()` helper.
+
 ## [1.3.0] — 2026-06-11
 
 ### Added
