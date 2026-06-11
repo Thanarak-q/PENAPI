@@ -3,23 +3,24 @@
    Kept high-contrast for legibility. */
 
 :root {
-  /* Titanium base — cool charcoal */
-  --bg: #0c0d10;
+  /* Titanium base — cool charcoal with a touch of blue */
+  --bg: #0a0c10;
   --bg-2: #111318;
   --bg-3: #181b21;
-  --text: #f3f4f6;
-  --text-dim: #aab1bd;
-  --muted: #717784;
+  --text: #f4f5f7;
+  --text-dim: #b2b9c6;
+  --muted: #79808d;
 
-  /* Liquid glass surfaces (translucent, used with backdrop-filter) */
-  --glass: rgba(255, 255, 255, 0.045);
-  --glass-2: rgba(255, 255, 255, 0.07);
-  --glass-strong: rgba(28, 32, 40, 0.72);
-  --hairline: rgba(255, 255, 255, 0.09);
-  --hairline-2: rgba(255, 255, 255, 0.14);
-  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.3);
+  /* Liquid glass surfaces (translucent, used with backdrop-filter).
+     Brighter than the base so the frost actually reads. */
+  --glass: rgba(255, 255, 255, 0.07);
+  --glass-2: rgba(255, 255, 255, 0.11);
+  --glass-strong: rgba(34, 39, 49, 0.78);
+  --hairline: rgba(255, 255, 255, 0.12);
+  --hairline-2: rgba(255, 255, 255, 0.2);
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 0.5px rgba(255,255,255,0.04);
+  --shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 4px 18px rgba(0, 0, 0, 0.35);
 
   /* keep legacy var names mapped so existing selectors work */
   --panel: var(--glass);
@@ -43,12 +44,12 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body {
-  /* Charcoal base with cool/warm light pools so glass has something to refract */
+  /* Charcoal base with vivid light pools so the glass has something to refract */
   background:
-    radial-gradient(1100px 620px at 78% -12%, rgba(46, 155, 255, 0.10), transparent 60%),
-    radial-gradient(900px 560px at -8% 112%, rgba(200, 123, 255, 0.07), transparent 58%),
-    radial-gradient(700px 500px at 50% 50%, rgba(255, 255, 255, 0.02), transparent 70%),
-    var(--bg);
+    radial-gradient(1200px 700px at 82% -15%, rgba(46, 155, 255, 0.22), transparent 58%),
+    radial-gradient(1000px 620px at -10% 115%, rgba(170, 120, 255, 0.16), transparent 56%),
+    radial-gradient(820px 560px at 18% 8%, rgba(80, 220, 220, 0.08), transparent 60%),
+    linear-gradient(160deg, #0d1017 0%, #0a0c10 55%, #0b0d14 100%);
   background-attachment: fixed;
   color: var(--text);
   font-family: var(--sans);
@@ -157,9 +158,15 @@ body {
 .panel { display: none; flex: 1; flex-direction: column; min-height: 0; padding: 14px; overflow: auto; }
 .panel.active { display: flex; }
 
-/* Request line */
-.req-line { display: flex; gap: 8px; align-items: stretch; }
-.req-line.small { font-size: 12px; }
+/* Request line — elevated glass bar */
+.req-line {
+  display: flex; gap: 8px; align-items: stretch;
+  padding: 8px; border-radius: 16px;
+  background: var(--glass); border: 1px solid var(--hairline);
+  backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: var(--highlight), var(--shadow-sm);
+}
+.req-line.small { font-size: 12px; padding: 6px; }
 .method-select {
   background: rgba(0,0,0,0.28); border: 1px solid var(--hairline); color: var(--text);
   border-radius: 9px; padding: 0 10px; font-family: var(--mono); font-weight: 700;
@@ -226,6 +233,7 @@ input:focus, select:focus, textarea:focus, .url-input:focus, .method-select:focu
 }
 .code.small { min-height: 70px; flex: none; }
 .code.output { margin: 0; white-space: pre-wrap; word-break: break-word; overflow: auto; }
+.code.output:empty::before { content: "Response body appears here after you Send."; color: var(--muted); font-style: italic; }
 
 .res-status { padding: 9px 11px; border-bottom: 1px solid var(--hairline); font-family: var(--mono); font-size: 12px; }
 .res-status .code-num { font-weight: 700; padding: 2px 8px; border-radius: 6px; }
@@ -308,7 +316,8 @@ tr.flagged td { background: rgba(255,92,87,0.14); }
 .count-badge:empty { display: none; }
 
 .recon-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
-.recon-card { background: var(--glass); border: 1px solid var(--hairline); border-radius: 14px; padding: 14px 16px; box-shadow: var(--highlight), var(--shadow-sm); }
+.recon-card { background: var(--glass); border: 1px solid var(--hairline); border-radius: 14px; padding: 14px 16px; box-shadow: var(--highlight), var(--shadow-sm); transition: transform 0.15s, border-color 0.15s; }
+.recon-card:hover { transform: translateY(-2px); border-color: var(--hairline-2); }
 .recon-card.wide { grid-column: 1 / -1; }
 .recon-val { font-size: 24px; font-weight: 700; font-family: var(--mono); }
 .recon-val.rv-vuln { color: var(--red); }
