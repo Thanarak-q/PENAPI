@@ -3,6 +3,18 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.8.0] — 2026-06-11
+
+### Added (find/navigation)
+- **Command palette** (Ctrl/Cmd+K) — fuzzy-jump to any endpoint or run an action
+  (send, → Fuzz/Matrix, attacks, load spec, switch tab) with keyboard nav.
+- **Find in response** — a search box over the response body with match
+  highlighting and a match count.
+- **Result-table filters** — text filters added to the Attack Surface and Access
+  Matrix tables (Fuzzer/Sweep already had them).
+- **Pinned endpoints** — ★ any endpoint to keep it in a Pinned group at the top
+  of the sidebar (persisted in localStorage).
+
 ## [1.7.0] — 2026-06-11
 
 ### Added (UX)

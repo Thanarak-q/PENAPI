@@ -14,6 +14,7 @@ import { initSweep, renderIdentityChecks } from './sweep.js';
 import { initJwt } from './jwt.js';
 import { initSpecLoader, setSpecSourceLabel } from './spec.js';
 import { initRecon, renderRecon } from './recon.js';
+import { initPalette, openPalette } from './palette.js';
 
 async function boot() {
   initRequest();
@@ -26,6 +27,7 @@ async function boot() {
   initJwt();
   initIdentities(() => renderIdentityChecks());
   initRecon();
+  initPalette();
   initSpecLoader(applySpec);
   wireTopbar();
   wireTabs();
@@ -112,6 +114,12 @@ function wireShortcuts() {
   document.addEventListener('keydown', (e) => {
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName);
 
+    // Ctrl/Cmd+K — command palette.
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      openPalette();
+      return;
+    }
     // Ctrl/Cmd+Enter — send the current request from anywhere.
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();

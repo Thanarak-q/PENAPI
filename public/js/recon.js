@@ -10,6 +10,7 @@ const MUTATING = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
 export function initRecon() {
   $('#reconFilter')?.addEventListener('change', renderRecon);
+  $('#reconTextFilter')?.addEventListener('input', renderRecon);
 }
 
 export function renderRecon() {
@@ -66,7 +67,9 @@ function renderCards(cards) {
 function renderList(list) {
   const tbody = $('#reconTable tbody');
   tbody.innerHTML = '';
+  const q = ($('#reconTextFilter')?.value || '').toLowerCase();
   for (const e of list) {
+    if (q && !e.path.toLowerCase().includes(q)) continue;
     const flags = [];
     if (!(e.security && e.security.length)) flags.push('unauth');
     if (MUTATING.includes(e.method) && !(e.security && e.security.length)) flags.push('danger');

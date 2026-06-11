@@ -13,6 +13,7 @@ const defaults = {
     { name: 'Unauth', headers: 'Authorization: null' },
   ],
   history: [],
+  pinned: [], // endpoint ids the user has bookmarked
 };
 
 export const state = {
@@ -32,11 +33,21 @@ function load() {
 }
 
 export function save() {
-  const { baseUrl, activeIdentity, identities, history } = state;
+  const { baseUrl, activeIdentity, identities, history, pinned } = state;
   localStorage.setItem(
     LS_KEY,
-    JSON.stringify({ baseUrl, activeIdentity, identities, history: history.slice(0, 200) })
+    JSON.stringify({ baseUrl, activeIdentity, identities, history: history.slice(0, 200), pinned })
   );
+}
+
+export function isPinned(id) {
+  return state.pinned.includes(id);
+}
+
+export function togglePin(id) {
+  if (isPinned(id)) state.pinned = state.pinned.filter((p) => p !== id);
+  else state.pinned = [...state.pinned, id];
+  save();
 }
 
 // Resolve the header set for the active identity (parsed). A value of the

@@ -107,6 +107,11 @@
               <button class="subtab" data-res="analysis">Analysis <span id="analysisCount" class="count-badge"></span></button>
             </div>
             <div class="subpanel active" data-respanel="body">
+              <div class="resp-find">
+                <span class="search-icon">⌕</span>
+                <input id="resFind" type="text" placeholder="Find in response…" spellcheck="false" />
+                <span class="resp-find-count" id="resFindCount"></span>
+              </div>
               <pre id="resBody" class="code output"></pre>
             </div>
             <div class="subpanel" data-respanel="headers">
@@ -208,6 +213,7 @@
             <button class="btn ghost tiny" id="matrixLoad">⟵ Load current request</button>
             <button class="btn primary" id="matrixRun">Run matrix</button>
           </div>
+          <input id="matrixFilter" type="search" placeholder="filter identity / body…" />
         </div>
         <div class="table-wrap">
           <table class="results" id="matrixTable">
@@ -236,6 +242,7 @@
               <option value="deprecated">Deprecated</option>
             </select>
           </label>
+          <input id="reconTextFilter" type="search" placeholder="filter path…" />
         </div>
         <div class="table-wrap">
           <table class="results" id="reconTable">
@@ -415,6 +422,15 @@
         <button class="btn primary" id="jwtCopy">Copy rebuilt token</button>
         <button class="btn ghost" id="closeJwt">Close</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Command palette -->
+  <div class="palette-backdrop" id="paletteBackdrop" hidden>
+    <div class="palette">
+      <input id="paletteInput" type="text" placeholder="Jump to endpoint or run a command…   (Esc to close)" spellcheck="false" autocomplete="off" />
+      <div class="palette-list" id="paletteList"></div>
+      <div class="palette-foot"><kbd>↑</kbd><kbd>↓</kbd> navigate · <kbd>↵</kbd> select · <kbd>Esc</kbd> close</div>
     </div>
   </div>
 

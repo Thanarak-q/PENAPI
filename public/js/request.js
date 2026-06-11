@@ -166,9 +166,44 @@ export function renderResponse(result) {
     `<span class="pill">${fmtBytes(result.size)}${result.truncated ? ' (truncated)' : ''}</span>` +
     (result.redirected ? `<span class="pill">redirected → ${result.finalUrl}</span>` : '');
   const ct = result.headers['content-type'] || '';
-  $('#resBody').textContent = ct.includes('json') ? prettyJson(result.body) : result.body;
+  lastBodyText = ct.includes('json') ? prettyJson(result.body) : result.body;
+  $('#resBody').textContent = lastBodyText;
   $('#resHeaders').textContent = headersToText(result.headers);
   renderAnalysis(analyzeResponse(result));
+  applyResponseFind();
+}
+
+// --- Response find (highlight matches in the body) ----------------------
+
+let lastBodyText = '';
+
+function escapeHtml(s) {
+  return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+}
+
+function applyResponseFind() {
+  const q = $('#resFind').value;
+  const countEl = $('#resFindCount');
+  if (!q) {
+    $('#resBody').textContent = lastBodyText;
+    countEl.textContent = '';
+    return;
+  }
+  const lower = lastBodyText.toLowerCase();
+  const needle = q.toLowerCase();
+  let count = 0, idx = 0, html = '';
+  while (true) {
+    const found = lower.indexOf(needle, idx);
+    if (found === -1) { html += escapeHtml(lastBodyText.slice(idx)); break; }
+    html += escapeHtml(lastBodyText.slice(idx, found));
+    html += '<mark>' + escapeHtml(lastBodyText.slice(found, found + q.length)) + '</mark>';
+    idx = found + q.length;
+    count++;
+  }
+  $('#resBody').innerHTML = html;
+  countEl.textContent = count ? `${count} match${count > 1 ? 'es' : ''}` : 'no matches';
+  const first = $('#resBody mark');
+  if (first) first.scrollIntoView({ block: 'center' });
 }
 
 const SEV_ORDER = { high: 0, medium: 1, low: 2, info: 3 };
@@ -221,6 +256,7 @@ export function initRequest() {
     copy(curl);
   });
   wireCodeModal();
+  $('#resFind').addEventListener('input', applyResponseFind);
 
   // request-editor subtabs
   wireSubtabs('.req-editor', 'sub', 'subpanel');

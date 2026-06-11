@@ -1,7 +1,7 @@
 // Sidebar: endpoint list grouped by tag, with filtering.
 
 import { $, el, methodClass } from './util.js';
-import { state } from './state.js';
+import { state, isPinned, togglePin } from './state.js';
 
 let onSelect = () => {};
 let collapsed = new Set();
@@ -43,6 +43,20 @@ function render(filter) {
   $('#endpointCount').textContent =
     `${shown} / ${state.spec.endpoints.length} operations · ${state.spec.tags.length} tags`;
 
+  // Pinned group at the top (respects the active filter).
+  const pinnedEps = state.spec.endpoints.filter(
+    (ep) => isPinned(ep.id) && (!q || matches(ep, q))
+  );
+  if (pinnedEps.length) {
+    list.appendChild(
+      el('div', { class: 'tag-head pinned-head' }, [
+        el('span', { text: '★ PINNED' }),
+        el('span', { class: 'count', text: String(pinnedEps.length) }),
+      ])
+    );
+    for (const ep of pinnedEps) list.appendChild(makeRow(ep, filter));
+  }
+
   for (const tag of Object.keys(groups).sort()) {
     const eps = groups[tag];
     const isCollapsed = collapsed.has(tag) && !q;
@@ -52,20 +66,32 @@ function render(filter) {
     ]);
     list.appendChild(head);
     if (isCollapsed) continue;
-    for (const ep of eps) {
-      const row = el('div', {
-        class: 'endpoint' + (state.current && state.current.id === ep.id ? ' active' : ''),
-        onclick: () => onSelect(ep),
-      }, [
-        el('span', { class: 'method-badge ' + methodClass(ep.method), text: ep.method }),
-        el('div', { style: 'overflow:hidden' }, [
-          el('div', { class: 'path', text: ep.path, title: ep.path }),
-          ep.summary ? el('div', { class: 'summ', text: ep.summary }) : null,
-        ]),
-      ]);
-      list.appendChild(row);
-    }
+    for (const ep of eps) list.appendChild(makeRow(ep, filter));
   }
+}
+
+function makeRow(ep, filter) {
+  const pinned = isPinned(ep.id);
+  return el('div', {
+    class: 'endpoint' + (state.current && state.current.id === ep.id ? ' active' : ''),
+    onclick: () => onSelect(ep),
+  }, [
+    el('span', { class: 'method-badge ' + methodClass(ep.method), text: ep.method }),
+    el('div', { style: 'overflow:hidden;flex:1' }, [
+      el('div', { class: 'path', text: ep.path, title: ep.path }),
+      ep.summary ? el('div', { class: 'summ', text: ep.summary }) : null,
+    ]),
+    el('span', {
+      class: 'pin' + (pinned ? ' on' : ''),
+      text: pinned ? '★' : '☆',
+      title: pinned ? 'Unpin' : 'Pin to top',
+      onclick: (e) => {
+        e.stopPropagation();
+        togglePin(ep.id);
+        render(filter);
+      },
+    }),
+  ]);
 }
 
 function matches(ep, q) {

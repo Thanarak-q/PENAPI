@@ -26,6 +26,7 @@ export function initMatrix() {
     $('#matrixUrl').value = req.url;
   });
   $('#matrixRun').addEventListener('click', run);
+  $('#matrixFilter').addEventListener('input', () => renderMatrix(lastResults));
 
   attachExport(document.querySelector('[data-panel="matrix"] .matrix-head'), () => ({
     name: 'penapi-matrix',
@@ -68,7 +69,9 @@ const LOW_PRIV = /unauth|guest|anon|user|public|none|other/i;
 function renderMatrix(results) {
   const tbody = $('#matrixTable tbody');
   tbody.innerHTML = '';
-  for (const r of results) {
+  const q = ($('#matrixFilter')?.value || '').toLowerCase();
+  for (const r of results || []) {
+    if (q && !((r.identity || '') + ' ' + (r.bodyPreview || '')).toLowerCase().includes(q)) continue;
     const reachable = r.status != null && r.status >= 200 && r.status < 300;
     const lowPriv = LOW_PRIV.test(r.identity);
     const vuln = reachable && lowPriv;

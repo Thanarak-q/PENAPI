@@ -1,6 +1,6 @@
 # PENAPI
 
-**Version 1.7.0** · MIT · Node ≥ 18
+**Version 1.8.0** · MIT · Node ≥ 18
 
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
@@ -55,6 +55,7 @@ runtime from the **Load Spec** button (URL / file / paste) — no restart needed
 
 | Key | Action |
 |---|---|
+| `Ctrl/Cmd + K` | Open the command palette (jump to endpoint / action) |
 | `Ctrl/Cmd + Enter` | Send the current request (from anywhere) |
 | `/` | Focus the endpoint filter |
 | `Alt + 1…8` | Jump to a tab |
@@ -89,6 +90,7 @@ what the UI renders.
 | **cURL import / Copy as code** | Paste a `curl` from Burp/DevTools to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
+| **Find & navigate** | Command palette (Ctrl/Cmd+K) to jump to any endpoint or action; find-in-response with highlighting; filterable result tables; ★ pinned endpoints. |
 | **History** | Every sent request, replayable, persisted in `localStorage`. |
 
 ## Examples
