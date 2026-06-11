@@ -3,6 +3,15 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — 2026-06-11
+
+### Added
+- **Response Analysis** — passive per-response checks: missing security headers
+  (HSTS, CSP, X-Content-Type-Options, X-Frame-Options/frame-ancestors,
+  Referrer-Policy), permissive CORS (`*`) and credentialed origin reflection
+  (high), tech-disclosure banners, and weak cookie flags (HttpOnly/Secure/
+  SameSite). Surfaced in an **Analysis** response subtab with a severity badge.
+
 ## [1.1.0] — 2026-06-11
 
 ### Added

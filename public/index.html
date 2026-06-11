@@ -89,12 +89,16 @@
             <div class="subtabs">
               <button class="subtab active" data-res="body">Body</button>
               <button class="subtab" data-res="headers">Resp. Headers</button>
+              <button class="subtab" data-res="analysis">Analysis <span id="analysisCount" class="count-badge"></span></button>
             </div>
             <div class="subpanel active" data-respanel="body">
               <pre id="resBody" class="code output"></pre>
             </div>
             <div class="subpanel" data-respanel="headers">
               <pre id="resHeaders" class="code output"></pre>
+            </div>
+            <div class="subpanel" data-respanel="analysis">
+              <div id="resAnalysis" class="findings"></div>
             </div>
           </div>
         </div>

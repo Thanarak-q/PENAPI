@@ -3,6 +3,7 @@
 import { $, $$, el, statusClass, fmtBytes, prettyJson, headersToText, copy } from './util.js';
 import { state, identityHeaders, pushHistory } from './state.js';
 import { sendProxy, buildCurl } from './api.js';
+import { analyzeResponse } from './analyze.js';
 
 // --- URL helpers (shared) ----------------------------------------------
 
@@ -155,6 +156,7 @@ export function renderResponse(result) {
     $('#resStatus').innerHTML = `<span class="code-num s-5xx">ERR</span> <span class="pill">${result.error}</span>`;
     $('#resBody').textContent = '';
     $('#resHeaders').textContent = '';
+    renderAnalysis([]);
     return;
   }
   $('#resStatus').innerHTML =
@@ -165,6 +167,33 @@ export function renderResponse(result) {
   const ct = result.headers['content-type'] || '';
   $('#resBody').textContent = ct.includes('json') ? prettyJson(result.body) : result.body;
   $('#resHeaders').textContent = headersToText(result.headers);
+  renderAnalysis(analyzeResponse(result));
+}
+
+const SEV_ORDER = { high: 0, medium: 1, low: 2, info: 3 };
+
+function renderAnalysis(findings) {
+  const host = $('#resAnalysis');
+  const badge = $('#analysisCount');
+  host.innerHTML = '';
+  if (!findings.length) {
+    badge.textContent = '';
+    host.innerHTML = '<span class="muted">No passive findings.</span>';
+    return;
+  }
+  findings.sort((a, b) => SEV_ORDER[a.sev] - SEV_ORDER[b.sev]);
+  const high = findings.filter((f) => f.sev === 'high' || f.sev === 'medium').length;
+  badge.textContent = String(findings.length);
+  badge.classList.toggle('hot', high > 0);
+  for (const f of findings) {
+    host.appendChild(
+      el('div', { class: 'finding f-' + f.sev }, [
+        el('span', { class: 'sev-tag sev-' + f.sev, text: f.sev }),
+        el('span', { class: 'finding-title', text: f.title }),
+        el('span', { class: 'finding-note', text: f.note }),
+      ])
+    );
+  }
 }
 
 // --- Wiring -------------------------------------------------------------

@@ -239,6 +239,22 @@ tr.flagged td { background: rgba(248,81,73,0.12); }
 
 .muted { color: var(--muted); }
 
+.findings { display: flex; flex-direction: column; gap: 6px; }
+.finding { display: flex; align-items: baseline; gap: 8px; padding: 6px 8px; border-radius: 5px; background: var(--bg-3); border-left: 3px solid var(--border-2); font-size: 11.5px; }
+.finding.f-high { border-left-color: var(--red); }
+.finding.f-medium { border-left-color: var(--yellow); }
+.finding.f-low { border-left-color: var(--accent-2); }
+.finding-title { color: var(--text); font-weight: 600; }
+.finding-note { color: var(--muted); font-family: var(--mono); font-size: 10.5px; }
+.sev-tag { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; flex-shrink: 0; }
+.sev-high { background: #3a1515; color: var(--red); }
+.sev-medium { background: #2c2410; color: var(--yellow); }
+.sev-low { background: #21304d; color: var(--accent-2); }
+.sev-info { background: #232a33; color: var(--text-dim); }
+.count-badge { font-size: 9px; background: var(--border-2); color: var(--text); padding: 0 5px; border-radius: 8px; margin-left: 2px; }
+.count-badge.hot { background: var(--red); color: #fff; }
+.count-badge:empty { display: none; }
+
 .recon-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
 .recon-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
 .recon-card.wide { grid-column: 1 / -1; }

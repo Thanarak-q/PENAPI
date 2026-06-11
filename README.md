@@ -1,6 +1,6 @@
 # PENAPI
 
-**Version 1.1.0** · MIT · Node ≥ 18
+**Version 1.2.0** · MIT · Node ≥ 18
 
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
@@ -75,6 +75,7 @@ what the UI renders.
 | **Auth Sweep** | Fires every spec endpoint as each identity to map authorization coverage. Safe idempotent methods by default; write verbs require a confirm. |
 | **JWT Inspector** | Decode/edit a token client-side; shows alg, `exp`, claims; forge an `alg:none` / unsigned token to test signature-verification flaws. |
 | **cURL import/export** | Paste a `curl` from Burp/DevTools to populate the Request tab; copy any request back out as `curl`. |
+| **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **History** | Every sent request, replayable, persisted in `localStorage`. |
 
 ## Examples
