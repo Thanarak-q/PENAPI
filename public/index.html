@@ -44,6 +44,7 @@
       <nav class="tabs">
         <button class="tab active" data-tab="request">Request</button>
         <button class="tab" data-tab="fuzzer">Fuzzer / Brute</button>
+        <button class="tab" data-tab="recon">Attack Surface</button>
         <button class="tab" data-tab="matrix">Access Matrix</button>
         <button class="tab" data-tab="sweep">Auth Sweep</button>
         <button class="tab" data-tab="history">History</button>
@@ -196,6 +197,30 @@
                 <th>Identity</th><th>Status</th><th>Length</th><th>Time</th><th>Flag</th><th>Body preview</th>
               </tr>
             </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- RECON / ATTACK SURFACE TAB -->
+      <section class="panel" data-panel="recon">
+        <p class="hint">Static analysis of the loaded spec to prioritize targets. <strong>Mutating + unauth</strong> operations and <strong>IDOR candidates</strong> are the usual first stops. Click → to open one in the Request tab.</p>
+        <div class="recon-cards" id="reconCards"></div>
+        <div class="results-toolbar">
+          <label>Show
+            <select id="reconFilter">
+              <option value="auto">Highest-risk first</option>
+              <option value="dangerous">Mutating + unauth</option>
+              <option value="unauth">No security defined</option>
+              <option value="idor">IDOR candidates</option>
+              <option value="body">Has request body</option>
+              <option value="deprecated">Deprecated</option>
+            </select>
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table class="results" id="reconTable">
+            <thead><tr><th>Method</th><th>Path</th><th>Sec</th><th>Flags</th><th></th></tr></thead>
             <tbody></tbody>
           </table>
         </div>

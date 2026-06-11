@@ -1,6 +1,6 @@
 # PENAPI
 
-**Version 1.0.0** · MIT · Node ≥ 18
+**Version 1.1.0** · MIT · Node ≥ 18
 
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
@@ -66,6 +66,7 @@ what the UI renders.
 | Feature | What it's for |
 |---|---|
 | **Endpoint explorer** | Operations grouped by tag, with method, summary, generated example body, and a flag when an operation has **no security defined**. |
+| **Attack Surface / Recon** | Static analysis of the spec: counts of unauthenticated ops, mutating+unauth ops, IDOR candidates (path ids), mass-assignment candidates (request bodies), deprecated ops, and a sortable, prioritized target list. |
 | **Request / Repeater** | Auto-fills path/query/header params and a schema-derived JSON body. Raw `http`/`https` client gives full header control (including `Host`, `Content-Length`). |
 | **Identities** | Named header sets (Admin / User / Unauth …). Switch the active identity to send every request as that role. Set a header value to `null` to *strip* it. |
 | **Fuzzer / Brute** | Mark injection points with `§§` (wrap a value: `§admin§`) or the keyword `FUZZ`. Built-in payload sets (SQLi, XSS, traversal, cmdi, SSRF, NoSQLi, LFI, usernames, passwords, auth-bypass, host-header), a numeric range for IDOR enumeration, and custom wordlists. Concurrency + delay, live streaming, sortable results, anomaly highlighting. |

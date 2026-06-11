@@ -3,6 +3,14 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] — 2026-06-11
+
+### Added
+- **Attack Surface / Recon tab** — static spec analysis: counts of unauthenticated,
+  mutating+unauth, IDOR-candidate, mass-assignment-candidate, and deprecated
+  operations, plus a prioritized target list that opens straight into the Request tab.
+- **CLI** `--version` / `-v`, `update` self-update command, version shown in UI header and banner.
+
 ## [1.0.0] — 2026-06-11
 
 Initial release.

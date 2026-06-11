@@ -13,6 +13,7 @@ import { initAttacks } from './attacks.js';
 import { initSweep, renderIdentityChecks } from './sweep.js';
 import { initJwt } from './jwt.js';
 import { initSpecLoader, setSpecSourceLabel } from './spec.js';
+import { initRecon, renderRecon } from './recon.js';
 
 async function boot() {
   initRequest();
@@ -24,6 +25,7 @@ async function boot() {
   initSweep();
   initJwt();
   initIdentities(() => renderIdentityChecks());
+  initRecon();
   initSpecLoader(applySpec);
   wireTopbar();
   wireTabs();
@@ -88,6 +90,7 @@ function wireTabs() {
         p.classList.toggle('active', p.dataset.panel === tab.dataset.tab)
       );
       if (tab.dataset.tab === 'history') renderHistory();
+      if (tab.dataset.tab === 'recon') renderRecon();
     });
   });
 }
