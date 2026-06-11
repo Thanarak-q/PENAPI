@@ -1,0 +1,16 @@
+{
+  "name": "penapi",
+  "version": "1.0.0",
+  "description": "Pentest-oriented API workbench — loads an OpenAPI/Swagger spec and adds offensive testing tooling (repeater, fuzzer/brute-force, access-control matrix, cURL import).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "bin": {
+    "penapi": "server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

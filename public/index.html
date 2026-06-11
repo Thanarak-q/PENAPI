@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PenAPI — Pentest API Workbench</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">▰</span>
+      <span class="brand-name">PenAPI</span>
+      <span class="brand-sub" id="specTitle">loading spec…</span>
+    </div>
+    <div class="topbar-controls">
+      <label class="field">
+        <span>Target base</span>
+        <input id="baseUrl" type="text" placeholder="https://host" spellcheck="false" />
+      </label>
+      <label class="field">
+        <span>Identity</span>
+        <select id="identitySelect"></select>
+      </label>
+      <button class="btn ghost" id="manageIdentities">Identities</button>
+      <button class="btn ghost" id="loadSpecBtn">Load Spec</button>
+      <button class="btn ghost" id="importCurlBtn">Import cURL</button>
+      <button class="btn ghost" id="jwtBtn">JWT</button>
+      <span class="status-dot" id="connDot" title="server"></span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <input id="endpointSearch" type="search" placeholder="Filter endpoints…" spellcheck="false" />
+        <div class="meta" id="endpointCount"></div>
+      </div>
+      <div class="endpoint-list" id="endpointList"></div>
+    </aside>
+
+    <main class="main">
+      <nav class="tabs">
+        <button class="tab active" data-tab="request">Request</button>
+        <button class="tab" data-tab="fuzzer">Fuzzer / Brute</button>
+        <button class="tab" data-tab="matrix">Access Matrix</button>
+        <button class="tab" data-tab="sweep">Auth Sweep</button>
+        <button class="tab" data-tab="history">History</button>
+      </nav>
+
+      <!-- REQUEST TAB -->
+      <section class="panel active" data-panel="request">
+        <div class="req-line">
+          <select id="reqMethod" class="method-select"></select>
+          <input id="reqUrl" type="text" class="url-input" placeholder="/path or full URL" spellcheck="false" />
+          <button class="btn primary" id="sendBtn">Send ▸</button>
+          <button class="btn ghost" id="quickAttackBtn" title="Run one-click attack variants">⚡ Attacks</button>
+          <button class="btn ghost" id="copyCurlBtn" title="Copy as cURL">cURL</button>
+        </div>
+        <div class="req-summary" id="reqSummary"></div>
+
+        <div class="split">
+          <div class="req-editor">
+            <div class="subtabs">
+              <button class="subtab active" data-sub="headers">Headers</button>
+              <button class="subtab" data-sub="params">Params</button>
+              <button class="subtab" data-sub="body">Body</button>
+            </div>
+            <div class="subpanel active" data-subpanel="headers">
+              <div id="headersTable" class="kv-table"></div>
+              <button class="btn tiny" id="addHeader">+ header</button>
+            </div>
+            <div class="subpanel" data-subpanel="params">
+              <div id="paramsTable" class="kv-table"></div>
+              <button class="btn tiny" id="addParam">+ query param</button>
+            </div>
+            <div class="subpanel" data-subpanel="body">
+              <textarea id="reqBody" class="code" spellcheck="false" placeholder="request body"></textarea>
+              <button class="btn tiny" id="prettyBody">Prettify JSON</button>
+            </div>
+          </div>
+
+          <div class="res-view">
+            <div class="res-status" id="resStatus">
+              <span class="muted">No response yet. Pick an endpoint and Send.</span>
+            </div>
+            <div class="subtabs">
+              <button class="subtab active" data-res="body">Body</button>
+              <button class="subtab" data-res="headers">Resp. Headers</button>
+            </div>
+            <div class="subpanel active" data-respanel="body">
+              <pre id="resBody" class="code output"></pre>
+            </div>
+            <div class="subpanel" data-respanel="headers">
+              <pre id="resHeaders" class="code output"></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FUZZER TAB -->
+      <section class="panel" data-panel="fuzzer">
+        <p class="hint">
+          Mark injection points in the URL, headers, or body with
+          <code>§§</code> (wrap a value like <code>§admin§</code>) or the bare
+          keyword <code>FUZZ</code>. Send the current request here from the
+          Request tab, or edit below.
+        </p>
+        <div class="fuzz-grid">
+          <div class="fuzz-template">
+            <label class="block">Method + URL
+              <input id="fuzzUrl" type="text" class="url-input" spellcheck="false" />
+            </label>
+            <label class="block">Headers (one per line, <code>Name: value</code>)
+              <textarea id="fuzzHeaders" class="code small" spellcheck="false"></textarea>
+            </label>
+            <label class="block">Body
+              <textarea id="fuzzBody" class="code small" spellcheck="false"></textarea>
+            </label>
+            <button class="btn ghost tiny" id="loadFromRequest">⟵ Load current request</button>
+          </div>
+
+          <div class="fuzz-config">
+            <label class="block">Payload set
+              <select id="payloadSet"></select>
+            </label>
+            <div class="range-row">
+              <label class="block">ID range (IDOR)
+                <span class="range-inputs">
+                  <input id="rangeStart" type="number" placeholder="start" />
+                  <input id="rangeEnd" type="number" placeholder="end" />
+                  <input id="rangeStep" type="number" placeholder="step" value="1" />
+                </span>
+              </label>
+            </div>
+            <label class="block">Custom payloads (one per line)
+              <textarea id="customPayloads" class="code small" spellcheck="false"></textarea>
+            </label>
+            <div class="opts-row">
+              <label>Concurrency <input id="fuzzConc" type="number" value="10" min="1" max="50" /></label>
+              <label>Delay ms <input id="fuzzDelay" type="number" value="0" min="0" /></label>
+              <label class="check"><input id="fuzzRedirects" type="checkbox" /> follow redirects</label>
+            </div>
+            <div class="fuzz-actions">
+              <button class="btn primary" id="fuzzStart">Start attack</button>
+              <button class="btn danger" id="fuzzStop" disabled>Stop</button>
+              <span class="fuzz-progress" id="fuzzProgress"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-toolbar">
+          <input id="fuzzFilter" type="search" placeholder="filter payloads…" />
+          <label class="check"><input id="anomalyOnly" type="checkbox" /> anomalies only</label>
+          <span class="meta" id="fuzzBaseline"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="results" id="fuzzTable">
+            <thead>
+              <tr>
+                <th data-sort="idx">#</th>
+                <th data-sort="payload">Payload</th>
+                <th data-sort="status">Status</th>
+                <th data-sort="size">Length</th>
+                <th data-sort="timeMs">Time</th>
+                <th>Location / Error</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MATRIX TAB -->
+      <section class="panel" data-panel="matrix">
+        <p class="hint">
+          Replay the current request as every identity to surface broken
+          object/function-level authorization (BOLA / BFLA). A low-privilege or
+          unauthenticated identity returning <code>2xx</code> on a privileged
+          route is flagged.
+        </p>
+        <div class="matrix-head">
+          <div class="req-line small">
+            <select id="matrixMethod" class="method-select"></select>
+            <input id="matrixUrl" type="text" class="url-input" spellcheck="false" />
+            <button class="btn ghost tiny" id="matrixLoad">⟵ Load current request</button>
+            <button class="btn primary" id="matrixRun">Run matrix</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="results" id="matrixTable">
+            <thead>
+              <tr>
+                <th>Identity</th><th>Status</th><th>Length</th><th>Time</th><th>Flag</th><th>Body preview</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SWEEP TAB -->
+      <section class="panel" data-panel="sweep">
+        <p class="hint">
+          Fires <strong>every endpoint in the spec</strong> as each selected
+          identity to map authorization coverage. Defaults to safe, idempotent
+          methods only — tick others knowingly, they may mutate data. Path
+          params are filled with their example value or a placeholder.
+        </p>
+        <div class="sweep-config">
+          <div class="opts-row">
+            <span class="meta">Methods:</span>
+            <label class="check"><input type="checkbox" class="sweepMethod" value="GET" checked> GET</label>
+            <label class="check"><input type="checkbox" class="sweepMethod" value="HEAD"> HEAD</label>
+            <label class="check"><input type="checkbox" class="sweepMethod" value="POST"> POST ⚠</label>
+            <label class="check"><input type="checkbox" class="sweepMethod" value="PUT"> PUT ⚠</label>
+            <label class="check"><input type="checkbox" class="sweepMethod" value="PATCH"> PATCH ⚠</label>
+            <label class="check"><input type="checkbox" class="sweepMethod" value="DELETE"> DELETE ⚠</label>
+          </div>
+          <div class="opts-row">
+            <span class="meta">Identities:</span>
+            <span id="sweepIdentities"></span>
+            <label>placeholder <input id="sweepPlaceholder" type="text" value="1" style="width:60px"></label>
+            <label>concurrency <input id="sweepConc" type="number" value="8" min="1" max="30"></label>
+          </div>
+          <div class="fuzz-actions">
+            <button class="btn primary" id="sweepStart">Start sweep</button>
+            <button class="btn danger" id="sweepStop" disabled>Stop</button>
+            <span class="fuzz-progress" id="sweepProgress"></span>
+          </div>
+        </div>
+        <div class="results-toolbar">
+          <input id="sweepFilter" type="search" placeholder="filter path…" />
+          <label class="check"><input id="sweepFlaggedOnly" type="checkbox" /> flagged only</label>
+          <span class="meta">Flags an endpoint when a low-priv/unauth identity gets 2xx.</span>
+        </div>
+        <div class="table-wrap">
+          <table class="results" id="sweepTable">
+            <thead><tr id="sweepHead"></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- HISTORY TAB -->
+      <section class="panel" data-panel="history">
+        <div class="results-toolbar">
+          <button class="btn ghost tiny" id="clearHistory">Clear history</button>
+          <span class="meta" id="historyCount"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="results" id="historyTable">
+            <thead>
+              <tr><th>Time</th><th>Method</th><th>URL</th><th>Status</th><th>Len</th><th>ms</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Identity manager modal -->
+  <div class="modal-backdrop" id="identityModal" hidden>
+    <div class="modal">
+      <h2>Identities <span class="muted">— header sets for access-control testing</span></h2>
+      <p class="hint">Each identity is a set of headers merged onto every request when active or run in the matrix. Set a value to <code>null</code> to strip a header (e.g. remove auth for an unauthenticated identity).</p>
+      <div id="identityEditor"></div>
+      <button class="btn ghost tiny" id="addIdentity">+ identity</button>
+      <div class="modal-actions">
+        <button class="btn primary" id="saveIdentities">Save</button>
+        <button class="btn ghost" id="closeIdentities">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spec loader modal -->
+  <div class="modal-backdrop" id="specModal" hidden>
+    <div class="modal">
+      <h2>Load API Spec <span class="muted">— OpenAPI / Swagger JSON</span></h2>
+      <p class="hint">Point PenAPI at any spec: pick a local file, fetch from a URL (e.g. <code>/v3/api-docs</code>, <code>/swagger.json</code>), or paste the JSON. The current spec source is <code id="specSourceLabel">—</code>.</p>
+      <label class="block">From URL (fetched server-side, no CORS)
+        <span style="display:flex;gap:8px">
+          <input id="specUrl" type="text" class="url-input" placeholder="https://target/swagger.json" spellcheck="false" />
+          <button class="btn primary" id="specUrlLoad">Fetch</button>
+        </span>
+      </label>
+      <label class="block">From file
+        <input id="specFile" type="file" accept=".json,application/json" />
+      </label>
+      <label class="block">Or paste JSON
+        <textarea id="specPaste" class="code" spellcheck="false" placeholder='{ "openapi": "3.0.0", ... }'></textarea>
+      </label>
+      <div class="modal-actions">
+        <button class="btn primary" id="specPasteLoad">Load pasted JSON</button>
+        <button class="btn ghost" id="closeSpec">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- cURL import modal -->
+  <div class="modal-backdrop" id="curlModal" hidden>
+    <div class="modal">
+      <h2>Import cURL</h2>
+      <p class="hint">Paste a <code>curl</code> command (e.g. copied from Burp or DevTools). It will populate the Request tab.</p>
+      <textarea id="curlInput" class="code" spellcheck="false" placeholder="curl 'https://...' -H '...' --data-raw '...'"></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="doImportCurl">Import</button>
+        <button class="btn ghost" id="closeCurl">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick attacks modal -->
+  <div class="modal-backdrop" id="attackModal" hidden>
+    <div class="modal">
+      <h2>Quick Attacks <span class="muted">— variants of the current request</span></h2>
+      <p class="hint">Each row is the same request with one mutation applied. A variant whose status matches the baseline (especially <code>2xx</code> under <em>no auth</em> / tampering) is flagged as a likely bypass.</p>
+      <div class="table-wrap" style="max-height:50vh">
+        <table class="results" id="attackTable">
+          <thead><tr><th>Variant</th><th>What</th><th>Status</th><th>Length</th><th>Time</th><th>Flag</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeAttacks">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JWT inspector modal -->
+  <div class="modal-backdrop" id="jwtModal" hidden>
+    <div class="modal">
+      <h2>JWT Inspector <span class="muted">— decode &amp; tamper</span></h2>
+      <p class="hint">Decodes a JWT locally (nothing is sent anywhere). Edit the payload and rebuild an unsigned / <code>alg:none</code> token to test signature-verification flaws.</p>
+      <label class="block">Token
+        <textarea id="jwtInput" class="code small" spellcheck="false" placeholder="eyJ...header.eyJ...payload.signature"></textarea>
+      </label>
+      <button class="btn ghost tiny" id="jwtLoadActive">⟵ Load active identity's bearer</button>
+      <div class="jwt-cols">
+        <label class="block">Header
+          <textarea id="jwtHeader" class="code small" spellcheck="false"></textarea>
+        </label>
+        <label class="block">Payload (editable)
+          <textarea id="jwtPayload" class="code small" spellcheck="false"></textarea>
+        </label>
+      </div>
+      <div class="jwt-meta" id="jwtMeta"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="jwtForgeNone">Forge alg:none token</button>
+        <button class="btn primary" id="jwtCopy">Copy rebuilt token</button>
+        <button class="btn ghost" id="closeJwt">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
