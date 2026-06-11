@@ -4,6 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
+const { execFileSync } = require('child_process');
 
 const { parseSpec } = require('./lib/specParser');
 const { sendRequest } = require('./lib/httpClient');
@@ -11,7 +12,27 @@ const { parseCurl, toCurl } = require('./lib/curl');
 const { buildVariants } = require('./lib/attacks');
 const payloads = require('./lib/payloads');
 
+const pkg = require('./package.json');
+const VERSION = pkg.version;
+
 // ---- CLI / config ------------------------------------------------------
+
+function selfUpdate() {
+  try {
+    console.log(`PenAPI ${VERSION} — updating from git (${__dirname})…`);
+    const out = execFileSync('git', ['-C', __dirname, 'pull', '--ff-only'], {
+      encoding: 'utf8',
+    });
+    process.stdout.write(out);
+    const v = require('./package.json').version;
+    console.log(`Now at version ${v}.`);
+  } catch (e) {
+    console.error('Update failed:', e.message);
+    console.error('(This command only works when PenAPI runs from its git clone.)');
+    process.exit(1);
+  }
+  process.exit(0);
+}
 
 function parseArgs(argv) {
   const cfg = {
@@ -23,7 +44,12 @@ function parseArgs(argv) {
     const a = argv[i];
     if (a === '--port' || a === '-p') cfg.port = argv[++i];
     else if (a === '--host') cfg.host = argv[++i];
-    else if (a === '--help' || a === '-h') {
+    else if (a === '--version' || a === '-v') {
+      console.log(`PenAPI ${VERSION}`);
+      process.exit(0);
+    } else if (a === 'update' || a === '--update') {
+      selfUpdate();
+    } else if (a === '--help' || a === '-h') {
       printHelp();
       process.exit(0);
     } else if (!a.startsWith('-')) cfg.spec = a;
@@ -42,10 +68,11 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`PenAPI — pentest API workbench
+  console.log(`PenAPI ${VERSION} — pentest API workbench
 
 Usage:
   penapi [spec] [options]
+  penapi update                  Update to the latest version (git pull)
 
 Arguments:
   spec               Path or URL to an OpenAPI/Swagger JSON document.
@@ -55,6 +82,7 @@ Arguments:
 Options:
   -p, --port <n>     Port to listen on        (default 7331, env PORT)
       --host <h>     Host/interface to bind    (default 127.0.0.1, env HOST)
+  -v, --version      Print version and exit
   -h, --help         Show this help
 
 Examples:
@@ -233,12 +261,16 @@ function sleep(ms) {
 // ---- Routes ------------------------------------------------------------
 
 async function handleApi(req, res, pathname) {
+  if (pathname === '/api/version' && req.method === 'GET') {
+    return sendJson(res, 200, { ok: true, version: VERSION });
+  }
+
   if (pathname === '/api/spec' && req.method === 'GET') {
     try {
       const spec = await loadSpec();
-      return sendJson(res, 200, { ok: true, spec, specSource });
+      return sendJson(res, 200, { ok: true, spec, specSource, version: VERSION });
     } catch (e) {
-      return sendJson(res, 200, { ok: false, error: e.message, specSource });
+      return sendJson(res, 200, { ok: false, error: e.message, specSource, version: VERSION });
     }
   }
 
@@ -555,7 +587,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, async () => {
-  console.log(`\n  PenAPI  —  pentest API workbench`);
+  console.log(`\n  PenAPI ${VERSION}  —  pentest API workbench`);
   console.log(`  Spec:   ${specSource || '(none — load one from the UI)'}`);
   console.log(`  URL:    http://${HOST}:${PORT}\n`);
   if (specSource) {

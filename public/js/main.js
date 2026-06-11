@@ -54,6 +54,7 @@ async function loadSpec() {
   const dot = $('#connDot');
   try {
     const data = await fetchSpec();
+    if (data.version) $('#brandVer').textContent = 'v' + data.version;
     if (!data.ok) {
       dot.classList.add('bad');
       $('#specTitle').textContent = 'no spec loaded — click “Load Spec”';

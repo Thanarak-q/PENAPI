@@ -44,6 +44,7 @@ body {
 .brand { display: flex; align-items: baseline; gap: 8px; }
 .brand-mark { color: var(--accent); font-size: 16px; transform: translateY(1px); }
 .brand-name { font-weight: 700; letter-spacing: 0.5px; }
+.brand-ver { color: var(--accent); font-size: 10px; font-family: var(--mono); background: var(--bg-3); padding: 1px 5px; border-radius: 4px; }
 .brand-sub { color: var(--muted); font-size: 11px; }
 .topbar-controls { display: flex; align-items: center; gap: 10px; }
 .field { display: flex; flex-direction: column; gap: 2px; font-size: 10px; color: var(--text-dim); }

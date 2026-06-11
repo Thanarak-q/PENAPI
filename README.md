@@ -1,5 +1,7 @@
 # PENAPI
 
+**Version 1.0.0** · MIT · Node ≥ 18
+
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
 request — then layer on a repeater, fuzzer/brute-forcer, access-control matrix,
@@ -17,11 +19,23 @@ Zero npm dependencies — pure Node plus a static front end. `penapi spec.json` 
 ```bash
 git clone https://github.com/Thanarak-q/PENAPI.git
 cd PENAPI
-# optional: put a launcher on your PATH
-ln -s "$PWD/server.js" ~/.local/bin/penapi   # or: alias penapi="node $PWD/server.js"
+# put a launcher on your PATH so `penapi` works anywhere
+printf '#!/usr/bin/env bash\nexec node "%s/server.js" "$@"\n' "$PWD" > ~/.local/bin/penapi
+chmod +x ~/.local/bin/penapi
+penapi --version
 ```
 
-Requires Node.js >= 18 (uses the built-in global `fetch`).
+Requires Node.js >= 18 (uses the built-in global `fetch`). No other dependencies.
+
+## Updating
+
+```bash
+penapi update      # runs `git pull` in the install dir, then reports the new version
+# or manually:
+cd /path/to/PENAPI && git pull
+```
+
+Check your version any time with `penapi --version` (also shown in the UI header).
 
 ## Run
 
@@ -64,7 +78,7 @@ what the UI renders.
 
 ## Examples
 
-- **IDOR sweep** — `GET /api/accounts/§1§`, ID range `1`–`500`, Start. Rows whose length differs from the baseline are flagged.
+- **IDOR sweep** — `GET /api/v1/items/§1§`, ID range `1`–`500`, Start. Rows whose length differs from the baseline are flagged.
 - **Login brute** — `POST /auth/login` body `{"user":"admin","pass":"§x§"}`, pick the *Common Passwords* set, watch for the status/length anomaly.
 - **SQLi probe** — mark a query value `§1§`, choose *SQL Injection*; time-based payloads surface as outliers in the Time column.
 
@@ -79,6 +93,10 @@ lib/payloads.js        # built-in payload sets + numeric range
 lib/attacks.js         # quick-attack variant generator
 public/                # front end (ES modules, no build step)
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
