@@ -6,6 +6,9 @@ import { state } from './state.js';
 import { textToHeaders } from './util.js';
 import { getCurrentRequest } from './request.js';
 import { runMatrix } from './api.js';
+import { attachExport } from './export.js';
+
+let lastResults = [];
 
 export function initMatrix() {
   $('#matrixLoad').addEventListener('click', () => {
@@ -14,6 +17,12 @@ export function initMatrix() {
     $('#matrixUrl').value = req.url;
   });
   $('#matrixRun').addEventListener('click', run);
+
+  attachExport(document.querySelector('[data-panel="matrix"] .matrix-head'), () => ({
+    name: 'penapi-matrix',
+    headers: ['identity', 'status', 'size', 'timeMs', 'error'],
+    rows: lastResults,
+  }));
 }
 
 async function run() {
@@ -41,6 +50,7 @@ async function run() {
   $('#matrixRun').disabled = false;
   if (!ok) return toast('Matrix error: ' + error, true);
 
+  lastResults = results;
   renderMatrix(results);
 }
 

@@ -5,6 +5,7 @@ import { $, $$, el, statusClass, toast, headersToText } from './util.js';
 import { getCurrentRequest, currentUrl } from './request.js';
 import { textToHeaders } from './util.js';
 import { fetchPayloadSets, startFuzz } from './api.js';
+import { attachExport } from './export.js';
 
 let results = [];
 let abortFn = null;
@@ -31,6 +32,12 @@ export async function initFuzzer() {
       renderTable();
     });
   });
+
+  attachExport(document.querySelector('[data-panel="fuzzer"] .results-toolbar'), () => ({
+    name: 'penapi-fuzz',
+    headers: ['idx', 'payload', 'status', 'size', 'timeMs', 'location', 'error'],
+    rows: results,
+  }));
 }
 
 function loadFromRequest() {

@@ -4,6 +4,7 @@
 import { $, $$, el, statusClass, toast, textToHeaders } from './util.js';
 import { state } from './state.js';
 import { startSweep } from './api.js';
+import { attachExport } from './export.js';
 
 let rows = [];
 let identityNames = [];
@@ -17,6 +18,19 @@ export function initSweep() {
   $('#sweepFilter').addEventListener('input', render);
   $('#sweepFlaggedOnly').addEventListener('change', render);
   renderIdentityChecks();
+
+  attachExport(document.querySelector('[data-panel="sweep"] .results-toolbar'), () => ({
+    name: 'penapi-sweep',
+    headers: ['method', 'path', 'hasSecurity', ...identityNames, 'flagged'],
+    rows: rows.map((r) => {
+      const row = { method: r.method, path: r.path, hasSecurity: r.hasSecurity, flagged: rowFlagged(r) };
+      for (const n of identityNames) {
+        const c = r.perIdentity[n];
+        row[n] = c ? (c.error ? 'ERR' : `${c.status} (${c.size ?? '-'})`) : '';
+      }
+      return row;
+    }),
+  }));
 }
 
 // Re-render identity checkboxes (called after identities change).

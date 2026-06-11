@@ -3,6 +3,12 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] — 2026-06-11
+
+### Added
+- **Findings export** — CSV / Markdown / JSON export buttons on the Fuzzer,
+  Auth Sweep, and Access Matrix result toolbars, with timestamped filenames.
+
 ## [1.2.0] — 2026-06-11
 
 ### Added
