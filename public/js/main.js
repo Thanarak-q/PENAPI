@@ -85,16 +85,21 @@ function wireTopbar() {
 
 function wireTabs() {
   $$('.tab').forEach((tab) => {
+    tab.title = tab.dataset.desc || '';
     tab.addEventListener('click', () => {
       $$('.tab').forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
       $$('.panel').forEach((p) =>
         p.classList.toggle('active', p.dataset.panel === tab.dataset.tab)
       );
+      $('#tabDesc').textContent = tab.dataset.desc || '';
       if (tab.dataset.tab === 'history') renderHistory();
       if (tab.dataset.tab === 'recon') renderRecon();
     });
   });
+  // Initialise the description strip with the active tab.
+  const active = document.querySelector('.tab.active');
+  if (active) $('#tabDesc').textContent = active.dataset.desc || '';
 }
 
 function wireCrossTab() {

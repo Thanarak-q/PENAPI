@@ -3,6 +3,16 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.7.0] — 2026-06-11
+
+### Added (UX)
+- **Per-tab descriptions** — a one-line explainer strip under the tab bar (and
+  tooltips) says what each tab does, so the tabs are no longer indistinguishable.
+- **Grouped top bar** — target/identity config and the tool buttons (Spec / cURL
+  / JWT) are now visually grouped with icons, tooltips, and a divider.
+- **Clearer endpoint find** — search field gains a ⌕ icon, a `/` shortcut hint,
+  and a "path, method, tag" placeholder.
+
 ## [1.6.0] — 2026-06-11
 
 ### Changed
