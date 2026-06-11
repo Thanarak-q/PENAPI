@@ -94,14 +94,19 @@ function wireTabs() {
       $$('.panel').forEach((p) =>
         p.classList.toggle('active', p.dataset.panel === tab.dataset.tab)
       );
-      $('#tabDesc').textContent = tab.dataset.desc || '';
+      const d = tab.dataset.desc || '';
+      $('#tabDesc').textContent = d;
+      $('#tabDesc').title = d;
       if (tab.dataset.tab === 'history') renderHistory();
       if (tab.dataset.tab === 'recon') renderRecon();
     });
   });
-  // Initialise the description strip with the active tab.
+  // Initialise the inline description with the active tab.
   const active = document.querySelector('.tab.active');
-  if (active) $('#tabDesc').textContent = active.dataset.desc || '';
+  if (active) {
+    $('#tabDesc').textContent = active.dataset.desc || '';
+    $('#tabDesc').title = active.dataset.desc || '';
+  }
 }
 
 function wireCrossTab() {

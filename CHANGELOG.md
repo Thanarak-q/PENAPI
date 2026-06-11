@@ -3,6 +3,13 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.8.2] — 2026-06-11
+
+### Changed
+- Removed the full-width tab-description row — the active tab's description now
+  sits inline at the right of the tab bar (full text on hover), and the request
+  summary line collapses when empty. Two fewer wasted rows.
+
 ## [1.8.1] — 2026-06-11
 
 ### Changed

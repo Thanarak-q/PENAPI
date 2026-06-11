@@ -177,11 +177,12 @@ body {
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 .tab-sep { width: 1px; height: 18px; background: var(--hairline); align-self: center; margin: 0 6px; }
 
-/* One-line description of the active tab — answers "what is this?" */
+/* Active-tab description, inline at the right of the tab bar — no extra row.
+   (Full text is also on each tab's hover tooltip.) */
 .tab-desc {
-  color: var(--muted); font-size: 11px; line-height: 1.4;
-  padding: 4px 14px; border-bottom: 1px solid var(--hairline);
-  background: rgba(255,255,255,0.015);
+  margin-left: auto; align-self: center; padding-right: 12px;
+  color: var(--muted); font-size: 10.5px;
+  max-width: 48%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .tab-desc:empty { display: none; }
 
@@ -209,7 +210,8 @@ input:focus, select:focus, textarea:focus, .url-input:focus, .method-select:focu
   outline: none; border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(46,155,255,0.18);
 }
-.req-summary { color: var(--text-dim); font-size: 11px; margin: 5px 2px; min-height: 14px; }
+.req-summary { color: var(--text-dim); font-size: 11px; margin: 5px 2px; }
+.req-summary:empty { display: none; }
 
 /* Buttons — glass pills */
 .btn {
