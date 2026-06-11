@@ -12,9 +12,11 @@ let results = [];
 let abortFn = null;
 let sortKey = 'idx';
 let sortDir = 1;
+const payloadSetCounts = {};
 
 export async function initFuzzer() {
   const data = await fetchPayloadSets();
+  for (const s of data.sets || []) payloadSetCounts[s.key] = s.count || 0;
   const sel = $('#payloadSet');
   sel.innerHTML = '<option value="">— none —</option>' +
     (data.sets || []).map((s) => `<option value="${s.key}">${s.label} (${s.count})</option>`).join('');
@@ -74,10 +76,24 @@ function start() {
     },
   };
   const options = {
-    concurrency: Number($('#fuzzConc').value) || 10,
+    concurrency: clamp(Number($('#fuzzConc').value) || 3, 1, 10),
     delayMs: Number($('#fuzzDelay').value) || 0,
     followRedirects: $('#fuzzRedirects').checked,
   };
+  $('#fuzzConc').value = String(options.concurrency);
+
+  const estimate = estimatePayloadCount(payloadsCfg);
+  const writeMethod = !['GET', 'HEAD', 'OPTIONS'].includes((template.method || 'GET').toUpperCase());
+  const risky = writeMethod || estimate > 20 || options.concurrency > 3 || options.delayMs === 0;
+  if (risky) {
+    const warning = [
+      `Fuzzer will send about ${estimate || 'unknown'} real requests.`,
+      `Concurrency: ${options.concurrency}, delay: ${options.delayMs}ms.`,
+      writeMethod ? `${template.method} may modify data.` : 'GET/HEAD/OPTIONS can still be expensive on some APIs.',
+      'Continue?',
+    ].join('\n');
+    if (!confirm(warning)) return;
+  }
 
   results = [];
   renderTable();
@@ -105,6 +121,21 @@ function start() {
       },
     }
   );
+}
+
+function clamp(n, min, max) {
+  return Math.min(Math.max(n, min), max);
+}
+
+function estimatePayloadCount(cfg) {
+  let total = cfg.builtin ? payloadSetCounts[cfg.builtin] || 0 : 0;
+  if (cfg.custom) total += String(cfg.custom).split('\n').filter((s) => s.length > 0).length;
+  const r = cfg.range || {};
+  if (r.start != null && r.end != null) {
+    const step = Math.max(1, Math.abs(r.step || 1));
+    total += Math.floor(Math.abs(r.end - r.start) / step) + 1;
+  }
+  return total;
 }
 
 function stop() {
@@ -196,6 +227,7 @@ function replay(r) {
   $('#reqUrl').value = url;
   $('#reqMethod').value = template.method;
   $('#reqBody').value = (template.body || '').replace(/§[^§]*§/g, r.payload).replace(/\bFUZZ\b/g, r.payload);
+  $('#reqBody').dispatchEvent(new Event('input'));
   goTab('request');
   toast('Loaded payload #' + r.idx + ' into Request tab');
 }

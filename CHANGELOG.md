@@ -3,6 +3,26 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+- **Request workspace polish** — request actions now live in the request header
+  with a visible current-endpoint context bar.
+- **Editable path params** — path params appear in the Params table and are
+  substituted into `{tokens}` at send time, so changing `id` before Send affects
+  the actual request URL.
+- **Endpoint focus tags** — add multiple custom tags to endpoints, search by
+  those tags, and keep pinned/tagged targets visible during triage.
+- **History detail view** — inspect saved request and response headers/body from
+  history without replaying; replay remains an explicit action.
+- **Request/response syntax color** — JSON-style attribute/value highlighting in
+  request and response bodies plus colored response headers.
+
+### Changed
+- **Safer active testing defaults** — Quick Attacks, Fuzzer, Matrix, and Sweep
+  now ask for confirmation before higher-risk runs; Fuzzer/Sweep default to
+  lower concurrency and server-side caps limit accidental high-volume traffic.
+
 ## [1.8.2] — 2026-06-11
 
 ### Changed

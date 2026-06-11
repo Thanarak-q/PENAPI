@@ -94,19 +94,11 @@ function wireTabs() {
       $$('.panel').forEach((p) =>
         p.classList.toggle('active', p.dataset.panel === tab.dataset.tab)
       );
-      const d = tab.dataset.desc || '';
-      $('#tabDesc').textContent = d;
-      $('#tabDesc').title = d;
+      $('.workbar')?.classList.toggle('request-active', tab.dataset.tab === 'request');
       if (tab.dataset.tab === 'history') renderHistory();
       if (tab.dataset.tab === 'recon') renderRecon();
     });
   });
-  // Initialise the inline description with the active tab.
-  const active = document.querySelector('.tab.active');
-  if (active) {
-    $('#tabDesc').textContent = active.dataset.desc || '';
-    $('#tabDesc').title = active.dataset.desc || '';
-  }
 }
 
 function wireCrossTab() {
@@ -181,6 +173,7 @@ function applyParsedRequest(req) {
   }
   if (!Object.keys(req.headers || {}).length) addHeaderRow(root, '', '');
   $('#reqBody').value = req.body || '';
+  $('#reqBody').dispatchEvent(new Event('input'));
   // clear params (curl URL already includes the query string)
   $('#paramsTable').innerHTML = '';
   $$('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === 'request'));

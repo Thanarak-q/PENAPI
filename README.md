@@ -5,8 +5,8 @@
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
 request — then layer on a repeater, fuzzer/brute-forcer, access-control matrix,
-identity switching, one-click bypass checks, a JWT tamperer, and cURL
-import/export.
+identity switching, tagged endpoint triage, guarded bypass checks, a JWT
+tamperer, and cURL import/export.
 
 Zero npm dependencies — pure Node plus a static front end. `penapi spec.json` and go.
 
@@ -61,7 +61,7 @@ runtime from the **Load Spec** button (URL / file / paste) — no restart needed
 | `Alt + 1…8` | Jump to a tab |
 | `Esc` | Close any open dialog |
 
-Use **→ Fuzz** / **→ Matrix** on the request line to push the current request
+Use **Fuzz** / **Matrix** in the request header to push the current request
 straight into the Fuzzer or Access Matrix.
 
 | Source | How |
@@ -78,20 +78,36 @@ what the UI renders.
 
 | Feature | What it's for |
 |---|---|
-| **Endpoint explorer** | Operations grouped by tag, with method, summary, generated example body, and a flag when an operation has **no security defined**. |
+| **Endpoint explorer** | Operations grouped by tag, with method, summary, generated example body, and a flag when an operation has **no security defined**. Add custom focus tags with `#`, pin endpoints with ★, and search by either built-in or custom tags. |
 | **Attack Surface / Recon** | Static analysis of the spec: counts of unauthenticated ops, mutating+unauth ops, IDOR candidates (path ids), mass-assignment candidates (request bodies), deprecated ops, and a sortable, prioritized target list. |
-| **Request / Repeater** | Auto-fills path/query/header params and a schema-derived JSON body. Raw `http`/`https` client gives full header control (including `Host`, `Content-Length`). |
+| **Request / Repeater** | Auto-fills path/query/header params and a schema-derived JSON body. Path params stay editable in the Params table and are substituted into `{tokens}` at send time. Raw `http`/`https` client gives full header control (including `Host`, `Content-Length`). |
 | **Identities** | Named header sets (Admin / User / Unauth …). Switch the active identity to send every request as that role. Set a header value to `null` to *strip* it. |
-| **Fuzzer / Brute** | Mark injection points with `§§` (wrap a value: `§admin§`) or the keyword `FUZZ`. Built-in payload sets (SQLi, XSS, traversal, cmdi, SSRF, NoSQLi, LFI, usernames, passwords, auth-bypass, host-header), a numeric range for IDOR enumeration, and custom wordlists. Concurrency + delay, live streaming, sortable results, anomaly highlighting. |
-| **Access Matrix (BOLA/BFLA)** | Replay one request as every identity and diff outcomes. Low-priv/unauth identity getting `2xx` is flagged. |
-| **Quick Attacks** | One click fires mutation variants — no-auth, empty/malformed bearer, verb swap, `X-HTTP-Method-Override`, `X-Original-URL`, spoofed `X-Forwarded-*`, trailing-slash, content-type confusion — flagging any that still succeed. |
-| **Auth Sweep** | Fires every spec endpoint as each identity to map authorization coverage. Safe idempotent methods by default; write verbs require a confirm. |
+| **Fuzzer / Brute** | Mark injection points with `§§` (wrap a value: `§admin§`) or the keyword `FUZZ`. Built-in payload sets (SQLi, XSS, traversal, cmdi, SSRF, NoSQLi, LFI, usernames, passwords, auth-bypass, host-header), a numeric range for IDOR enumeration, and custom wordlists. Concurrency + delay, live streaming, sortable results, anomaly highlighting. Risky runs require confirmation and server-side caps limit accidental floods. |
+| **Access Matrix (BOLA/BFLA)** | Replay one request as every identity and diff outcomes. Low-priv/unauth identity getting `2xx` is flagged. Write-method replay requires confirmation. |
+| **Quick Attacks** | Runs mutation variants — no-auth, empty/malformed bearer, verb swap, `X-HTTP-Method-Override`, `X-Original-URL`, spoofed `X-Forwarded-*`, trailing-slash, content-type confusion — after confirmation, flagging any that still succeed. |
+| **Auth Sweep** | Fires every spec endpoint as each identity to map authorization coverage. Every sweep shows an estimated request count and requires confirmation; write verbs are explicitly warned. |
 | **JWT Inspector** | Decode/edit a token client-side; shows alg, `exp`, claims; forge an `alg:none` / unsigned token to test signature-verification flaws. |
 | **cURL import / Copy as code** | Paste a `curl` from Burp/DevTools to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
-| **Find & navigate** | Command palette (Ctrl/Cmd+K) to jump to any endpoint or action; find-in-response with highlighting; filterable result tables; ★ pinned endpoints. |
-| **History** | Every sent request, replayable, persisted in `localStorage`. |
+| **Find & navigate** | Command palette (Ctrl/Cmd+K) to jump to any endpoint or action; find-in-response with highlighting; filterable result tables; ★ pinned endpoints and custom tags. |
+| **History** | Every sent request is persisted in `localStorage` with request/response detail, a safe view dialog, and explicit replay. |
+
+## Session & Safety
+
+PenAPI persists local working state in the browser: target base URL, identities,
+request history, pinned endpoints, and custom endpoint tags. It does not yet
+export/import full session files; clearing browser storage clears this state.
+
+Actions that send multiple real requests now have guardrails:
+
+- **Quick Attacks** confirms before sending mutation variants.
+- **Fuzzer** confirms high-volume or write-method runs, defaults to concurrency
+  `3`, and the server rejects runs over 500 payloads.
+- **Access Matrix** confirms before replaying write methods as multiple
+  identities.
+- **Auth Sweep** confirms every run with estimated request count and caps
+  concurrency to `10`.
 
 ## Examples
 

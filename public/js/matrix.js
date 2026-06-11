@@ -45,6 +45,7 @@ async function run() {
     headers: baseReq.headers,
     body: baseReq.body,
   };
+  const writeMethod = !['GET', 'HEAD', 'OPTIONS'].includes((request.method || 'GET').toUpperCase());
 
   const identities = state.identities.map((i) => {
     const parsed = textToHeaders(i.headers);
@@ -53,6 +54,14 @@ async function run() {
     return { name: i.name, headers };
   });
   if (!identities.length) return toast('No identities defined', true);
+  if (writeMethod) {
+    const warning = [
+      `Access Matrix will replay this ${request.method} request as ${identities.length} identities.`,
+      'That may modify data multiple times.',
+      'Continue?',
+    ].join('\n');
+    if (!confirm(warning)) return;
+  }
 
   $('#matrixRun').disabled = true;
   $('#matrixTable tbody').innerHTML = '<tr><td colspan="6" class="muted">running…</td></tr>';

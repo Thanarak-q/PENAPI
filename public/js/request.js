@@ -1,7 +1,7 @@
 // Request tab: builder + repeater + response viewer.
 
-import { $, $$, el, statusClass, fmtBytes, prettyJson, headersToText, copy } from './util.js';
-import { state, identityHeaders, pushHistory } from './state.js';
+import { $, $$, el, statusClass, methodClass, fmtBytes, prettyJson, headersToText, copy } from './util.js';
+import { state, identityHeaders, pushHistory, tagsFor } from './state.js';
 import { sendProxy, buildCurl } from './api.js';
 import { analyzeResponse } from './analyze.js';
 import { goTab } from './util.js';
@@ -19,15 +19,36 @@ export function joinUrl(base, path) {
 export function currentUrl() {
   const raw = $('#reqUrl').value.trim();
   const base = state.baseUrl.trim();
-  let url = joinUrl(base, raw);
   const params = readKv('#paramsTable').filter((p) => p.enabled && p.k);
-  if (params.length) {
-    const qs = params
+  const pathParams = params.filter((p) => p.in === 'path');
+  const queryParams = params.filter((p) => p.in !== 'path');
+  let path = pathTemplate(raw, pathParams);
+  for (const p of pathParams) {
+    path = path.replace(new RegExp(`\\{${escapeRegExp(p.k)}\\}`, 'g'), encodeURIComponent(p.v));
+  }
+  let url = joinUrl(base, path);
+  if (queryParams.length) {
+    const qs = queryParams
       .map((p) => `${encodeURIComponent(p.k)}=${encodeURIComponent(p.v)}`)
       .join('&');
     url += (url.includes('?') ? '&' : '?') + qs;
   }
   return url;
+}
+
+function pathTemplate(raw, pathParams) {
+  if (!pathParams.length) return raw;
+  if (pathParams.some((p) => raw.includes(`{${p.k}}`))) return raw;
+  const currentPath = state.current?.path || '';
+  if (!pathParams.every((p) => currentPath.includes(`{${p.k}}`))) return raw;
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      return new URL(raw).origin + currentPath;
+    } catch {
+      return raw;
+    }
+  }
+  return currentPath;
 }
 
 export function getCurrentRequest({ withIdentity = true } = {}) {
@@ -59,19 +80,24 @@ export function loadEndpoint(ep) {
   $$('.endpoint').forEach((n) => n.classList.remove('active'));
 
   $('#reqMethod').value = ep.method;
-  // Substitute path params with their example values inline.
-  let path = ep.path;
-  for (const p of ep.params.path) {
-    path = path.replace(`{${p.name}}`, encodeURIComponent(p.example ?? p.name));
-  }
-  $('#reqUrl').value = path;
+  $('#reqUrl').value = ep.path;
 
-  // Query params table
-  renderKv('#paramsTable', ep.params.query.map((p) => ({
-    enabled: p.required,
-    k: p.name,
-    v: p.example == null ? '' : String(p.example),
-  })));
+  // Path + query params table. Path params are substituted into {tokens}
+  // when building the outgoing URL; query params are appended as ?k=v.
+  renderKv('#paramsTable', [
+    ...ep.params.path.map((p) => ({
+      in: 'path',
+      enabled: true,
+      k: p.name,
+      v: p.example == null || p.example === '' ? p.name : String(p.example),
+    })),
+    ...ep.params.query.map((p) => ({
+      in: 'query',
+      enabled: p.required,
+      k: p.name,
+      v: p.example == null ? '' : String(p.example),
+    })),
+  ]);
 
   // Headers table: spec header params + content-type
   const headerRows = ep.params.header.map((p) => ({
@@ -88,8 +114,10 @@ export function loadEndpoint(ep) {
   $('#reqBody').value = ep.body && ep.body.example != null
     ? JSON.stringify(ep.body.example, null, 2)
     : '';
+  syncReqBodyHighlight();
 
   renderSummary(ep);
+  renderCurrentEndpoint(ep);
   goTab('request');
 }
 
@@ -104,6 +132,19 @@ function renderSummary(ep) {
   $('#reqSummary').innerHTML = bits.join(' · ');
 }
 
+function renderCurrentEndpoint(ep) {
+  const method = $('#currentMethod');
+  method.textContent = ep.method;
+  method.className = 'method-badge ' + methodClass(ep.method);
+  $('#currentPath').textContent = ep.path;
+  $('#currentPath').title = ep.path;
+  $('#currentSummary').textContent = ep.summary || ep.operationId || '';
+  const tags = [...ep.tags, ...tagsFor(ep.id)];
+  $('#currentTags').innerHTML = tags
+    .map((tag) => `<span class="endpoint-tag">${escapeHtml(tag)}</span>`)
+    .join('');
+}
+
 // --- Key/value tables ---------------------------------------------------
 
 function renderKv(sel, rows) {
@@ -114,20 +155,32 @@ function renderKv(sel, rows) {
 }
 
 export function addKvRow(root, row = { enabled: true, k: '', v: '' }) {
+  const paramIn = row.in || (root.id === 'paramsTable' ? 'query' : '');
   const node = el('div', { class: 'kv-row' }, [
+    paramIn ? el('span', { class: 'kv-kind ' + paramIn, text: paramIn }) : null,
     el('input', { type: 'checkbox', ...(row.enabled ? { checked: 'checked' } : {}) }),
     el('input', { type: 'text', class: 'k', value: row.k, placeholder: 'name' }),
     el('input', { type: 'text', class: 'v', value: row.v, placeholder: 'value' }),
     el('span', { class: 'del', text: '✕', onclick: () => node.remove() }),
   ]);
+  if (paramIn) node.dataset.in = paramIn;
   root.appendChild(node);
 }
 
 function readKv(sel) {
   return $$('.kv-row', $(sel)).map((row) => {
     const inputs = row.querySelectorAll('input');
-    return { enabled: inputs[0].checked, k: inputs[1].value.trim(), v: inputs[2].value };
+    return {
+      in: row.dataset.in || 'query',
+      enabled: inputs[0].checked,
+      k: inputs[1].value.trim(),
+      v: inputs[2].value,
+    };
   });
+}
+
+function escapeRegExp(text) {
+  return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // --- Send + response ----------------------------------------------------
@@ -137,7 +190,8 @@ export async function sendCurrent() {
   if (!req.url) return;
   $('#sendBtn').disabled = true;
   $('#resStatus').innerHTML = '<span class="muted">Sending…</span>';
-  const { result } = await sendProxy({ ...req, followRedirects: false });
+  const data = await sendProxy({ ...req, followRedirects: false });
+  const result = data.result || { error: data.error || 'Request failed' };
   $('#sendBtn').disabled = false;
   renderResponse(result);
   pushHistory({
@@ -148,7 +202,23 @@ export async function sendCurrent() {
     timeMs: result.timeMs ?? null,
     error: result.error || null,
     request: req,
+    response: historyResponse(result),
   });
+}
+
+function historyResponse(result) {
+  if (!result) return null;
+  return {
+    status: result.status ?? null,
+    statusText: result.statusText || '',
+    headers: result.headers || {},
+    body: String(result.body || '').slice(0, 50000),
+    size: result.size ?? null,
+    timeMs: result.timeMs ?? null,
+    error: result.error || null,
+    truncated: !!result.truncated,
+    finalUrl: result.finalUrl || '',
+  };
 }
 
 export function renderResponse(result) {
@@ -166,9 +236,9 @@ export function renderResponse(result) {
     `<span class="pill">${fmtBytes(result.size)}${result.truncated ? ' (truncated)' : ''}</span>` +
     (result.redirected ? `<span class="pill">redirected → ${result.finalUrl}</span>` : '');
   const ct = result.headers['content-type'] || '';
-  lastBodyText = ct.includes('json') ? prettyJson(result.body) : result.body;
-  $('#resBody').textContent = lastBodyText;
-  $('#resHeaders').textContent = headersToText(result.headers);
+  lastBodyIsJson = ct.includes('json');
+  lastBodyText = lastBodyIsJson ? prettyJson(result.body) : result.body;
+  $('#resHeaders').innerHTML = highlightHeaders(headersToText(result.headers));
   renderAnalysis(analyzeResponse(result));
   applyResponseFind();
 }
@@ -176,16 +246,66 @@ export function renderResponse(result) {
 // --- Response find (highlight matches in the body) ----------------------
 
 let lastBodyText = '';
+let lastBodyIsJson = false;
 
 function escapeHtml(s) {
-  return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  return String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+}
+
+function highlightJson(text) {
+  const tokenRe = /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(?:true|false)\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
+  let html = '';
+  let last = 0;
+  for (const match of text.matchAll(tokenRe)) {
+    const token = match[0];
+    html += escapeHtml(text.slice(last, match.index));
+    let cls = 'tok-number';
+    if (token.startsWith('"')) cls = token.endsWith(':') ? 'tok-key' : 'tok-string';
+    else if (token === 'true' || token === 'false') cls = 'tok-bool';
+    else if (token === 'null') cls = 'tok-null';
+    html += `<span class="${cls}">${escapeHtml(token)}</span>`;
+    last = match.index + token.length;
+  }
+  html += escapeHtml(text.slice(last));
+  return html;
+}
+
+function highlightHeaders(text) {
+  return text
+    .split('\n')
+    .map((line) => {
+      const idx = line.indexOf(':');
+      if (idx === -1) return escapeHtml(line);
+      const name = line.slice(0, idx);
+      const value = line.slice(idx + 1);
+      return `<span class="tok-header-name">${escapeHtml(name)}</span>:<span class="tok-header-value">${escapeHtml(value)}</span>`;
+    })
+    .join('\n');
+}
+
+function renderResponseBody() {
+  if (!lastBodyText) {
+    $('#resBody').textContent = '';
+    return;
+  }
+  $('#resBody').innerHTML = lastBodyIsJson ? highlightJson(lastBodyText) : escapeHtml(lastBodyText);
+}
+
+function syncReqBodyHighlight() {
+  const body = $('#reqBody');
+  const highlight = $('#reqBodyHighlight');
+  if (!body || !highlight) return;
+  const text = body.value;
+  highlight.innerHTML = text ? highlightJson(text) : '';
+  highlight.scrollTop = body.scrollTop;
+  highlight.scrollLeft = body.scrollLeft;
 }
 
 function applyResponseFind() {
   const q = $('#resFind').value;
   const countEl = $('#resFindCount');
   if (!q) {
-    $('#resBody').textContent = lastBodyText;
+    renderResponseBody();
     countEl.textContent = '';
     return;
   }
@@ -249,7 +369,10 @@ export function initRequest() {
   $('#addParam').addEventListener('click', () => addKvRow($('#paramsTable')));
   $('#prettyBody').addEventListener('click', () => {
     $('#reqBody').value = prettyJson($('#reqBody').value);
+    syncReqBodyHighlight();
   });
+  $('#reqBody').addEventListener('input', syncReqBodyHighlight);
+  $('#reqBody').addEventListener('scroll', syncReqBodyHighlight);
   wireCodeModal();
   $('#resFind').addEventListener('input', applyResponseFind);
 

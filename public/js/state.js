@@ -14,6 +14,7 @@ const defaults = {
   ],
   history: [],
   pinned: [], // endpoint ids the user has bookmarked
+  endpointTags: {}, // endpoint id -> user-defined focus tags
 };
 
 export const state = {
@@ -33,10 +34,10 @@ function load() {
 }
 
 export function save() {
-  const { baseUrl, activeIdentity, identities, history, pinned } = state;
+  const { baseUrl, activeIdentity, identities, history, pinned, endpointTags } = state;
   localStorage.setItem(
     LS_KEY,
-    JSON.stringify({ baseUrl, activeIdentity, identities, history: history.slice(0, 200), pinned })
+    JSON.stringify({ baseUrl, activeIdentity, identities, history: history.slice(0, 200), pinned, endpointTags })
   );
 }
 
@@ -47,6 +48,25 @@ export function isPinned(id) {
 export function togglePin(id) {
   if (isPinned(id)) state.pinned = state.pinned.filter((p) => p !== id);
   else state.pinned = [...state.pinned, id];
+  save();
+}
+
+export function tagsFor(id) {
+  return state.endpointTags[id] || [];
+}
+
+export function addEndpointTag(id, tag) {
+  const cleaned = String(tag || '').trim().replace(/^#+/, '').replace(/\s+/g, '-').slice(0, 24);
+  if (!cleaned) return;
+  const next = [...new Set([...(state.endpointTags[id] || []), cleaned])];
+  state.endpointTags = { ...state.endpointTags, [id]: next };
+  save();
+}
+
+export function removeEndpointTag(id, tag) {
+  const next = (state.endpointTags[id] || []).filter((t) => t !== tag);
+  state.endpointTags = { ...state.endpointTags, [id]: next };
+  if (!next.length) delete state.endpointTags[id];
   save();
 }
 

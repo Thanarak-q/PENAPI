@@ -1,7 +1,7 @@
 // Sidebar: endpoint list grouped by tag, with filtering.
 
 import { $, el, methodClass } from './util.js';
-import { state, isPinned, togglePin } from './state.js';
+import { state, isPinned, togglePin, tagsFor, addEndpointTag, removeEndpointTag } from './state.js';
 
 let onSelect = () => {};
 let collapsed = new Set();
@@ -72,15 +72,49 @@ function render(filter) {
 
 function makeRow(ep, filter) {
   const pinned = isPinned(ep.id);
+  const customTags = tagsFor(ep.id);
   return el('div', {
     class: 'endpoint' + (state.current && state.current.id === ep.id ? ' active' : ''),
-    onclick: () => onSelect(ep),
+    onclick: () => {
+      onSelect(ep);
+      render(filter);
+    },
   }, [
     el('span', { class: 'method-badge ' + methodClass(ep.method), text: ep.method }),
     el('div', { style: 'overflow:hidden;flex:1' }, [
       el('div', { class: 'path', text: ep.path, title: ep.path }),
       ep.summary ? el('div', { class: 'summ', text: ep.summary }) : null,
+      customTags.length
+        ? el('div', { class: 'endpoint-tags' }, customTags.map((tag) =>
+            el('span', {
+              class: 'endpoint-tag removable',
+              text: tag,
+              title: 'Remove tag',
+              onclick: (e) => {
+                e.stopPropagation();
+                removeEndpointTag(ep.id, tag);
+                renderCurrentTags(ep);
+                render(filter);
+              },
+            })
+          ))
+        : null,
     ]),
+    el('span', {
+      class: 'pin tag-add',
+      text: '#',
+      title: 'Add focus tag',
+      onclick: (e) => {
+        e.stopPropagation();
+        const tags = prompt('Tags for this endpoint (comma, space, or newline separated)');
+        if (!tags) return;
+        for (const tag of tags.split(/[,\s]+/).filter(Boolean)) {
+          addEndpointTag(ep.id, tag);
+        }
+        renderCurrentTags(ep);
+        render(filter);
+      },
+    }),
     el('span', {
       class: 'pin' + (pinned ? ' on' : ''),
       text: pinned ? '★' : '☆',
@@ -94,13 +128,24 @@ function makeRow(ep, filter) {
   ]);
 }
 
+function renderCurrentTags(ep) {
+  if (!state.current || state.current.id !== ep.id) return;
+  const host = $('#currentTags');
+  if (!host) return;
+  host.innerHTML = '';
+  for (const tag of [...ep.tags, ...tagsFor(ep.id)]) {
+    host.appendChild(el('span', { class: 'endpoint-tag', text: tag }));
+  }
+}
+
 function matches(ep, q) {
   return (
     ep.path.toLowerCase().includes(q) ||
     ep.method.toLowerCase().includes(q) ||
     (ep.summary || '').toLowerCase().includes(q) ||
     (ep.operationId || '').toLowerCase().includes(q) ||
-    ep.tags.some((t) => t.toLowerCase().includes(q))
+    ep.tags.some((t) => t.toLowerCase().includes(q)) ||
+    tagsFor(ep.id).some((t) => t.toLowerCase().includes(q))
   );
 }
 

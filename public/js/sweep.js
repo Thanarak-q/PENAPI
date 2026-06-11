@@ -68,10 +68,19 @@ function start() {
   if (!identities.length) return toast('Pick at least one identity', true);
 
   const writeMethods = methods.filter((m) => !['GET', 'HEAD', 'OPTIONS'].includes(m));
-  if (writeMethods.length &&
-      !confirm(`This sweep includes ${writeMethods.join(', ')} which may modify data. Continue?`)) {
-    return;
-  }
+  const estimatedEndpoints = (state.spec?.endpoints || []).filter((e) => methods.includes(e.method)).length;
+  const concurrency = clamp(Number($('#sweepConc').value) || 3, 1, 10);
+  $('#sweepConc').value = String(concurrency);
+  const estimatedRequests = estimatedEndpoints * identities.length;
+  const warning = [
+    `Auth Sweep will send about ${estimatedRequests} real requests (${estimatedEndpoints} endpoints × ${identities.length} identities).`,
+    `Concurrency: ${concurrency}.`,
+    writeMethods.length
+      ? `${writeMethods.join(', ')} may modify data.`
+      : 'Safe methods can still be expensive on some APIs.',
+    'Continue?',
+  ].join('\n');
+  if (!confirm(warning)) return;
 
   rows = [];
   identityNames = identities.map((i) => i.name);
@@ -86,7 +95,7 @@ function start() {
       methods,
       identities,
       placeholder: $('#sweepPlaceholder').value || '1',
-      concurrency: Number($('#sweepConc').value) || 8,
+      concurrency,
     },
     {
       onStart: (d) => ($('#sweepProgress').textContent = `0 / ${d.total}`),
@@ -106,6 +115,10 @@ function start() {
       },
     }
   );
+}
+
+function clamp(n, min, max) {
+  return Math.min(Math.max(n, min), max);
 }
 
 function stop() {
