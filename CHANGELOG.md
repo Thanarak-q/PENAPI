@@ -3,6 +3,14 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.8.1] — 2026-06-11
+
+### Changed
+- **Denser layout** — shorter top bar, tabs and request bar; tighter padding
+  throughout so the UI wastes far less vertical space.
+- **Removed duplicate cURL button** — the standalone *cURL* action was merged
+  into the single **⧉ Copy** dialog (which already offers cURL / fetch / Python / HTTPie).
+
 ## [1.8.0] — 2026-06-11
 
 ### Added (find/navigation)

@@ -250,11 +250,6 @@ export function initRequest() {
   $('#prettyBody').addEventListener('click', () => {
     $('#reqBody').value = prettyJson($('#reqBody').value);
   });
-  $('#copyCurlBtn').addEventListener('click', async () => {
-    const req = getCurrentRequest();
-    const { curl } = await buildCurl({ ...req, insecure: true });
-    copy(curl);
-  });
   wireCodeModal();
   $('#resFind').addEventListener('input', applyResponseFind);
 
