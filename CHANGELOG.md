@@ -3,6 +3,13 @@
 All notable changes to PenAPI are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.6.0] — 2026-06-11
+
+### Changed
+- **Titanium / Liquid-Glass UI** — frosted translucent surfaces (backdrop-blur),
+  neutral metal tones, soft inner highlights, iOS-style blue accent and rounded
+  geometry. Reverted the gold theme; kept high contrast for readability.
+
 ## [1.5.0] — 2026-06-11
 
 ### Added

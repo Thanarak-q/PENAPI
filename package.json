@@ -1,6 +1,6 @@
 {
   "name": "penapi",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Pentest-oriented API workbench — loads an OpenAPI/Swagger spec and adds offensive testing tooling (repeater, fuzzer/brute-force, access-control matrix, cURL import).",
   "main": "server.js",
   "scripts": {

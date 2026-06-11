@@ -1,6 +1,6 @@
 # PENAPI
 
-**Version 1.5.0** · MIT · Node ≥ 18
+**Version 1.6.0** · MIT · Node ≥ 18
 
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
