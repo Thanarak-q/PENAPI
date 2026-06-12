@@ -22,6 +22,7 @@ const PROFILE_FIELDS = [
   'history',
   'pinned',
   'endpointTags',
+  'sequence',
 ];
 
 function blankProfile() {
@@ -36,6 +37,7 @@ function blankProfile() {
     history: [],
     pinned: [], // endpoint ids the user has bookmarked
     endpointTags: {}, // endpoint id -> user-defined focus tags
+    sequence: { steps: [] }, // saved Sequence Runner steps
   };
 }
 
