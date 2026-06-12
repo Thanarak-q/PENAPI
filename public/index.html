@@ -68,6 +68,7 @@
           <button class="menu-item" data-act="cookie">Cookie Inspector…</button>
           <button class="menu-item" data-act="headers">Header Auditor…</button>
           <button class="menu-item" data-act="hashid">Hash Identifier…</button>
+          <button class="menu-item" data-act="timestamp">Timestamp Converter…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -722,6 +723,22 @@
       <div class="modal-actions">
         <button class="btn primary" id="hidRun">Identify</button>
         <button class="btn ghost" id="closeHid">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="tsModal" hidden>
+    <div class="modal">
+      <h2>Timestamp Converter <span class="muted">— epoch ⇄ ISO</span></h2>
+      <p class="hint">Enter a Unix epoch (seconds or milliseconds) or an ISO 8601 date to see every representation and how long until / since it. Handy for JWT <code>exp</code> / <code>iat</code> claims.</p>
+      <div class="req-line">
+        <input id="tsIn" class="url-input" type="text" spellcheck="false" placeholder="1735689600  ·  2025-01-01T00:00:00Z" />
+        <button class="btn ghost" id="tsNow" title="Insert current time">Now</button>
+      </div>
+      <div class="ck-out" id="tsOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="tsRun">Convert</button>
+        <button class="btn ghost" id="closeTs">Close</button>
       </div>
     </div>
   </div>

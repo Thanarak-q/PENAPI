@@ -58,6 +58,12 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Timestamp Converter** — under **Tools → Timestamp Converter…**, enter a Unix
+  epoch (seconds or milliseconds) or an ISO 8601 date to see every
+  representation (Unix s/ms, ISO, UTC) plus a human-relative offset and an
+  expired/future flag — handy for reading JWT `exp`/`iat` claims. A **Now**
+  button inserts the current time. Logic is unit-tested via `node --test`
+  (`public/js/timestamp-core.js`).
 - **Hash Identifier** — under **Tools → Hash Identifier…**, paste a hash to
   guess likely algorithms from length, character set, and crypt prefix
   (MD5/NTLM, SHA-1/256/384/512, SHA-3, bcrypt, md5/sha256/sha512crypt, Argon2,
