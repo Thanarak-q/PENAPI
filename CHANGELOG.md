@@ -58,6 +58,14 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Fuzzer payload sets expanded** — three new built-in sets: **SSTI** (template
+  injection across Jinja2/Twig/SpEL/Razor), **XXE** (file read, SSRF, and
+  out-of-band parameter-entity exfiltration), and **CRLF / Header Injection**.
+  The **SQLi** set gains cross-engine time-based probes (MySQL/Postgres/Oracle)
+  and comment/whitespace WAF-bypass variants. New sets appear automatically in
+  the Fuzzer's payload-set dropdown. `lib/payloads.js` is now covered by a
+  `node --test` suite (set integrity, de-duplication, `getSet` copy-safety,
+  `numericRange` bounds/caps).
 - **User-Agent Library** — under **Tools → User-Agent Library…**, a searchable
   set of representative User-Agent strings (desktop, mobile, bot/crawler, tools)
   for testing UA-based routing, cloaking, and access logic, with per-entry copy.
