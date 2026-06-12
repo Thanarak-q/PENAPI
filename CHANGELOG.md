@@ -57,7 +57,18 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 
 ## Unreleased
 
+### Changed
+- **Tools menu organized into labeled groups** — the menu (now ~28 entries) is
+  split into *Current request*, *Payloads & attack*, *Tokens & crypto*,
+  *Encode & convert*, and *Recon & analysis* sections with headings, and the
+  dropdown scrolls if it would exceed the viewport. No tools were removed.
+
 ### Added
+- **Six more Fuzzer payload sets** — **LDAP Injection**, **XPath Injection**,
+  **GraphQL Introspection**, **Open Redirect**, **Email Header Injection**, and
+  **Format String / Edge Cases** — bringing the built-in sets to 20. All surface
+  automatically in the Fuzzer dropdown and are covered by the `lib/payloads.js`
+  integrity tests.
 - **Injection Payloads cheat sheet expanded** — added **NoSQLi**, **XXE**,
   **CRLF / header**, and **Polyglot** categories (with `{{M}}` marker support for
   OOB exfil / canaries), keeping the client-side cheat sheet aligned with the

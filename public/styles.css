@@ -552,6 +552,16 @@ kbd {
 }
 .menu-item:hover { background: var(--accent-soft); color: var(--accent-press); }
 .menu-sep { height: 1px; background: var(--line); margin: var(--s1) 0; }
+.menu-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint, var(--ink-soft));
+  padding: var(--s1) var(--s3) 2px;
+  pointer-events: none;
+  user-select: none;
+}
 
 /* --- Panels ------------------------------------------------------------ */
 .panel { display: none; flex: 1 1 auto; min-height: 0; flex-direction: column; }
@@ -1342,6 +1352,8 @@ table.results tbody tr.anomaly:hover { background: #f1e4c8; }
   box-shadow: var(--shadow-sheet);
   padding: var(--s1);
   flex-direction: column;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 .menu-root.open .menu-drop { display: flex; animation: rise var(--dur) var(--ease); }
 .menu-drop .menu-item { display: flex; justify-content: space-between; gap: var(--s4); }
