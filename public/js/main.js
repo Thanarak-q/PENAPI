@@ -21,6 +21,7 @@ import { initAuth, openAuth } from './auth.js';
 import { initRandom, openRandom } from './random.js';
 import { initCookie, openCookie } from './cookie.js';
 import { initHeaders, openHeaders } from './headers.js';
+import { initHashId, openHashId } from './hashid.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -53,6 +54,7 @@ async function boot() {
   initRandom();
   initCookie();
   initHeaders();
+  initHashId();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -80,6 +82,7 @@ async function boot() {
     random: openRandom,
     cookie: openCookie,
     headers: openHeaders,
+    hashid: openHashId,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

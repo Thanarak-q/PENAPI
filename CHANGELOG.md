@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Hash Identifier** — under **Tools → Hash Identifier…**, paste a hash to
+  guess likely algorithms from length, character set, and crypt prefix
+  (MD5/NTLM, SHA-1/256/384/512, SHA-3, bcrypt, md5/sha256/sha512crypt, Argon2,
+  LDAP {SSHA}, salted forms). Heuristic and fully client-side; logic is
+  unit-tested via `node --test` (`public/js/hashid-core.js`).
 - **Header Auditor** — under **Tools → Header Auditor…**, paste a raw HTTP
   response header block to audit it for missing or weak security headers
   (**CSP** incl. `unsafe-inline`/`unsafe-eval`, **HSTS** max-age, **X-Content-Type-Options**,

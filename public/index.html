@@ -67,6 +67,7 @@
           <button class="menu-item" data-act="random">Random Generator…</button>
           <button class="menu-item" data-act="cookie">Cookie Inspector…</button>
           <button class="menu-item" data-act="headers">Header Auditor…</button>
+          <button class="menu-item" data-act="hashid">Hash Identifier…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -708,6 +709,19 @@
       <div class="modal-actions">
         <button class="btn primary" id="hdrRun">Audit</button>
         <button class="btn ghost" id="closeHdr">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="hidModal" hidden>
+    <div class="modal">
+      <h2>Hash Identifier <span class="muted">— guess the digest</span></h2>
+      <p class="hint">Paste a hash. Likely algorithms are guessed from length, character set, and crypt prefix. Heuristic — several algorithms can share a length.</p>
+      <input id="hidIn" class="url-input" type="text" spellcheck="false" placeholder="5f4dcc3b5aa765d61d8327deb882cf99" />
+      <div class="ck-out" id="hidOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="hidRun">Identify</button>
+        <button class="btn ghost" id="closeHid">Close</button>
       </div>
     </div>
   </div>

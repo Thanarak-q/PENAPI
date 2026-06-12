@@ -915,6 +915,10 @@ mark { background: var(--accent); color: #fff; border-radius: 1px; padding: 0 1p
 .hdr-row .flag-tag { flex: 0 0 auto; }
 .hdr-note { font-size: var(--text-xs); color: var(--ink-soft); }
 
+/* Hash Identifier */
+.hid-meta { font-family: var(--mono); font-size: var(--text-2xs); color: var(--ink-soft); margin-bottom: var(--s1); }
+.hid-cands { display: flex; flex-wrap: wrap; gap: var(--s1); margin-bottom: var(--s2); }
+
 /* =======================================================================
    Generic tool layouts (fuzzer / sweep / recon / matrix)
    ======================================================================= */

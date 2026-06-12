@@ -136,6 +136,7 @@ what the UI renders.
 | **Random Generator** | From **Tools → Random Generator…**, generate CSPRNG values — UUID v4, random hex, URL-safe token, or a custom-length string — for nonces, cache-busters, and fuzzing. |
 | **Cookie Inspector** | From **Tools → Cookie Inspector…**, paste `Set-Cookie` values to parse each cookie and audit its security flags — missing HttpOnly / Secure / SameSite (and `SameSite=None`) are flagged. |
 | **Header Auditor** | From **Tools → Header Auditor…**, paste a raw response header block to audit security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy), tech-stack disclosure, and unsafe CORS — each flagged missing / weak / ok. |
+| **Hash Identifier** | From **Tools → Hash Identifier…**, paste a hash to guess likely algorithms (MD5/NTLM, SHA family, bcrypt, *crypt, Argon2, LDAP) from length, charset, and crypt prefix. Heuristic, client-side. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
