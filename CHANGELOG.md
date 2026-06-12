@@ -58,6 +58,12 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Body Converter** — under **Tools → Body Converter…**, paste a JSON object to
+  re-encode the same data as `application/x-www-form-urlencoded`, a query
+  string, and `multipart/form-data` (per-block copy) — for probing content-type
+  confusion and parameter pollution. Nested values are JSON-encoded so they
+  survive the round trip. Logic is unit-tested via `node --test`
+  (`public/js/bodyconv-core.js`).
 - **JSON Flattener** — under **Tools → JSON Flattener…**, paste a JSON response
   to flatten it into `dot.path[i]` → value leaf rows with each leaf's type, and
   auto-highlight keys that look sensitive (password, token, api_key, email, …).

@@ -943,6 +943,13 @@ mark { background: var(--accent); color: #fff; border-radius: 1px; padding: 0 1p
 .jf-value { flex: 1 1 auto; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .jf-sensitive .jf-path { color: var(--accent); font-weight: 700; }
 
+/* Body Converter */
+.bc-block { margin-bottom: var(--s2); }
+.bc-head { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s1); }
+.bc-title { font-weight: 700; font-size: var(--text-xs); }
+.bc-ct { font-size: var(--text-2xs); color: var(--ink-soft); flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bc-pre { max-height: 140px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
+
 /* =======================================================================
    Generic tool layouts (fuzzer / sweep / recon / matrix)
    ======================================================================= */

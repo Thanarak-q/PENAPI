@@ -73,6 +73,7 @@
           <button class="menu-item" data-act="entropy">Entropy Analyzer…</button>
           <button class="menu-item" data-act="redirect">Redirect &amp; SSRF Payloads…</button>
           <button class="menu-item" data-act="jsonflat">JSON Flattener…</button>
+          <button class="menu-item" data-act="bodyconv">Body Converter…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -800,6 +801,19 @@
         <button class="btn primary" id="jfRun">Flatten</button>
         <button class="btn ghost" id="jfCopy">Copy paths</button>
         <button class="btn ghost" id="closeJf">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="bcModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Body Converter <span class="muted">— JSON → form / query / multipart</span></h2>
+      <p class="hint">Paste a JSON object to re-encode the same data as <code>x-www-form-urlencoded</code>, a query string, and <code>multipart/form-data</code> — for probing content-type confusion and parameter pollution. Nested values are JSON-encoded so they survive.</p>
+      <textarea id="bcIn" class="code code-out" spellcheck="false" placeholder='{"username":"admin","role":"user"}'></textarea>
+      <div class="ck-out" id="bcOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="bcRun">Convert</button>
+        <button class="btn ghost" id="closeBc">Close</button>
       </div>
     </div>
   </div>
