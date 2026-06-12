@@ -97,6 +97,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   request and response bodies plus colored response headers.
 
 ### Changed
+- **De-duplicated navigation** — the View menu no longer repeats the tab list
+  (which had also drifted out of sync); the tab bar is the single source for
+  switching panels. Tag Manager and Command Palette remain under View.
+
+### Changed
 - **Safer active testing defaults** — Quick Attacks, Fuzzer, Matrix, and Sweep
   now ask for confirmation before higher-risk runs; Fuzzer/Sweep default to
   lower concurrency and server-side caps limit accidental high-volume traffic.

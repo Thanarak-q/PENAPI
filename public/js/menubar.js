@@ -2,14 +2,13 @@
 // One menu open at a time; hovering a sibling while open switches to it;
 // click-outside / Esc / choosing an item closes.
 //
-// Menu items act in three ways:
-//   data-act="tab:<name>"   → goTab(name)
+// Menu items act in two ways:
 //   data-act="click:<id>"   → forwards a click to an existing button by id
 //   data-act="<name>"       → calls a handler supplied via initMenubar(handlers)
 // Items with their own id (e.g. #loadSpecBtn) keep their existing listeners and
 // just close the menu on click.
 
-import { $, $$, goTab } from './util.js';
+import { $, $$ } from './util.js';
 import { openPalette } from './palette.js';
 
 let handlers = {};
@@ -54,7 +53,6 @@ export function initMenubar(actionHandlers = {}) {
 }
 
 function runAct(act) {
-  if (act.startsWith('tab:')) return goTab(act.slice(4));
   if (act.startsWith('click:')) {
     const el = document.getElementById(act.slice(6));
     if (el) el.click();
