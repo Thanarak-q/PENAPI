@@ -55,9 +55,28 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 - Accessibility: visible focus rings on all controls and `prefers-reduced-motion`
   support.
 
-## Unreleased
+## 1.11.0
 
 ### Added
+- **Decoder** — a new tab to encode, decode, smart-decode, and hash text
+  entirely in the browser. Supports Base64 /
+  Base64URL, URL, hex, HTML entities, and JWT decode, plus SHA-1/256/384/512
+  hashing via Web Crypto. **Smart decode** auto-detects the encoding; `⇅` feeds
+  the output back into the input for chained transforms; **From request** seeds
+  the current request body/URL. Nothing is sent. The transform engine
+  (`public/js/decoder-core.js`) is unit-tested via `node --test`.
+- **Sequence Runner** — a new tab that chains requests into a multi-step flow.
+  **Capture** a value from any response (a JSON body path like `data.id`, a
+  response header, or the status) into a named variable, then reference it as
+  `{{name}}` in any later step's URL, headers, or body (`{{baseUrl}}` is always
+  available). Each step picks its own identity, and per-step **checks**
+  (status/body/header `eq`/`ne`/`contains`/`exists`) flag failures, with an
+  optional "stop on fail". This adds the missing primitive behind BOLA/IDOR
+  setups, auth-token refresh, and any stateful flow. Runs sequentially through
+  the existing proxy (no new backend surface), records each step to History, and
+  exports results. Reach it from the tab bar or **Request → ⋯ → Send to
+  Sequence**. Sequences are saved per session profile. Engine is unit-tested via
+  `node --test` (`public/js/sequence-core.js`).
 - **Expanded passive static analysis** — the Attack Surface tab now produces a
   severity-ranked report from loaded endpoints and saved human request logs:
   auth gaps, optional auth, IDOR/BOLA hints, risky params, mass-assignment
