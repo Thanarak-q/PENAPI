@@ -33,6 +33,7 @@
         <button class="menu-top" type="button">Edit</button>
         <div class="menu-drop">
           <button class="menu-item" data-act="find">Find Endpoint <span class="menu-key">/</span></button>
+          <button class="menu-item" data-act="search">Search Traffic…</button>
           <button class="menu-item" data-act="clear-filters">Clear Filters</button>
           <button class="menu-item" data-act="click:clearReq">New / Clear Request</button>
           <div class="menu-sep"></div>
@@ -593,6 +594,27 @@
       </div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeDsc">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="srchModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Search Traffic <span class="muted" id="srchCount"></span></h2>
+      <p class="hint">Grep every request and response captured this session — method, URL, headers, and bodies. Find tokens, emails, stack traces, anything.</p>
+      <div class="srch-bar">
+        <input id="srchQuery" type="search" class="url-input" spellcheck="false" placeholder="search…" />
+        <label class="check"><input type="checkbox" id="srchRegex"> regex</label>
+        <label class="check"><input type="checkbox" id="srchCase"> case</label>
+      </div>
+      <div class="table-wrap">
+        <table class="results" id="srchTable">
+          <thead><tr><th>Method</th><th>URL</th><th>Status</th><th>Matched in</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeSrch">Close</button>
       </div>
     </div>
   </div>

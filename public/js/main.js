@@ -15,6 +15,7 @@ import { initComparer, openComparer } from './comparer.js';
 import { initSiteMap, openSiteMap } from './sitemap.js';
 import { initMatchReplace, openMatchReplace } from './matchreplace.js';
 import { initDiscovery, openDiscovery } from './discovery.js';
+import { initSearch, openSearch } from './search.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -41,6 +42,7 @@ async function boot() {
   initSiteMap();
   initMatchReplace();
   initDiscovery();
+  initSearch();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -62,6 +64,7 @@ async function boot() {
     sitemap: openSiteMap,
     matchreplace: openMatchReplace,
     discovery: openDiscovery,
+    search: openSearch,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Traffic Search** — under **Edit → Search Traffic…**, grep every request and
+  response captured this session (method, URL, headers, bodies) with a literal
+  or regex query to surface tokens, emails, or stack traces anywhere in the
+  session. Results show where each match landed. Pure client-side; engine is
+  unit-tested via `node --test` (`public/js/search-core.js`).
 - **Content Discovery** — under **Tools → Content Discovery…**, brute-force a
   built-in list of common paths (plus your own wordlist) off a base URL to find
   unspecced/shadow endpoints. Sends real GET requests as the active identity,
