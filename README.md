@@ -37,15 +37,29 @@ git clone git@github.com:Thanarak-q/Swaggernaut.git
 Requires Node.js >= 18 (uses the built-in global `fetch`). No npm install is
 required.
 
-## Updating
+## Update
+
+If you installed from the GitHub source checkout:
 
 ```bash
-swaggernaut update      # runs `git pull` in the install dir, then reports the new version
-# or manually:
-cd /path/to/Swaggernaut && git pull
+cd /path/to/Swaggernaut
+git pull --ff-only
+swaggernaut --version
 ```
 
-Check your version any time with `swaggernaut --version` (also shown in the UI header).
+If you kept the launcher from the install step, it keeps pointing at the same
+checkout after the pull.
+
+## Delete / Uninstall
+
+Remove the launcher, then remove the source checkout:
+
+```bash
+rm -f ~/.local/bin/swaggernaut
+rm -rf /path/to/Swaggernaut
+```
+
+Replace `/path/to/Swaggernaut` with the directory where you cloned the repo.
 
 ## Run
 
