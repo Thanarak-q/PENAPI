@@ -13,6 +13,13 @@ export function initAttacks() {
 async function run() {
   const req = getCurrentRequest();
   if (!req.url) return toast('Build a request first', true);
+  const writeMethod = !['GET', 'HEAD', 'OPTIONS'].includes((req.method || 'GET').toUpperCase());
+  const warning = [
+    'Quick Attacks sends multiple real requests to the target with auth/header/method mutations.',
+    writeMethod ? `${req.method} may modify data, so variants can repeat that action.` : 'Even safe methods can add load to a fragile endpoint.',
+    'Continue?',
+  ].join('\n');
+  if (!confirm(warning)) return;
   const tbody = $('#attackTable tbody');
   tbody.innerHTML = '<tr><td colspan="6" class="muted">running variants…</td></tr>';
   $('#attackModal').hidden = false;

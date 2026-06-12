@@ -3,7 +3,7 @@
 import { $, $$, toast, goTab } from './util.js';
 import { state, save } from './state.js';
 import { fetchSpec, parseCurl } from './api.js';
-import { initExplorer, renderExplorer } from './explorer.js';
+import { initExplorer, renderExplorer, clearFilters, openTagManager } from './explorer.js';
 import { initRequest, loadEndpoint, sendCurrent } from './request.js';
 import { initFuzzer, sendToFuzzer } from './fuzzer.js';
 import { initMatrix, sendToMatrix } from './matrix.js';
@@ -15,6 +15,11 @@ import { initJwt } from './jwt.js';
 import { initSpecLoader, setSpecSourceLabel } from './spec.js';
 import { initRecon, renderRecon } from './recon.js';
 import { initPalette, openPalette } from './palette.js';
+import { initMenubar } from './menubar.js';
+import {
+  initSession, updateProfileLabel,
+  saveSession, openSessions, exportSession, importSession,
+} from './session.js';
 
 async function boot() {
   initRequest();
@@ -29,6 +34,22 @@ async function boot() {
   initRecon();
   initPalette();
   initSpecLoader(applySpec);
+  initSession(onProfileChange);
+  initMenubar({
+    'session-save': saveSession,
+    'session-open': openSessions,
+    'session-export': exportSession,
+    'session-import': importSession,
+    tags: openTagManager,
+    'clear-filters': clearFilters,
+    shortcuts: () => ($('#shortcutsModal').hidden = false),
+    about: () => {
+      $('#aboutVer').textContent = $('#brandVer').textContent || '';
+      $('#aboutModal').hidden = false;
+    },
+  });
+  $('#closeShortcuts')?.addEventListener('click', () => ($('#shortcutsModal').hidden = true));
+  $('#closeAbout')?.addEventListener('click', () => ($('#aboutModal').hidden = true));
   wireTopbar();
   wireTabs();
   wireCurlModal();
@@ -38,6 +59,18 @@ async function boot() {
   await loadSpec();
   populateSelect();
   renderHistory();
+  updateProfileLabel();
+}
+
+// Re-render everything that reflects per-profile state (after a profile
+// switch / import / JSON edit in the Session manager).
+function onProfileChange() {
+  populateSelect();
+  $('#baseUrl').value = state.baseUrl || '';
+  renderIdentityChecks();
+  renderExplorer();
+  renderHistory();
+  updateProfileLabel();
 }
 
 // Apply a parsed spec to the app (used on boot and after loading a new spec).
@@ -94,19 +127,11 @@ function wireTabs() {
       $$('.panel').forEach((p) =>
         p.classList.toggle('active', p.dataset.panel === tab.dataset.tab)
       );
-      const d = tab.dataset.desc || '';
-      $('#tabDesc').textContent = d;
-      $('#tabDesc').title = d;
+      $('.workbar')?.classList.toggle('request-active', tab.dataset.tab === 'request');
       if (tab.dataset.tab === 'history') renderHistory();
       if (tab.dataset.tab === 'recon') renderRecon();
     });
   });
-  // Initialise the inline description with the active tab.
-  const active = document.querySelector('.tab.active');
-  if (active) {
-    $('#tabDesc').textContent = active.dataset.desc || '';
-    $('#tabDesc').title = active.dataset.desc || '';
-  }
 }
 
 function wireCrossTab() {
@@ -130,6 +155,12 @@ function wireShortcuts() {
       e.preventDefault();
       goTab('request');
       sendCurrent();
+      return;
+    }
+    // Ctrl/Cmd+S — save the current session profile.
+    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+      e.preventDefault();
+      saveSession();
       return;
     }
     // Esc — close any open modal.
@@ -181,6 +212,7 @@ function applyParsedRequest(req) {
   }
   if (!Object.keys(req.headers || {}).length) addHeaderRow(root, '', '');
   $('#reqBody').value = req.body || '';
+  $('#reqBody').dispatchEvent(new Event('input'));
   // clear params (curl URL already includes the query string)
   $('#paramsTable').innerHTML = '';
   $$('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === 'request'));

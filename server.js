@@ -19,7 +19,7 @@ const VERSION = pkg.version;
 
 function selfUpdate() {
   try {
-    console.log(`PenAPI ${VERSION} — updating from git (${__dirname})…`);
+    console.log(`Swaggernaut ${VERSION} — updating from git (${__dirname})…`);
     const out = execFileSync('git', ['-C', __dirname, 'pull', '--ff-only'], {
       encoding: 'utf8',
     });
@@ -28,7 +28,7 @@ function selfUpdate() {
     console.log(`Now at version ${v}.`);
   } catch (e) {
     console.error('Update failed:', e.message);
-    console.error('(This command only works when PenAPI runs from its git clone.)');
+    console.error('(This command only works when Swaggernaut runs from its git clone.)');
     process.exit(1);
   }
   process.exit(0);
@@ -45,7 +45,7 @@ function parseArgs(argv) {
     if (a === '--port' || a === '-p') cfg.port = argv[++i];
     else if (a === '--host') cfg.host = argv[++i];
     else if (a === '--version' || a === '-v') {
-      console.log(`PenAPI ${VERSION}`);
+      console.log(`Swaggernaut ${VERSION}`);
       process.exit(0);
     } else if (a === 'update' || a === '--update') {
       selfUpdate();
@@ -68,11 +68,11 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`PenAPI ${VERSION} — pentest API workbench
+  console.log(`Swaggernaut ${VERSION} — pentest API workbench
 
 Usage:
-  penapi [spec] [options]
-  penapi update                  Update to the latest version (git pull)
+  swaggernaut [spec] [options]
+  swaggernaut update                  Update to the latest version (git pull)
 
 Arguments:
   spec               Path or URL to an OpenAPI/Swagger JSON document.
@@ -86,9 +86,9 @@ Options:
   -h, --help         Show this help
 
 Examples:
-  penapi ./swagger.json
-  penapi https://target.example/v3/api-docs --port 8080
-  SPEC=./openapi.json penapi`);
+  swaggernaut ./swagger.json
+  swaggernaut https://target.example/v3/api-docs --port 8080
+  SPEC=./openapi.json swaggernaut`);
 }
 
 const cfg = parseArgs(process.argv.slice(2));
@@ -166,6 +166,7 @@ async function parseJsonBody(req) {
 // ---- Fuzzer ------------------------------------------------------------
 
 const MARKER = /§([^§]*)§|\bFUZZ\b/;
+const MAX_FUZZ_PAYLOADS = 500;
 
 function hasMarker(req) {
   return (
@@ -214,7 +215,7 @@ function resolvePayloads(cfg) {
 
 // Run requests with bounded concurrency, emitting each result via onResult.
 async function runFuzz(template, list, options, onResult, shouldStop) {
-  const concurrency = Math.min(Math.max(1, options.concurrency || 10), 50);
+  const concurrency = Math.min(Math.max(1, options.concurrency || 3), 10);
   const delay = Math.max(0, options.delayMs || 0);
   let idx = 0;
   let done = 0;
@@ -434,6 +435,12 @@ async function handleFuzz(req, res) {
   if (!list.length) {
     return sendJson(res, 400, { ok: false, error: 'No payloads resolved.' });
   }
+  if (list.length > MAX_FUZZ_PAYLOADS) {
+    return sendJson(res, 400, {
+      ok: false,
+      error: `Too many payloads (${list.length}). Limit this run to ${MAX_FUZZ_PAYLOADS} or less.`,
+    });
+  }
 
   // Server-Sent Events stream of live results.
   res.writeHead(200, {
@@ -500,7 +507,7 @@ async function handleSweep(req, res) {
   const methods = (cfg.methods && cfg.methods.length ? cfg.methods : ['GET']).map((m) => m.toUpperCase());
   const identities = cfg.identities && cfg.identities.length ? cfg.identities : [{ name: 'as-sent', headers: {} }];
   const placeholder = cfg.placeholder || '1';
-  const concurrency = Math.min(Math.max(1, cfg.concurrency || 8), 30);
+  const concurrency = Math.min(Math.max(1, cfg.concurrency || 3), 10);
 
   const targets = spec.endpoints.filter((e) => methods.includes(e.method));
 
@@ -587,7 +594,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, async () => {
-  console.log(`\n  PenAPI ${VERSION}  —  pentest API workbench`);
+  console.log(`\n  Swaggernaut ${VERSION}  —  pentest API workbench`);
   console.log(`  Spec:   ${specSource || '(none — load one from the UI)'}`);
   console.log(`  URL:    http://${HOST}:${PORT}\n`);
   if (specSource) {
