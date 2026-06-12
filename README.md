@@ -119,6 +119,7 @@ what the UI renders.
 | **Identities** | Named header sets (Admin / User / Unauth …). Switch the active identity to send every request as that role. Set a header value to `null` to *strip* it. |
 | **Fuzzer / Brute** | Mark injection points with `§§` (wrap a value: `§admin§`) or the keyword `FUZZ`. Built-in payload sets (SQLi, XSS, traversal, cmdi, SSRF, NoSQLi, LFI, usernames, passwords, auth-bypass, host-header), a numeric range for IDOR enumeration, and custom wordlists. Concurrency + delay, live streaming, sortable results, anomaly highlighting. Risky runs require confirmation and server-side caps limit accidental floods. |
 | **Access Matrix (BOLA/BFLA)** | Replay one request as every identity and diff outcomes. Low-priv/unauth identity getting `2xx` is flagged. Write-method replay requires confirmation. |
+| **Sequence Runner** | Chain requests into a multi-step flow. **Capture** a value from any response — a JSON body path (`data.id`), a response header, or the status — into a named variable, then reference it as `{{name}}` in any later step's URL, headers, or body (`{{baseUrl}}` is always available). Each step picks its own identity, and per-step **checks** (`eq`/`ne`/`contains`/`exists` on status/body/header) flag failures with optional stop-on-fail. Powers BOLA/IDOR setups, auth-token refresh, and stateful flows. Runs sequentially through the proxy, records each step to History, and exports results. Add a step from **Request → ⋯ → Send to Sequence**; sequences persist per session profile. |
 | **Quick Attacks** | Runs mutation variants — no-auth, empty/malformed bearer, verb swap, `X-HTTP-Method-Override`, `X-Original-URL`, spoofed `X-Forwarded-*`, trailing-slash, content-type confusion — after confirmation, flagging any that still succeed. |
 | **Auth Sweep** | Fires every spec endpoint as each identity to map authorization coverage. Every sweep shows an estimated request count and requires confirmation; write verbs are explicitly warned. |
 | **JWT Inspector** | Decode/edit a token client-side; shows alg, `exp`, claims; forge an `alg:none` / unsigned token to test signature-verification flaws. |
@@ -141,6 +142,8 @@ Actions that send multiple real requests now have guardrails:
   `3`, and the server rejects runs over 500 payloads.
 - **Access Matrix** confirms before replaying write methods as multiple
   identities.
+- **Sequence Runner** confirms before a run that contains any write-method
+  step, and sends steps strictly one at a time.
 - **Auth Sweep** confirms every run with estimated request count and caps
   concurrency to `10`.
 
@@ -153,6 +156,7 @@ anything on its own.
 - **IDOR sweep** — `GET /api/v1/items/§1§`, ID range `1`–`500`, Start. Rows whose length differs from the baseline are flagged.
 - **Login brute** — `POST /auth/login` body `{"user":"admin","pass":"§x§"}`, pick the *Common Passwords* set, watch for the status/length anomaly.
 - **SQLi probe** — mark a query value `§1§`, choose *SQL Injection*; time-based payloads surface as outliers in the Time column.
+- **BOLA via chained flow** — in the **Sequence** tab: step 1 `POST /api/orders` as *Admin*, capture `data.id` → `orderId`; step 2 `GET /api/orders/{{orderId}}` as *User* with a check `status eq 403`. A `2xx` on step 2 flags broken object-level auth.
 
 ## Layout
 
