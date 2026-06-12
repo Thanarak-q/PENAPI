@@ -66,6 +66,7 @@
           <button class="menu-item" data-act="auth">Auth Builder…</button>
           <button class="menu-item" data-act="random">Random Generator…</button>
           <button class="menu-item" data-act="cookie">Cookie Inspector…</button>
+          <button class="menu-item" data-act="headers">Header Auditor…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -694,6 +695,19 @@
       <div class="modal-actions">
         <button class="btn primary" id="ckRun">Inspect</button>
         <button class="btn ghost" id="closeCk">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="hdrModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Header Auditor <span class="muted">— response security headers</span></h2>
+      <p class="hint">Paste a raw HTTP <strong>response</strong> header block. Missing or weak security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy), tech-stack disclosure, and unsafe CORS are flagged.</p>
+      <textarea id="hdrIn" class="code code-out" spellcheck="false" placeholder="HTTP/1.1 200 OK&#10;Content-Type: text/html&#10;Server: nginx&#10;Content-Security-Policy: default-src 'self'"></textarea>
+      <div class="ck-out" id="hdrOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="hdrRun">Audit</button>
+        <button class="btn ghost" id="closeHdr">Close</button>
       </div>
     </div>
   </div>

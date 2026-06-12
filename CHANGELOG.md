@@ -58,6 +58,13 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Header Auditor** — under **Tools → Header Auditor…**, paste a raw HTTP
+  response header block to audit it for missing or weak security headers
+  (**CSP** incl. `unsafe-inline`/`unsafe-eval`, **HSTS** max-age, **X-Content-Type-Options**,
+  **X-Frame-Options** / CSP `frame-ancestors`, **Referrer-Policy**), tech-stack
+  disclosure (`Server`, `X-Powered-By`, …), and unsafe CORS (`Access-Control-Allow-Origin: *`,
+  worse with `Allow-Credentials: true`). Parser/audit are unit-tested via
+  `node --test` (`public/js/headers-core.js`).
 - **Cookie Inspector** — under **Tools → Cookie Inspector…**, paste one or more
   `Set-Cookie` header values to parse each cookie and audit its security
   attributes, flagging missing **HttpOnly**, **Secure**, and **SameSite** (and

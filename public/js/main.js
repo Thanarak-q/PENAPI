@@ -20,6 +20,7 @@ import { initTiming, openTiming } from './timing.js';
 import { initAuth, openAuth } from './auth.js';
 import { initRandom, openRandom } from './random.js';
 import { initCookie, openCookie } from './cookie.js';
+import { initHeaders, openHeaders } from './headers.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -51,6 +52,7 @@ async function boot() {
   initAuth();
   initRandom();
   initCookie();
+  initHeaders();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -77,6 +79,7 @@ async function boot() {
     auth: openAuth,
     random: openRandom,
     cookie: openCookie,
+    headers: openHeaders,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {
