@@ -64,6 +64,12 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   dropdown scrolls if it would exceed the viewport. No tools were removed.
 
 ### Added
+- **More Quick Attack variants** — the one-click attack runner now also tries
+  path-normalization ACL bypasses (`/.` trailing dot, `%2f` encoded slash,
+  case-swapped path, leading double slash), a scheme downgrade
+  (`X-Forwarded-Proto: http`), extra method-override headers, wildcard `Accept`,
+  and a JSON→XML content-type swap. `lib/attacks.js` is now covered by a
+  `node --test` suite (variant gating, path rewriting, header stripping).
 - **Six more Fuzzer payload sets** — **LDAP Injection**, **XPath Injection**,
   **GraphQL Introspection**, **Open Redirect**, **Email Header Injection**, and
   **Format String / Edge Cases** — bringing the built-in sets to 20. All surface
