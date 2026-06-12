@@ -57,6 +57,7 @@
           <button class="menu-item" data-act="click:toMatrixBtn">Send to Access Matrix</button>
           <div class="menu-sep"></div>
           <button class="menu-item" data-act="sequencer">Token Sequencer…</button>
+          <button class="menu-item" data-act="comparer">Comparer…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -513,6 +514,31 @@
       <div class="modal-actions">
         <button class="btn primary" id="tokAnalyze">Analyze</button>
         <button class="btn ghost" id="closeTok">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="cmpModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Comparer <span class="muted">— diff two blobs</span></h2>
+      <p class="hint">Paste two requests or responses and diff them line- or word-by-word. Nothing is sent.</p>
+      <div class="cmp-inputs">
+        <textarea id="cmpA" class="code code-out" spellcheck="false" placeholder="A — paste a request or response…"></textarea>
+        <textarea id="cmpB" class="code code-out" spellcheck="false" placeholder="B — paste a request or response…"></textarea>
+      </div>
+      <div class="cmp-controls">
+        <label>Mode
+          <select id="cmpMode" class="mini-select">
+            <option value="line">Line</option>
+            <option value="word">Word</option>
+          </select>
+        </label>
+        <span class="meta" id="cmpSummary"></span>
+      </div>
+      <div class="cmp-result" id="cmpResult" hidden></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="cmpRun">Compare</button>
+        <button class="btn ghost" id="closeCmp">Close</button>
       </div>
     </div>
   </div>

@@ -11,6 +11,7 @@ import { initSequence, sendToSequence, renderSequence } from './sequence.js';
 import { initDecoder } from './decoder.js';
 import { initCsrf } from './csrf.js';
 import { initSequencer, openSequencer } from './sequencer.js';
+import { initComparer, openComparer } from './comparer.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -33,6 +34,7 @@ async function boot() {
   initDecoder();
   initCsrf();
   initSequencer();
+  initComparer();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -50,6 +52,7 @@ async function boot() {
     'session-import': importSession,
     tags: openTagManager,
     sequencer: openSequencer,
+    comparer: openComparer,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

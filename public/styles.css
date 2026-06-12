@@ -1550,3 +1550,20 @@ table.results tbody tr.anomaly:hover { background: #f1e4c8; }
 .tok-bars-label { font-size: var(--text-2xs); color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.05em; }
 .tok-bars { display: flex; align-items: flex-end; gap: 2px; height: 44px; padding-top: 2px; }
 .tok-bar { flex: 1 1 auto; min-width: 2px; max-width: 14px; background: var(--accent); opacity: 0.8; }
+
+/* --- Comparer modal --------------------------------------------------- */
+.modal-wide { max-width: 900px; width: 90vw; }
+.cmp-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); }
+.cmp-inputs textarea { min-height: 120px; }
+.cmp-controls { display: flex; align-items: center; gap: var(--s3); margin: var(--s2) 0; }
+.cmp-controls label { display: inline-flex; align-items: center; gap: 5px; font-size: var(--text-xs); }
+.cmp-result {
+  max-height: 320px; overflow: auto;
+  border: 1px solid var(--line); background: var(--surface-2);
+  font-family: var(--mono); font-size: var(--text-xs);
+}
+.cmp-line { white-space: pre-wrap; padding: 0 var(--s2); }
+.cmp-pre { white-space: pre-wrap; margin: 0; padding: var(--s2); }
+.cmp-add { background: var(--ok-soft); color: var(--ok); }
+.cmp-del { background: var(--accent-soft); color: var(--accent-press); }
+.cmp-pre .cmp-del { text-decoration: line-through; }

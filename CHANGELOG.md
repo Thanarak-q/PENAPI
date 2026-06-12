@@ -58,6 +58,12 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Comparer** — under **Tools → Comparer…**, diff two pasted blobs (requests or
+  responses) at line or word granularity via an LCS diff, with an
+  added/removed/unchanged summary and colored output. Makes subtle differences
+  between two responses (an extra field, a flipped flag) obvious. Pure
+  client-side; diff engine is unit-tested via `node --test`
+  (`public/js/comparer-core.js`).
 - **Token Sequencer** — under **Tools → Token Sequencer…**, paste a sample of
   tokens (session IDs, CSRF, reset tokens) to estimate their randomness:
   sample/uniqueness counts, fixed vs. varying length, charset size, a

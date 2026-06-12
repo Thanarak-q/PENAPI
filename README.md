@@ -126,6 +126,7 @@ what the UI renders.
 | **Decoder** | Encode, decode, smart-decode, and hash text entirely client-side — Base64 / Base64URL, URL, hex, HTML entities, JWT decode, and SHA-1/256/384/512 hashing. **Smart decode** auto-detects the encoding; `⇅` chains the output back into the input; **From request** seeds the current body/URL. |
 | **CSRF PoC generator** | From **Request → ⋯ → Generate CSRF PoC…**, build a self-submitting HTML page from the current request to test for missing CSRF protection. Handles GET, form-urlencoded, and JSON bodies (via the `text/plain` trick), flags caveats like a non-cookie `Authorization` header, and HTML-escapes all values. Copy or download the `.html`. |
 | **Token Sequencer** | From **Tools → Token Sequencer…**, paste a sample of tokens to estimate randomness — uniqueness, length, charset, per-position Shannon entropy (bar chart), total bits, and a graded verdict that flags sequential or colliding tokens. Pure client-side. |
+| **Comparer** | From **Tools → Comparer…**, diff two pasted blobs (requests or responses) line- or word-by-word with an added/removed summary and colored output. Pure client-side. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
@@ -167,7 +168,6 @@ Planned additions, in rough priority:
 
 | Planned | What it does |
 |---|---|
-| **Comparer** | Word/byte-level diff of two requests or responses — pick any two from History or a Sequence run. Pure client-side. |
 | **Content discovery** | Brute-force paths and directories off the base URL to surface unspecced/shadow endpoints; reuses the fuzzer engine and caps. |
 | **Match & replace** | Rewrite rules applied to outgoing requests (headers/body regex) at the proxy layer — e.g. inject a header on every send. |
 | **Site map tree** | Tree view of discovered/visited endpoints with per-node request/response history. |
