@@ -12,6 +12,7 @@ import { initDecoder } from './decoder.js';
 import { initCsrf } from './csrf.js';
 import { initSequencer, openSequencer } from './sequencer.js';
 import { initComparer, openComparer } from './comparer.js';
+import { initSiteMap, openSiteMap } from './sitemap.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -35,6 +36,7 @@ async function boot() {
   initCsrf();
   initSequencer();
   initComparer();
+  initSiteMap();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -53,6 +55,7 @@ async function boot() {
     tags: openTagManager,
     sequencer: openSequencer,
     comparer: openComparer,
+    sitemap: openSiteMap,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

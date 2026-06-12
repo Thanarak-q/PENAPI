@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Site Map** — under **View → Site Map…**, browse the loaded spec's endpoints
+  as a URL-path tree (shared prefixes merged, per-branch operation counts) — a
+  hierarchical lens complementary to the tag-grouped explorer. Click any
+  operation to open it in the Request tab. Tree builder is unit-tested via
+  `node --test` (`public/js/sitemap-core.js`).
 - **Comparer** — under **Tools → Comparer…**, diff two pasted blobs (requests or
   responses) at line or word granularity via an LCS diff, with an
   added/removed/unchanged summary and colored output. Makes subtle differences

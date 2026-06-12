@@ -42,6 +42,7 @@
       <div class="menu-root">
         <button class="menu-top" type="button">View</button>
         <div class="menu-drop">
+          <button class="menu-item" data-act="sitemap">Site Map…</button>
           <button class="menu-item" data-act="tags">Tag Manager…</button>
           <button class="menu-item" data-act="palette">Command Palette <span class="menu-key">⌘K</span></button>
         </div>
@@ -539,6 +540,17 @@
       <div class="modal-actions">
         <button class="btn primary" id="cmpRun">Compare</button>
         <button class="btn ghost" id="closeCmp">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="smModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Site Map <span class="muted" id="smTitle"></span></h2>
+      <p class="hint">Endpoints from the loaded spec, organized by URL path. Click an operation to open it in the Request tab.</p>
+      <div class="sm-tree" id="smTree"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeSm">Close</button>
       </div>
     </div>
   </div>
