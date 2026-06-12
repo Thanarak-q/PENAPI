@@ -9,6 +9,7 @@ import { initFuzzer, sendToFuzzer } from './fuzzer.js';
 import { initMatrix, sendToMatrix } from './matrix.js';
 import { initSequence, sendToSequence, renderSequence } from './sequence.js';
 import { initDecoder } from './decoder.js';
+import { initCsrf } from './csrf.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -29,6 +30,7 @@ async function boot() {
   initMatrix();
   initSequence();
   initDecoder();
+  initCsrf();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();

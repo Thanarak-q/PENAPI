@@ -1519,3 +1519,14 @@ table.results tbody tr.anomaly:hover { background: #f1e4c8; }
   padding: 2px 0;
 }
 .dec-mid .meta { flex: 1 1 auto; }
+
+/* --- CSRF PoC modal notes ---------------------------------------------- */
+.csrf-notes { display: flex; flex-direction: column; gap: 4px; margin-bottom: var(--s2); }
+.csrf-note {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  background: var(--accent-soft);
+  border-left: 2px solid var(--accent);
+  padding: 4px var(--s2);
+}
+.csrf-notes:empty { display: none; }

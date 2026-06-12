@@ -139,6 +139,7 @@
               <button class="menu-item" id="toMatrixBtn" title="Send this request to the Access Matrix">Send to Access Matrix</button>
               <button class="menu-item" id="toSequenceBtn" title="Add this request as a step in the Sequence Runner">Send to Sequence</button>
               <button class="menu-item" id="codeBtn" title="Copy as code — cURL / fetch / Python / HTTPie">Copy as code…</button>
+              <button class="menu-item" id="csrfBtn" title="Generate a self-submitting CSRF proof-of-concept page">Generate CSRF PoC…</button>
               <div class="menu-sep"></div>
               <button class="menu-item" id="clearReq" title="Clear the request editor to a blank request">New / clear request</button>
             </div>
@@ -483,6 +484,20 @@
       <div class="modal-actions">
         <button class="btn primary" id="codeCopy">Copy</button>
         <button class="btn ghost" id="closeCode">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="csrfModal" hidden>
+    <div class="modal">
+      <h2>CSRF PoC <span class="muted">— current request</span></h2>
+      <p class="hint">A self-submitting HTML page that fires this request cross-site. Host it and open it as a logged-in victim — if the action goes through, the endpoint is missing CSRF protection.</p>
+      <div class="csrf-notes" id="csrfNotes"></div>
+      <textarea id="csrfOut" class="code code-out" spellcheck="false" readonly></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="csrfCopy">Copy</button>
+        <button class="btn ghost" id="csrfDownload">Download .html</button>
+        <button class="btn ghost" id="closeCsrf">Close</button>
       </div>
     </div>
   </div>

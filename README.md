@@ -124,6 +124,7 @@ what the UI renders.
 | **Auth Sweep** | Fires every spec endpoint as each identity to map authorization coverage. Every sweep shows an estimated request count and requires confirmation; write verbs are explicitly warned. |
 | **JWT Inspector** | Decode/edit a token client-side; shows alg, `exp`, claims; forge an `alg:none` / unsigned token to test signature-verification flaws. |
 | **Decoder** | Encode, decode, smart-decode, and hash text entirely client-side — Base64 / Base64URL, URL, hex, HTML entities, JWT decode, and SHA-1/256/384/512 hashing. **Smart decode** auto-detects the encoding; `⇅` chains the output back into the input; **From request** seeds the current body/URL. |
+| **CSRF PoC generator** | From **Request → ⋯ → Generate CSRF PoC…**, build a self-submitting HTML page from the current request to test for missing CSRF protection. Handles GET, form-urlencoded, and JSON bodies (via the `text/plain` trick), flags caveats like a non-cookie `Authorization` header, and HTML-escapes all values. Copy or download the `.html`. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
@@ -169,7 +170,6 @@ Planned additions, in rough priority:
 | **Sequencer** | Entropy/randomness analysis of a set of captured tokens (session IDs, CSRF, reset tokens). Pure client-side stats. |
 | **Content discovery** | Brute-force paths and directories off the base URL to surface unspecced/shadow endpoints; reuses the fuzzer engine and caps. |
 | **Match & replace** | Rewrite rules applied to outgoing requests (headers/body regex) at the proxy layer — e.g. inject a header on every send. |
-| **CSRF PoC generator** | Generate a self-submitting HTML form from any request to test CSRF protections. Pure client-side. |
 | **Site map tree** | Tree view of discovered/visited endpoints with per-node request/response history. |
 
 Out of scope by design: an intercepting MITM proxy and an out-of-band

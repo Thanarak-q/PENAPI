@@ -55,6 +55,17 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 - Accessibility: visible focus rings on all controls and `prefers-reduced-motion`
   support.
 
+## Unreleased
+
+### Added
+- **CSRF PoC generator** — from **Request → ⋯ → Generate CSRF PoC…**, turn the
+  current request into a self-submitting HTML page to test whether an endpoint
+  is missing CSRF protection. Handles GET (query → form fields), form-urlencoded
+  POST, and JSON POST (via the `text/plain` form trick), flags caveats (e.g. an
+  `Authorization` header that a browser form can't set), and HTML-escapes every
+  value. Copy or download the `.html`. Pure client-side; generator is
+  unit-tested via `node --test` (`public/js/csrf-core.js`).
+
 ## 1.11.0
 
 ### Added
