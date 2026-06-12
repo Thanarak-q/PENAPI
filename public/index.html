@@ -130,6 +130,7 @@
           <button class="tab" data-tab="sequence" data-desc="Chain requests into a multi-step flow — capture a value from one response (e.g. an id or token) and feed it into later steps. Powers BOLA setups, token refresh, and stateful flows.">Sequence</button>
           <button class="tab" data-tab="sweep" data-desc="Fire every endpoint in the spec as each identity to map authorization coverage across the whole API.">Auth Sweep</button>
           <span class="tab-sep"></span>
+          <button class="tab" data-tab="decoder" data-desc="Encode, decode, smart-decode and hash text — Base64 / Base64URL, URL, hex, HTML entities, JWT, and SHA hashing. Fully client-side; nothing is sent.">Decoder</button>
           <button class="tab" data-tab="history" data-desc="Every request you've sent this session — replay any of them or review past responses.">History</button>
         </nav>
         <div class="req-summary" id="reqSummary"></div>
@@ -311,6 +312,46 @@
             </thead>
             <tbody></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- DECODER TAB -->
+      <section class="panel" data-panel="decoder">
+        <p class="hint">Encode, decode, smart-decode, and hash text — all in the browser, nothing is sent. Pick a format and <strong>Encode</strong>/<strong>Decode</strong>, or hit <strong>Smart decode</strong> to auto-detect. <code>⇅</code> feeds the output back into the input for chained transforms.</p>
+        <div class="dec-toolbar">
+          <select id="decFormat" class="mini-select" title="Transform format">
+            <option value="base64">Base64</option>
+            <option value="base64url">Base64URL</option>
+            <option value="url">URL</option>
+            <option value="hex">Hex</option>
+            <option value="html">HTML entities</option>
+            <option value="jwt">JWT (decode)</option>
+          </select>
+          <button class="btn ghost tiny" id="decEncode">Encode</button>
+          <button class="btn ghost tiny" id="decDecode">Decode</button>
+          <button class="btn tiny" id="decSmart" title="Auto-detect the encoding and decode once">Smart decode</button>
+          <span class="dec-sep"></span>
+          <select id="decHash" class="mini-select" title="Hash algorithm">
+            <option value="SHA-1">SHA-1</option>
+            <option value="SHA-256" selected>SHA-256</option>
+            <option value="SHA-384">SHA-384</option>
+            <option value="SHA-512">SHA-512</option>
+          </select>
+          <button class="btn ghost tiny" id="decHashBtn">Hash</button>
+          <span class="dec-spacer"></span>
+          <button class="btn ghost tiny" id="decFromReq" title="Load the current request body / URL">From request</button>
+          <button class="btn ghost tiny" id="decClear">Clear</button>
+        </div>
+        <div class="dec-grid">
+          <label class="seq-label" for="decIn">Input</label>
+          <textarea id="decIn" class="mono-area" rows="8" spellcheck="false" placeholder="paste a token, parameter, or blob…"></textarea>
+          <div class="dec-mid">
+            <button class="btn ghost tiny" id="decSwap" title="Send output to input">⇅ Output → Input</button>
+            <span class="meta" id="decDetected"></span>
+            <button class="btn ghost tiny" id="decCopy" title="Copy output">Copy</button>
+          </div>
+          <label class="seq-label" for="decOut">Output</label>
+          <textarea id="decOut" class="mono-area" rows="8" spellcheck="false" readonly placeholder="result appears here"></textarea>
         </div>
       </section>
 
@@ -502,7 +543,7 @@
   <div class="modal-backdrop" id="curlModal" hidden>
     <div class="modal">
       <h2>Import cURL</h2>
-      <p class="hint">Paste a <code>curl</code> command (e.g. copied from Burp or DevTools). It will populate the Request tab.</p>
+      <p class="hint">Paste a <code>curl</code> command (e.g. copied from your browser DevTools or a proxy). It will populate the Request tab.</p>
       <textarea id="curlInput" class="code" spellcheck="false" placeholder="curl 'https://...' -H '...' --data-raw '...'"></textarea>
       <div class="modal-actions">
         <button class="btn primary" id="doImportCurl">Import</button>

@@ -1,6 +1,6 @@
 # Swaggernaut
 
-**Version 1.10.0** · MIT · Node >= 18
+**Version 1.11.0** · MIT · Node >= 18
 
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
@@ -119,10 +119,12 @@ what the UI renders.
 | **Identities** | Named header sets (Admin / User / Unauth …). Switch the active identity to send every request as that role. Set a header value to `null` to *strip* it. |
 | **Fuzzer / Brute** | Mark injection points with `§§` (wrap a value: `§admin§`) or the keyword `FUZZ`. Built-in payload sets (SQLi, XSS, traversal, cmdi, SSRF, NoSQLi, LFI, usernames, passwords, auth-bypass, host-header), a numeric range for IDOR enumeration, and custom wordlists. Concurrency + delay, live streaming, sortable results, anomaly highlighting. Risky runs require confirmation and server-side caps limit accidental floods. |
 | **Access Matrix (BOLA/BFLA)** | Replay one request as every identity and diff outcomes. Low-priv/unauth identity getting `2xx` is flagged. Write-method replay requires confirmation. |
+| **Sequence Runner** | Chain requests into a multi-step flow. **Capture** a value from any response — a JSON body path (`data.id`), a response header, or the status — into a named variable, then reference it as `{{name}}` in any later step's URL, headers, or body (`{{baseUrl}}` is always available). Each step picks its own identity, and per-step **checks** (`eq`/`ne`/`contains`/`exists` on status/body/header) flag failures with optional stop-on-fail. Powers BOLA/IDOR setups, auth-token refresh, and stateful flows. Runs sequentially through the proxy, records each step to History, and exports results. Add a step from **Request → ⋯ → Send to Sequence**; sequences persist per session profile. |
 | **Quick Attacks** | Runs mutation variants — no-auth, empty/malformed bearer, verb swap, `X-HTTP-Method-Override`, `X-Original-URL`, spoofed `X-Forwarded-*`, trailing-slash, content-type confusion — after confirmation, flagging any that still succeed. |
 | **Auth Sweep** | Fires every spec endpoint as each identity to map authorization coverage. Every sweep shows an estimated request count and requires confirmation; write verbs are explicitly warned. |
 | **JWT Inspector** | Decode/edit a token client-side; shows alg, `exp`, claims; forge an `alg:none` / unsigned token to test signature-verification flaws. |
-| **cURL import / Copy as code** | Paste a `curl` from Burp/DevTools to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
+| **Decoder** | Encode, decode, smart-decode, and hash text entirely client-side — Base64 / Base64URL, URL, hex, HTML entities, JWT decode, and SHA-1/256/384/512 hashing. **Smart decode** auto-detects the encoding; `⇅` chains the output back into the input; **From request** seeds the current body/URL. |
+| **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
 | **Find & navigate** | Command palette (Ctrl/Cmd+K) to jump to any endpoint or action; find-in-response with highlighting; filterable result tables; ★ pinned endpoints and custom tags. |
@@ -141,6 +143,8 @@ Actions that send multiple real requests now have guardrails:
   `3`, and the server rejects runs over 500 payloads.
 - **Access Matrix** confirms before replaying write methods as multiple
   identities.
+- **Sequence Runner** confirms before a run that contains any write-method
+  step, and sends steps strictly one at a time.
 - **Auth Sweep** confirms every run with estimated request count and caps
   concurrency to `10`.
 
@@ -153,6 +157,24 @@ anything on its own.
 - **IDOR sweep** — `GET /api/v1/items/§1§`, ID range `1`–`500`, Start. Rows whose length differs from the baseline are flagged.
 - **Login brute** — `POST /auth/login` body `{"user":"admin","pass":"§x§"}`, pick the *Common Passwords* set, watch for the status/length anomaly.
 - **SQLi probe** — mark a query value `§1§`, choose *SQL Injection*; time-based payloads surface as outliers in the Time column.
+- **BOLA via chained flow** — in the **Sequence** tab: step 1 `POST /api/orders` as *Admin*, capture `data.id` → `orderId`; step 2 `GET /api/orders/{{orderId}}` as *User* with a check `status eq 403`. A `2xx` on step 2 flags broken object-level auth.
+
+## Roadmap
+
+Planned additions, in rough priority:
+
+| Planned | What it does |
+|---|---|
+| **Comparer** | Word/byte-level diff of two requests or responses — pick any two from History or a Sequence run. Pure client-side. |
+| **Sequencer** | Entropy/randomness analysis of a set of captured tokens (session IDs, CSRF, reset tokens). Pure client-side stats. |
+| **Content discovery** | Brute-force paths and directories off the base URL to surface unspecced/shadow endpoints; reuses the fuzzer engine and caps. |
+| **Match & replace** | Rewrite rules applied to outgoing requests (headers/body regex) at the proxy layer — e.g. inject a header on every send. |
+| **CSRF PoC generator** | Generate a self-submitting HTML form from any request to test CSRF protections. Pure client-side. |
+| **Site map tree** | Tree view of discovered/visited endpoints with per-node request/response history. |
+
+Out of scope by design: an intercepting MITM proxy and an out-of-band
+interaction service — both need infrastructure beyond a zero-dependency local
+tool. Swaggernaut stays spec-driven and self-contained.
 
 ## Layout
 
