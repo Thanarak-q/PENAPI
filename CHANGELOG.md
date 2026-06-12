@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Wordlist Generator** — under **Tools → Wordlist Generator…**, build fuzzing
+  lists from a numeric range (with step and zero-padding) or case/leet mutations
+  of base words, then wrap each entry with a prefix/suffix and copy it into the
+  Fuzzer or Content Discovery. Output is capped to keep ranges safe. Logic is
+  unit-tested via `node --test` (`public/js/wordlist-core.js`).
 - **Status Reference** — under **Tools → Status Reference…**, a searchable HTTP
   status-code table (by number, phrase, or keyword) where each entry carries a
   short pentest note — e.g. 403 → verb/header tampering, 500 → error-based

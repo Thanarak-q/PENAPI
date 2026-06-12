@@ -146,6 +146,7 @@ what the UI renders.
 | **Injection Payloads** | From **Tools → Injection Payloads…**, a categorized cheat sheet (XSS, SQLi, path traversal, SSTI, command injection) with per-payload copy and a `{{M}}` marker for your OOB host / canary. Generation only — nothing is sent. |
 | **WAF Fingerprint** | From **Tools → WAF Fingerprint…**, paste response headers/body to detect the WAF/CDN in front of the API (Cloudflare, Akamai, AWS, Imperva, F5, Sucuri, Fastly, Azure, ModSecurity, …) from known signatures. |
 | **Status Reference** | From **Tools → Status Reference…**, search HTTP status codes by number/phrase/keyword — each entry adds a pentest note (403 → verb tampering, 500 → error-based injection, 502/504 → SSRF). |
+| **Wordlist Generator** | From **Tools → Wordlist Generator…**, build fuzzing lists from a numeric range (step + zero-pad) or case/leet mutations, wrap with a prefix/suffix, and copy into the Fuzzer or Content Discovery. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |

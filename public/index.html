@@ -77,6 +77,7 @@
           <button class="menu-item" data-act="payloadlib">Injection Payloads…</button>
           <button class="menu-item" data-act="waf">WAF Fingerprint…</button>
           <button class="menu-item" data-act="status">Status Reference…</button>
+          <button class="menu-item" data-act="wordlist">Wordlist Generator…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -857,6 +858,40 @@
       <div class="ck-out" id="stOut"></div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeSt">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="wlModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Wordlist Generator <span class="muted">— ranges &amp; mutations</span></h2>
+      <p class="hint">Build a fuzzing wordlist — a numeric range (with zero-padding) or case/leet mutations of base words — then wrap each entry with a prefix/suffix. Copy it into the <strong>Fuzzer</strong> or <strong>Content Discovery</strong>.</p>
+      <div class="wl-controls">
+        <select id="wlMode" class="method-select">
+          <option value="range">Numeric range</option>
+          <option value="mutate">Word mutations</option>
+        </select>
+        <span id="wlRangeRow" class="wl-controls">
+          <input id="wlStart" class="wl-num" type="number" value="1" title="start" />
+          <input id="wlEnd" class="wl-num" type="number" value="100" title="end" />
+          <input id="wlStep" class="wl-num" type="number" value="1" title="step" />
+          <input id="wlPad" class="wl-num" type="number" value="0" title="zero-pad width" />
+        </span>
+        <span id="wlMutateRow" class="wl-controls" hidden>
+          <label class="check"><input type="checkbox" id="wlLeet"> leet</label>
+        </span>
+      </div>
+      <textarea id="wlBase" class="code code-out" spellcheck="false" placeholder="base words for mutation mode — one per line&#10;admin&#10;root&#10;test" hidden></textarea>
+      <div class="wl-controls">
+        <input id="wlPrefix" type="text" placeholder="prefix" spellcheck="false" />
+        <input id="wlSuffix" type="text" placeholder="suffix" spellcheck="false" />
+        <span class="meta" id="wlCount"></span>
+      </div>
+      <textarea id="wlOut" class="code output" spellcheck="false" readonly></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="wlGen">Generate</button>
+        <button class="btn ghost" id="wlCopy">Copy</button>
+        <button class="btn ghost" id="closeWl">Close</button>
       </div>
     </div>
   </div>

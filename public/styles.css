@@ -963,6 +963,12 @@ mark { background: var(--accent); color: #fff; border-radius: 1px; padding: 0 1p
 .st-5xx { background: var(--accent); color: #fff; }
 .st-phrase { font-weight: 700; font-size: var(--text-sm); }
 
+/* Wordlist Generator */
+.wl-controls { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; margin-bottom: var(--s2); }
+.wl-controls input[type="text"], .wl-controls input[type="number"] { width: 7rem; }
+.wl-controls .wl-num { width: 5rem; }
+#wlOut { width: 100%; min-height: 180px; }
+
 /* =======================================================================
    Generic tool layouts (fuzzer / sweep / recon / matrix)
    ======================================================================= */
