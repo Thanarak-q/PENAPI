@@ -58,6 +58,13 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Content Discovery** — under **Tools → Content Discovery…**, brute-force a
+  built-in list of common paths (plus your own wordlist) off a base URL to find
+  unspecced/shadow endpoints. Sends real GET requests as the active identity,
+  classifies each outcome (found / protected / redirect / missing / error), and
+  is capped at 500 requests behind a confirmation gate. Candidate building and
+  classification are unit-tested via `node --test`
+  (`public/js/discovery-core.js`).
 - **Match & Replace** — under **Tools → Match & Replace…**, define session-scoped
   rewrite rules applied to requests sent from the Request tab before they leave:
   literal/regex replace on the URL or body, or set/remove a header (e.g. inject

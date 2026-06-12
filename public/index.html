@@ -60,6 +60,7 @@
           <button class="menu-item" data-act="sequencer">Token Sequencer…</button>
           <button class="menu-item" data-act="comparer">Comparer…</button>
           <button class="menu-item" data-act="matchreplace">Match &amp; Replace…</button>
+          <button class="menu-item" data-act="discovery">Content Discovery…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -565,6 +566,33 @@
         <button class="btn ghost tiny" id="mrAdd">+ Rule</button>
         <span class="mr-spacer"></span>
         <button class="btn ghost" id="closeMr">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="dscModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Content Discovery <span class="muted">— brute paths</span></h2>
+      <p class="hint">Fires real GET requests for each path against the base URL to find unspecced/shadow endpoints. <strong>Authorized testing only.</strong> Uses the active identity; capped at 500 requests.</p>
+      <div class="req-line small">
+        <input id="dscBase" type="text" class="url-input" spellcheck="false" placeholder="https://target/base" />
+      </div>
+      <label class="check"><input type="checkbox" id="dscBuiltin" checked> Built-in common paths</label>
+      <textarea id="dscCustom" class="mono-area" rows="4" spellcheck="false" placeholder="extra paths, one per line (# comments allowed)"></textarea>
+      <div class="dsc-controls">
+        <button class="btn primary" id="dscRun">Run</button>
+        <button class="btn ghost" id="dscStop" disabled>Stop</button>
+        <label class="check"><input type="checkbox" id="dscInteresting" checked> interesting only</label>
+        <span class="meta" id="dscProgress"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="results" id="dscTable">
+          <thead><tr><th>Path</th><th>Status</th><th>Outcome</th><th>Length</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeDsc">Close</button>
       </div>
     </div>
   </div>

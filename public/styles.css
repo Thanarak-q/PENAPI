@@ -1592,3 +1592,8 @@ table.results tbody tr.anomaly:hover { background: #f1e4c8; }
 .mr-rule .v { flex: 1 1 160px; min-width: 120px; }
 .mr-regex { font-size: var(--text-2xs); color: var(--ink-soft); }
 .mr-spacer { flex: 1 1 auto; }
+
+/* --- Content Discovery modal ------------------------------------------ */
+.dsc-controls { display: flex; align-items: center; gap: var(--s3); margin: var(--s2) 0; flex-wrap: wrap; }
+#dscModal .table-wrap { max-height: 300px; overflow: auto; }
+#dscCustom { width: 100%; }
