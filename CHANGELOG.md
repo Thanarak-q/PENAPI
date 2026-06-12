@@ -58,6 +58,13 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Token Sequencer** — under **Tools → Token Sequencer…**, paste a sample of
+  tokens (session IDs, CSRF, reset tokens) to estimate their randomness:
+  sample/uniqueness counts, fixed vs. varying length, charset size, a
+  per-character-position Shannon-entropy bar chart, total entropy in bits, and a
+  graded verdict (predictable / weak / moderate / strong) that flags sequential
+  tokens and duplicate collisions. Pure client-side; engine is unit-tested via
+  `node --test` (`public/js/sequencer-core.js`).
 - **CSRF PoC generator** — from **Request → ⋯ → Generate CSRF PoC…**, turn the
   current request into a self-submitting HTML page to test whether an endpoint
   is missing CSRF protection. Handles GET (query → form fields), form-urlencoded

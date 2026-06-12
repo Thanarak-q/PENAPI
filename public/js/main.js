@@ -10,6 +10,7 @@ import { initMatrix, sendToMatrix } from './matrix.js';
 import { initSequence, sendToSequence, renderSequence } from './sequence.js';
 import { initDecoder } from './decoder.js';
 import { initCsrf } from './csrf.js';
+import { initSequencer, openSequencer } from './sequencer.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -31,6 +32,7 @@ async function boot() {
   initSequence();
   initDecoder();
   initCsrf();
+  initSequencer();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -47,6 +49,7 @@ async function boot() {
     'session-export': exportSession,
     'session-import': importSession,
     tags: openTagManager,
+    sequencer: openSequencer,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

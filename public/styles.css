@@ -1530,3 +1530,23 @@ table.results tbody tr.anomaly:hover { background: #f1e4c8; }
   padding: 4px var(--s2);
 }
 .csrf-notes:empty { display: none; }
+
+/* --- Token Sequencer modal -------------------------------------------- */
+#tokInput { min-height: 120px; }
+.tok-report { display: flex; flex-direction: column; gap: var(--s2); margin: var(--s3) 0; }
+.tok-verdict {
+  display: flex; align-items: center; gap: var(--s2);
+  font-size: var(--text-sm); padding: var(--s2);
+  border-left: 3px solid var(--line-strong); background: var(--surface-2);
+}
+.tok-grade { font-family: var(--mono); font-weight: 700; font-size: var(--text-2xs); letter-spacing: 0.05em; }
+.tok-predictable, .tok-weak { border-left-color: var(--accent); background: var(--accent-soft); }
+.tok-moderate { border-left-color: var(--yellow, #b8860b); }
+.tok-strong { border-left-color: var(--ok); background: var(--ok-soft); }
+.tok-stats { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--s3); font-size: var(--text-xs); }
+.tok-stat { display: contents; }
+.tok-k { color: var(--ink-faint); text-transform: uppercase; font-size: var(--text-2xs); letter-spacing: 0.05em; }
+.tok-v { font-family: var(--mono); color: var(--ink); }
+.tok-bars-label { font-size: var(--text-2xs); color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+.tok-bars { display: flex; align-items: flex-end; gap: 2px; height: 44px; padding-top: 2px; }
+.tok-bar { flex: 1 1 auto; min-width: 2px; max-width: 14px; background: var(--accent); opacity: 0.8; }

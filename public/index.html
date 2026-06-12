@@ -55,6 +55,8 @@
           <div class="menu-sep"></div>
           <button class="menu-item" data-act="click:toFuzzerBtn">Send to Fuzzer</button>
           <button class="menu-item" data-act="click:toMatrixBtn">Send to Access Matrix</button>
+          <div class="menu-sep"></div>
+          <button class="menu-item" data-act="sequencer">Token Sequencer…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -498,6 +500,19 @@
         <button class="btn primary" id="csrfCopy">Copy</button>
         <button class="btn ghost" id="csrfDownload">Download .html</button>
         <button class="btn ghost" id="closeCsrf">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="tokModal" hidden>
+    <div class="modal">
+      <h2>Token Sequencer <span class="muted">— randomness estimate</span></h2>
+      <p class="hint">Paste a sample of tokens (one per line) — session IDs, CSRF tokens, reset tokens. The more samples, the better the estimate. Nothing is sent.</p>
+      <textarea id="tokInput" class="code code-out" spellcheck="false" placeholder="one token per line…"></textarea>
+      <div class="tok-report" id="tokReport" hidden></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="tokAnalyze">Analyze</button>
+        <button class="btn ghost" id="closeTok">Close</button>
       </div>
     </div>
   </div>
