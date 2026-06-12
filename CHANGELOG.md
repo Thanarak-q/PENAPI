@@ -3,6 +3,27 @@
 All notable changes to Swaggernaut are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## 1.12.0
+
+### Added
+- **Attack menu with nested flyouts** — payload generation, spoofing helpers,
+  Match & Replace, Content Discovery, and Quick Attacks now live under a
+  top-level **Attack** menu. Payloads and header/spoofing tools are grouped in
+  second-level flyout menus.
+- **Nested Tools flyouts** — standalone utilities are grouped under
+  **Tokens & crypto**, **Encode & convert**, and **Recon & analysis** instead of
+  one long flat dropdown.
+- **Theme palettes and dark mode** — the top bar now includes palette swatches
+  and a light/dark toggle. Preferences persist locally before the UI paints.
+- **User Guide** — **Help → User Guide…** opens a local guide page covering the
+  safe workflow, active-test tools, dark mode, and palettes.
+- **Hover help** — compact icon and short-label buttons now expose `title`
+  hints so their purpose is visible on hover.
+
+### Changed
+- Removed the unused request-header endpoint strip that displayed
+  "Pick an endpoint" before a request was selected.
+
 ## 1.10.0
 
 ### Added

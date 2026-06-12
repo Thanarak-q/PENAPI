@@ -6,7 +6,7 @@ import { convertBody } from './bodyconv-core.js';
 
 function outBlock(title, contentType, value) {
   const pre = el('pre', { class: 'code output bc-pre', text: value });
-  const btn = el('button', { class: 'btn tiny ghost', text: 'copy' });
+  const btn = el('button', { class: 'btn tiny ghost', text: 'copy', title: `Copy ${title} body` });
   btn.addEventListener('click', () => { copy(value); toast('Copied'); });
   return el('div', { class: 'bc-block' }, [
     el('div', { class: 'bc-head' }, [

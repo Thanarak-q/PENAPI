@@ -41,6 +41,7 @@ export function attachExport(container, getData) {
     const b = document.createElement('button');
     b.className = 'btn ghost tiny';
     b.textContent = label;
+    b.title = `Export this table as ${label}`;
     b.addEventListener('click', () => doExport(getData(), fmt));
     return b;
   };

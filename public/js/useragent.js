@@ -18,7 +18,7 @@ function render() {
       host.appendChild(el('div', { class: 'rd-group-title', text: e.category }));
       lastCat = e.category;
     }
-    const btn = el('button', { class: 'btn tiny ghost', text: 'copy' });
+    const btn = el('button', { class: 'btn tiny ghost', text: 'copy', title: 'Copy this User-Agent string' });
     btn.addEventListener('click', () => { copy(e.ua); toast('UA copied'); });
     host.appendChild(el('div', { class: 'ah-row' }, [
       el('div', { class: 'ah-head' }, [

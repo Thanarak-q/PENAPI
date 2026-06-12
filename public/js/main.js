@@ -44,12 +44,14 @@ import { initSpecLoader, setSpecSourceLabel } from './spec.js';
 import { initRecon, renderRecon } from './recon.js';
 import { initPalette, openPalette } from './palette.js';
 import { initMenubar } from './menubar.js';
+import { initTheme } from './theme.js';
 import {
   initSession, updateProfileLabel,
   saveSession, openSessions, exportSession, importSession,
 } from './session.js';
 
 async function boot() {
+  initTheme();
   initRequest();
   await initFuzzer();
   initMatrix();
@@ -123,6 +125,7 @@ async function boot() {
     attackhdr: openAttackHdr,
     useragent: openUserAgent,
     'clear-filters': clearFilters,
+    guide: () => window.open('/guide.html', '_blank', 'noopener'),
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {
       $('#aboutVer').textContent = $('#brandVer').textContent || '';

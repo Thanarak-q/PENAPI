@@ -41,6 +41,7 @@ export function renderHistory() {
         el('button', {
           class: 'btn tiny',
           text: 'View',
+          title: 'Open request and response details',
           onclick: (e) => {
             e.stopPropagation();
             showDetail(h);
