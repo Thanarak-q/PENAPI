@@ -29,7 +29,7 @@ export function initMatrix() {
   $('#matrixFilter').addEventListener('input', () => renderMatrix(lastResults));
 
   attachExport(document.querySelector('[data-panel="matrix"] .matrix-head'), () => ({
-    name: 'penapi-matrix',
+    name: 'swaggernaut-matrix',
     headers: ['identity', 'status', 'size', 'timeMs', 'error'],
     rows: lastResults,
   }));

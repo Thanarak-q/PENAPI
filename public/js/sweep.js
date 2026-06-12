@@ -20,7 +20,7 @@ export function initSweep() {
   renderIdentityChecks();
 
   attachExport(document.querySelector('[data-panel="sweep"] .results-toolbar'), () => ({
-    name: 'penapi-sweep',
+    name: 'swaggernaut-sweep',
     headers: ['method', 'path', 'hasSecurity', ...identityNames, 'flagged'],
     rows: rows.map((r) => {
       const row = { method: r.method, path: r.path, hasSecurity: r.hasSecurity, flagged: rowFlagged(r) };

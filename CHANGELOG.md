@@ -1,7 +1,59 @@
 # Changelog
 
-All notable changes to PenAPI are documented here. This project adheres to
+All notable changes to Swaggernaut are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
+
+## 1.10.0
+
+### Added
+- **Application menu bar** (File · Edit · View · Tools · Help) replacing the scattered
+  top-bar buttons. Classic behavior: click to open, hover to switch, Esc/click-out to close.
+- **Named-profile sessions** — save multiple working setups (target URL, identities, history,
+  pinned endpoints, focus tags) and switch between them. **Export / Open** a session as a `.json`
+  file, **Edit** the active session JSON in place, quick-save with `⌘/Ctrl+S`. Existing saved state
+  is migrated automatically into a "default" profile.
+- **JWT toolkit** (all in-browser via Web Crypto — nothing leaves the machine):
+  - **Sign / verify** with an HMAC secret (HS256/384/512).
+  - **Brute-force** a weak secret from a local wordlist (paste or load a file).
+  - **Claim & attack presets** (role=admin, admin=true, bump/remove exp, sub=1, alg=none,
+    RS→HS alg-confusion, kid traversal).
+  - **Apply token** — set as the active identity's bearer, or copy a ready `Authorization` header.
+- **Split find & filter** in the sidebar — the text search now sits above a filter row: method
+  chips, tag and security selects, and flag toggles (body / IDOR / deprecated / pinned), all
+  combinable, with an active-filter count and one-click clear.
+- **Tag UX** — inline **chip editor** with autocomplete (replaces the old prompt), **click a tag to
+  filter**, color-coded tag dots, and a **Tag Manager** (View menu) to rename or delete a tag
+  everywhere it is used. Right-click a tag chip to remove it from an endpoint.
+- **Help** menu with a Keyboard Shortcuts reference and an About dialog.
+
+## 1.9.1
+
+### Changed
+- **Density & button IA pass** (follow-up to the 1.9.0 redesign):
+  - **Send** now sits on the method+URL line as the primary action. Attack, Send
+    to Fuzzer, Send to Matrix, and Copy-as-code moved into a `⋯` overflow menu,
+    removing the buttons that duplicated the Fuzzer/Matrix tabs.
+  - Added **New / clear request** to the `⋯` menu.
+  - **Find in response** collapses to a `⌕` icon in the response bar (reclaims a
+    full row); click to reveal a slim search field.
+  - Relabeled the cryptic topbar identities button (`IDS` → `Identities`) and
+    dropped redundant micro-labels (TARGET / IDENTITY / ENDPOINTS).
+  - Shortened the per-tab hint text to one line each; the request body editor now
+    fills the column (no large empty void); tighter table rows, topbar, and
+    panel padding for higher data density.
+
+## 1.9.0
+
+### Changed
+- **Complete UI/UX redesign — "Light Technical / Swiss".** The entire interface
+  was rebuilt from scratch: a paper-white surface, a single signal-red accent,
+  hairline data grids, strong typographic hierarchy, and disciplined 8px spacing.
+  New segmented tab nav, restyled sidebar/endpoint list, response viewer, modal
+  "sheet" system, command palette, and toast. Markup (`public/index.html`) and
+  styles (`public/styles.css`) were fully replaced; the 6-tab structure and all
+  features/workflows are preserved. No backend or JS behavior changes.
+- Accessibility: visible focus rings on all controls and `prefers-reduced-motion`
+  support.
 
 ## Unreleased
 
@@ -72,7 +124,7 @@ All notable changes to PenAPI are documented here. This project adheres to
 ### Added
 - **Copy as code** — `</>` button on the request line generates the current
   request as `fetch`, Python `requests`, or HTTPie (alongside cURL) in a tabbed
-  dialog, for reproducing findings outside PenAPI.
+  dialog, for reproducing findings outside Swaggernaut.
 
 ## [1.4.0] — 2026-06-11
 

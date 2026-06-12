@@ -1,13 +1,13 @@
 {
-  "name": "penapi",
-  "version": "1.8.2",
+  "name": "swaggernaut",
+  "version": "1.10.0",
   "description": "Pentest-oriented API workbench — loads an OpenAPI/Swagger spec and adds offensive testing tooling (repeater, fuzzer/brute-force, access-control matrix, cURL import).",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "bin": {
-    "penapi": "server.js"
+    "swaggernaut": "server.js"
   },
   "engines": {
     "node": ">=18"

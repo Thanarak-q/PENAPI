@@ -1,5 +1,5 @@
 // Generate code snippets for the current request in several languages so a
-// finding can be reproduced outside PenAPI.
+// finding can be reproduced outside Swaggernaut.
 
 function pyStr(s) {
   return "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";

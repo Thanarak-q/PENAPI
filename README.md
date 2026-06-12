@@ -1,6 +1,6 @@
-# PENAPI
+# Swaggernaut
 
-**Version 1.8.2** · MIT · Node ≥ 18
+**Version 1.10.0** · MIT · Node >= 18
 
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
@@ -8,21 +8,21 @@ request — then layer on a repeater, fuzzer/brute-forcer, access-control matrix
 identity switching, tagged endpoint triage, guarded bypass checks, a JWT
 tamperer, and cURL import/export.
 
-Zero npm dependencies — pure Node plus a static front end. `penapi spec.json` and go.
+Zero npm dependencies — pure Node plus a static front end. `swaggernaut spec.json` and go.
 
-> **For authorized testing only.** PenAPI sends whatever you tell it to from the
+> **For authorized testing only.** Swaggernaut sends whatever you tell it to from the
 > host it runs on. Use it only against systems you have explicit permission to
 > test. The maintainers are not responsible for misuse.
 
 ## Install
 
 ```bash
-git clone https://github.com/Thanarak-q/PENAPI.git
-cd PENAPI
-# put a launcher on your PATH so `penapi` works anywhere
-printf '#!/usr/bin/env bash\nexec node "%s/server.js" "$@"\n' "$PWD" > ~/.local/bin/penapi
-chmod +x ~/.local/bin/penapi
-penapi --version
+git clone https://github.com/Thanarak-q/PENAPI.git Swaggernaut
+cd Swaggernaut
+# put a launcher on your PATH so `swaggernaut` works anywhere
+printf '#!/usr/bin/env bash\nexec node "%s/server.js" "$@"\n' "$PWD" > ~/.local/bin/swaggernaut
+chmod +x ~/.local/bin/swaggernaut
+swaggernaut --version
 ```
 
 Requires Node.js >= 18 (uses the built-in global `fetch`). No other dependencies.
@@ -30,12 +30,12 @@ Requires Node.js >= 18 (uses the built-in global `fetch`). No other dependencies
 ## Updating
 
 ```bash
-penapi update      # runs `git pull` in the install dir, then reports the new version
+swaggernaut update      # runs `git pull` in the install dir, then reports the new version
 # or manually:
-cd /path/to/PENAPI && git pull
+cd /path/to/Swaggernaut && git pull
 ```
 
-Check your version any time with `penapi --version` (also shown in the UI header).
+Check your version any time with `swaggernaut --version` (also shown in the UI header).
 
 ## Run
 
@@ -66,9 +66,9 @@ straight into the Fuzzer or Access Matrix.
 
 | Source | How |
 |---|---|
-| CLI argument | `penapi <file-or-url>` |
-| Current directory | run `penapi` with no args; finds `swagger.json` / `openapi.json` |
-| Environment | `SPEC=/path/to/spec.json penapi` |
+| CLI argument | `swaggernaut <file-or-url>` |
+| Current directory | run `swaggernaut` with no args; finds `swagger.json` / `openapi.json` |
+| Environment | `SPEC=/path/to/spec.json swaggernaut` |
 | Runtime (UI) | **Load Spec** → URL, file upload, or paste |
 
 The spec is parsed **server-side**; file contents never leave the box beyond
@@ -95,7 +95,7 @@ what the UI renders.
 
 ## Session & Safety
 
-PenAPI persists local working state in the browser: target base URL, identities,
+Swaggernaut persists local working state in the browser: target base URL, identities,
 request history, pinned endpoints, and custom endpoint tags. It does not yet
 export/import full session files; clearing browser storage clears this state.
 

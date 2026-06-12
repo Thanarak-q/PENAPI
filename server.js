@@ -19,7 +19,7 @@ const VERSION = pkg.version;
 
 function selfUpdate() {
   try {
-    console.log(`PenAPI ${VERSION} — updating from git (${__dirname})…`);
+    console.log(`Swaggernaut ${VERSION} — updating from git (${__dirname})…`);
     const out = execFileSync('git', ['-C', __dirname, 'pull', '--ff-only'], {
       encoding: 'utf8',
     });
@@ -28,7 +28,7 @@ function selfUpdate() {
     console.log(`Now at version ${v}.`);
   } catch (e) {
     console.error('Update failed:', e.message);
-    console.error('(This command only works when PenAPI runs from its git clone.)');
+    console.error('(This command only works when Swaggernaut runs from its git clone.)');
     process.exit(1);
   }
   process.exit(0);
@@ -45,7 +45,7 @@ function parseArgs(argv) {
     if (a === '--port' || a === '-p') cfg.port = argv[++i];
     else if (a === '--host') cfg.host = argv[++i];
     else if (a === '--version' || a === '-v') {
-      console.log(`PenAPI ${VERSION}`);
+      console.log(`Swaggernaut ${VERSION}`);
       process.exit(0);
     } else if (a === 'update' || a === '--update') {
       selfUpdate();
@@ -68,11 +68,11 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`PenAPI ${VERSION} — pentest API workbench
+  console.log(`Swaggernaut ${VERSION} — pentest API workbench
 
 Usage:
-  penapi [spec] [options]
-  penapi update                  Update to the latest version (git pull)
+  swaggernaut [spec] [options]
+  swaggernaut update                  Update to the latest version (git pull)
 
 Arguments:
   spec               Path or URL to an OpenAPI/Swagger JSON document.
@@ -86,9 +86,9 @@ Options:
   -h, --help         Show this help
 
 Examples:
-  penapi ./swagger.json
-  penapi https://target.example/v3/api-docs --port 8080
-  SPEC=./openapi.json penapi`);
+  swaggernaut ./swagger.json
+  swaggernaut https://target.example/v3/api-docs --port 8080
+  SPEC=./openapi.json swaggernaut`);
 }
 
 const cfg = parseArgs(process.argv.slice(2));
@@ -594,7 +594,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, async () => {
-  console.log(`\n  PenAPI ${VERSION}  —  pentest API workbench`);
+  console.log(`\n  Swaggernaut ${VERSION}  —  pentest API workbench`);
   console.log(`  Spec:   ${specSource || '(none — load one from the UI)'}`);
   console.log(`  URL:    http://${HOST}:${PORT}\n`);
   if (specSource) {

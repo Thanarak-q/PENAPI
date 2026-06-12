@@ -132,6 +132,27 @@ function renderSummary(ep) {
   $('#reqSummary').innerHTML = bits.join(' · ');
 }
 
+// Reset the request editor to a blank request ("New / clear request").
+export function clearRequest() {
+  state.current = null;
+  $$('.endpoint').forEach((n) => n.classList.remove('active'));
+  $('#reqMethod').value = 'GET';
+  $('#reqUrl').value = '';
+  renderKv('#headersTable', []);
+  renderKv('#paramsTable', []);
+  $('#reqBody').value = '';
+  syncReqBodyHighlight();
+  $('#reqSummary').innerHTML = '';
+  const method = $('#currentMethod');
+  method.textContent = 'REQ';
+  method.className = 'method-badge';
+  $('#currentPath').textContent = 'New request';
+  $('#currentPath').title = '';
+  $('#currentSummary').textContent = '';
+  $('#currentTags').innerHTML = '';
+  $('#reqUrl').focus();
+}
+
 function renderCurrentEndpoint(ep) {
   const method = $('#currentMethod');
   method.textContent = ep.method;
@@ -375,6 +396,31 @@ export function initRequest() {
   $('#reqBody').addEventListener('scroll', syncReqBodyHighlight);
   wireCodeModal();
   $('#resFind').addEventListener('input', applyResponseFind);
+
+  // New / clear request.
+  $('#clearReq')?.addEventListener('click', clearRequest);
+
+  // Collapsible find-in-response: toggle reveals a slim field in the status bar.
+  $('#resFindToggle')?.addEventListener('click', () => {
+    const wrap = $('#resFindWrap');
+    const open = wrap.classList.toggle('find-open');
+    if (open) {
+      $('#resFind').focus();
+    } else {
+      $('#resFind').value = '';
+      applyResponseFind();
+    }
+  });
+
+  // Close the ⋯ overflow menu after any item is chosen.
+  $$('#reqMenu .menu-item').forEach((item) =>
+    item.addEventListener('click', () => ($('#reqMenu').open = false))
+  );
+  // Close the ⋯ menu when clicking elsewhere.
+  document.addEventListener('click', (e) => {
+    const menu = $('#reqMenu');
+    if (menu && menu.open && !menu.contains(e.target)) menu.open = false;
+  });
 
   // request-editor subtabs
   wireSubtabs('.req-editor', 'sub', 'subpanel');

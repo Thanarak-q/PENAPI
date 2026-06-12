@@ -37,7 +37,7 @@ export async function initFuzzer() {
   });
 
   attachExport(document.querySelector('[data-panel="fuzzer"] .results-toolbar'), () => ({
-    name: 'penapi-fuzz',
+    name: 'swaggernaut-fuzz',
     headers: ['idx', 'payload', 'status', 'size', 'timeMs', 'location', 'error'],
     rows: results,
   }));

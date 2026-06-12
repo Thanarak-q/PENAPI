@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-PenAPI is a zero-dependency Node.js application with a static browser UI. The main server entry point is `server.js`; it serves `public/` and exposes the local `/api/*` endpoints used by the UI. Reusable server modules live in `lib/`: `specParser.js` normalizes OpenAPI/Swagger specs, `httpClient.js` sends raw HTTP/HTTPS requests, `curl.js` handles cURL import/export, and `payloads.js` plus `attacks.js` power offensive testing helpers. Front-end ES modules live in `public/js/`, with `public/index.html` and `public/styles.css` holding the shell and styling.
+Swaggernaut is a zero-dependency Node.js application with a static browser UI. The main server entry point is `server.js`; it serves `public/` and exposes the local `/api/*` endpoints used by the UI. Reusable server modules live in `lib/`: `specParser.js` normalizes OpenAPI/Swagger specs, `httpClient.js` sends raw HTTP/HTTPS requests, `curl.js` handles cURL import/export, and `payloads.js` plus `attacks.js` power offensive testing helpers. Front-end ES modules live in `public/js/`, with `public/index.html` and `public/styles.css` holding the shell and styling.
 
 ## Build, Test, and Development Commands
 
@@ -28,4 +28,4 @@ Follow the existing Conventional Commit style, for example `feat: add endpoint f
 
 ## Security & Configuration Tips
 
-Use PenAPI only for authorized testing. Do not commit tokens, captured credentials, private specs, or target-specific secrets. Prefer environment variables such as `PORT`, `HOST`, and `SPEC` for local configuration. Validate any new input path, URL, header, or request-shaping feature at the server boundary.
+Use Swaggernaut only for authorized testing. Do not commit tokens, captured credentials, private specs, or target-specific secrets. Prefer environment variables such as `PORT`, `HOST`, and `SPEC` for local configuration. Validate any new input path, URL, header, or request-shaping feature at the server boundary.
