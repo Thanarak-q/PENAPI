@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Injection Payloads** — under **Tools → Injection Payloads…**, a categorized
+  cheat sheet of test strings (XSS, SQLi, path traversal, SSTI, command
+  injection) with per-payload copy. A marker field substitutes `{{M}}` with your
+  OOB host or a unique reflection canary. Generation only — nothing is sent.
+  Library is unit-tested via `node --test` (`public/js/payloads-lib-core.js`).
 - **Body Converter** — under **Tools → Body Converter…**, paste a JSON object to
   re-encode the same data as `application/x-www-form-urlencoded`, a query
   string, and `multipart/form-data` (per-block copy) — for probing content-type

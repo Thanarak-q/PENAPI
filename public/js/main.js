@@ -28,6 +28,7 @@ import { initEntropy, openEntropy } from './entropy.js';
 import { initRedirect, openRedirect } from './redirect.js';
 import { initJsonFlat, openJsonFlat } from './jsonflat.js';
 import { initBodyConv, openBodyConv } from './bodyconv.js';
+import { initPayloadLib, openPayloadLib } from './payloads-lib.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -67,6 +68,7 @@ async function boot() {
   initRedirect();
   initJsonFlat();
   initBodyConv();
+  initPayloadLib();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -101,6 +103,7 @@ async function boot() {
     redirect: openRedirect,
     jsonflat: openJsonFlat,
     bodyconv: openBodyConv,
+    payloadlib: openPayloadLib,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

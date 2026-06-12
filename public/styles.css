@@ -950,6 +950,10 @@ mark { background: var(--accent); color: #fff; border-radius: 1px; padding: 0 1p
 .bc-ct { font-size: var(--text-2xs); color: var(--ink-soft); flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bc-pre { max-height: 140px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
 
+/* Injection Payloads */
+.pl-row { display: flex; align-items: center; gap: var(--s2); padding: 2px 0; border-bottom: 1px solid var(--line); }
+.pl-payload { flex: 1 1 auto; font-family: var(--mono); font-size: var(--text-xs); color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: all; }
+
 /* =======================================================================
    Generic tool layouts (fuzzer / sweep / recon / matrix)
    ======================================================================= */

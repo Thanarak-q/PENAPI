@@ -74,6 +74,7 @@
           <button class="menu-item" data-act="redirect">Redirect &amp; SSRF Payloads…</button>
           <button class="menu-item" data-act="jsonflat">JSON Flattener…</button>
           <button class="menu-item" data-act="bodyconv">Body Converter…</button>
+          <button class="menu-item" data-act="payloadlib">Injection Payloads…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -814,6 +815,20 @@
       <div class="modal-actions">
         <button class="btn primary" id="bcRun">Convert</button>
         <button class="btn ghost" id="closeBc">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="plModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Injection Payloads <span class="muted">— authorized testing cheat sheet</span></h2>
+      <p class="hint">Categorized test strings for XSS, SQLi, path traversal, SSTI, and command injection. Set a marker to replace <code>{{M}}</code> (your OOB host or a unique reflection canary). Generation only — nothing is sent; copy a payload into a request yourself.</p>
+      <div class="req-line">
+        <input id="plMarker" class="url-input" type="text" spellcheck="false" placeholder="marker for {{M}} — e.g. oob.attacker.test or a canary" />
+      </div>
+      <div class="ck-out" id="plOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closePl">Close</button>
       </div>
     </div>
   </div>
