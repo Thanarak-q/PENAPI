@@ -19,11 +19,15 @@ Zero npm dependencies — pure Node plus a static front end. `swaggernaut spec.j
 Install from GitHub source:
 
 ```bash
+cd ~
 git clone https://github.com/Thanarak-q/Swaggernaut.git
 cd Swaggernaut
 # put a launcher on your PATH so `swaggernaut` works anywhere
+mkdir -p ~/.local/bin
 printf '#!/usr/bin/env bash\nexec node "%s/server.js" "$@"\n' "$PWD" > ~/.local/bin/swaggernaut
 chmod +x ~/.local/bin/swaggernaut
+export PATH="$HOME/.local/bin:$PATH"
+hash -r 2>/dev/null || true
 swaggernaut --version
 ```
 
@@ -31,19 +35,22 @@ If GitHub asks for a username when cloning, the repo is private or your GitHub
 session does not have access. Use SSH instead if your key is configured:
 
 ```bash
+cd ~
 git clone git@github.com:Thanarak-q/Swaggernaut.git
 ```
 
 Requires Node.js >= 18 (uses the built-in global `fetch`). No npm install is
-required.
+required. If `swaggernaut` is not found in a new terminal, add
+`export PATH="$HOME/.local/bin:$PATH"` to your shell profile.
 
 ## Update
 
 If you installed from the GitHub source checkout:
 
 ```bash
-cd /path/to/Swaggernaut
+cd ~/Swaggernaut
 git pull --ff-only
+hash -r 2>/dev/null || true
 swaggernaut --version
 ```
 
@@ -55,11 +62,14 @@ checkout after the pull.
 Remove the launcher, then remove the source checkout:
 
 ```bash
+cd ~
 rm -f ~/.local/bin/swaggernaut
-rm -rf /path/to/Swaggernaut
+rm -rf ~/Swaggernaut
+hash -r 2>/dev/null || true
 ```
 
-Replace `/path/to/Swaggernaut` with the directory where you cloned the repo.
+Run delete commands from outside the checkout so your shell is not left inside a
+removed directory.
 
 ## Run
 
