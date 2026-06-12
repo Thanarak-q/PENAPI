@@ -75,6 +75,7 @@
           <button class="menu-item" data-act="jsonflat">JSON Flattener…</button>
           <button class="menu-item" data-act="bodyconv">Body Converter…</button>
           <button class="menu-item" data-act="payloadlib">Injection Payloads…</button>
+          <button class="menu-item" data-act="waf">WAF Fingerprint…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -829,6 +830,20 @@
       <div class="ck-out" id="plOut"></div>
       <div class="modal-actions">
         <button class="btn ghost" id="closePl">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="wfModal" hidden>
+    <div class="modal modal-wide">
+      <h2>WAF Fingerprint <span class="muted">— what's in front of the API</span></h2>
+      <p class="hint">Paste a response's headers (and optionally a body snippet, e.g. a block page) to detect common WAFs / CDNs / reverse proxies — Cloudflare, Akamai, AWS, Imperva, F5, Sucuri, Fastly, Azure, ModSecurity, and more.</p>
+      <textarea id="wfHeaders" class="code code-out" spellcheck="false" placeholder="Server: cloudflare&#10;cf-ray: 7a1b2c3d4e5f"></textarea>
+      <textarea id="wfBody" class="code code-out" spellcheck="false" placeholder="optional body snippet (block page text)"></textarea>
+      <div class="ck-out" id="wfOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="wfRun">Fingerprint</button>
+        <button class="btn ghost" id="closeWf">Close</button>
       </div>
     </div>
   </div>

@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **WAF Fingerprint** — under **Tools → WAF Fingerprint…**, paste a response's
+  headers (and optional body snippet) to detect common WAFs / CDNs / reverse
+  proxies — Cloudflare, Akamai, AWS (CloudFront/ALB/WAF), Imperva, F5 BIG-IP,
+  Sucuri, Fastly, Azure, ModSecurity, Barracuda, and more — from header and body
+  signatures. Logic is unit-tested via `node --test` (`public/js/waf-core.js`).
 - **Injection Payloads** — under **Tools → Injection Payloads…**, a categorized
   cheat sheet of test strings (XSS, SQLi, path traversal, SSTI, command
   injection) with per-payload copy. A marker field substitutes `{{M}}` with your
