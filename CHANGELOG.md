@@ -58,6 +58,12 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **JSON Flattener** — under **Tools → JSON Flattener…**, paste a JSON response
+  to flatten it into `dot.path[i]` → value leaf rows with each leaf's type, and
+  auto-highlight keys that look sensitive (password, token, api_key, email, …).
+  A **sensitive only** toggle and **Copy paths** make it quick to spot leaks and
+  locate a value to extract in a Sequence step. Logic is unit-tested via
+  `node --test` (`public/js/jsonflat-core.js`).
 - **Redirect & SSRF Payloads** — under **Tools → Redirect & SSRF Payloads…**,
   generate classic open-redirect (scheme-relative, backslash, userinfo `@`,
   subdomain, encoded) and SSRF filter-bypass strings (loopback obfuscations in

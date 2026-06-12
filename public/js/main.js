@@ -26,6 +26,7 @@ import { initTimestamp, openTimestamp } from './timestamp.js';
 import { initParams, openParams } from './params.js';
 import { initEntropy, openEntropy } from './entropy.js';
 import { initRedirect, openRedirect } from './redirect.js';
+import { initJsonFlat, openJsonFlat } from './jsonflat.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -63,6 +64,7 @@ async function boot() {
   initParams();
   initEntropy();
   initRedirect();
+  initJsonFlat();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -95,6 +97,7 @@ async function boot() {
     params: openParams,
     entropy: openEntropy,
     redirect: openRedirect,
+    jsonflat: openJsonFlat,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

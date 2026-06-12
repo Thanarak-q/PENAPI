@@ -72,6 +72,7 @@
           <button class="menu-item" data-act="params">Param Analyzer…</button>
           <button class="menu-item" data-act="entropy">Entropy Analyzer…</button>
           <button class="menu-item" data-act="redirect">Redirect &amp; SSRF Payloads…</button>
+          <button class="menu-item" data-act="jsonflat">JSON Flattener…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -784,6 +785,21 @@
       <div class="modal-actions">
         <button class="btn primary" id="rdCopy">Copy all</button>
         <button class="btn ghost" id="closeRd">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="jfModal" hidden>
+    <div class="modal modal-wide">
+      <h2>JSON Flattener <span class="muted">— paths &amp; leaked fields</span></h2>
+      <p class="hint">Paste a JSON response to flatten it into <code>dot.path[i]</code> → value rows. Keys that look sensitive (password, token, api_key, email, …) are highlighted — useful for spotting leaks and locating a value to extract in a <strong>Sequence</strong> step.</p>
+      <textarea id="jfIn" class="code code-out" spellcheck="false" placeholder='{"user":{"id":7,"email":"a@b.com"},"token":"eyJ..."}'></textarea>
+      <label class="check"><input type="checkbox" id="jfOnly"> sensitive only</label>
+      <div class="ck-out" id="jfOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="jfRun">Flatten</button>
+        <button class="btn ghost" id="jfCopy">Copy paths</button>
+        <button class="btn ghost" id="closeJf">Close</button>
       </div>
     </div>
   </div>
