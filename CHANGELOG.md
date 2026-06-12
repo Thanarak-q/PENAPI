@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **IP Obfuscator** — under **Tools → IP Obfuscator…**, convert an IPv4 address
+  into every equivalent encoding (decimal, octal, hex, dotted-hex/octal,
+  IPv6-mapped, loopback shorthand) that bypasses naive SSRF host filters;
+  click-to-copy. Pairs with **Redirect & SSRF Payloads**. Conversion is
+  unit-tested via `node --test` (`public/js/ipobf-core.js`).
 - **Wordlist Generator** — under **Tools → Wordlist Generator…**, build fuzzing
   lists from a numeric range (with step and zero-padding) or case/leet mutations
   of base words, then wrap each entry with a prefix/suffix and copy it into the

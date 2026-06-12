@@ -32,6 +32,7 @@ import { initPayloadLib, openPayloadLib } from './payloads-lib.js';
 import { initWaf, openWaf } from './waf.js';
 import { initStatus, openStatus } from './status.js';
 import { initWordlist, openWordlist } from './wordlist.js';
+import { initIpObf, openIpObf } from './ipobf.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -75,6 +76,7 @@ async function boot() {
   initWaf();
   initStatus();
   initWordlist();
+  initIpObf();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -113,6 +115,7 @@ async function boot() {
     waf: openWaf,
     status: openStatus,
     wordlist: openWordlist,
+    ipobf: openIpObf,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

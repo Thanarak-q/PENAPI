@@ -78,6 +78,7 @@
           <button class="menu-item" data-act="waf">WAF Fingerprint…</button>
           <button class="menu-item" data-act="status">Status Reference…</button>
           <button class="menu-item" data-act="wordlist">Wordlist Generator…</button>
+          <button class="menu-item" data-act="ipobf">IP Obfuscator…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -892,6 +893,18 @@
         <button class="btn primary" id="wlGen">Generate</button>
         <button class="btn ghost" id="wlCopy">Copy</button>
         <button class="btn ghost" id="closeWl">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="ipModal" hidden>
+    <div class="modal">
+      <h2>IP Obfuscator <span class="muted">— SSRF filter-bypass forms</span></h2>
+      <p class="hint">Enter an IPv4 address to see every equivalent encoding (decimal, octal, hex, dotted-hex, IPv6-mapped, shorthand) that bypasses naive host filters. Click any value to copy. Pairs with <strong>Redirect &amp; SSRF Payloads</strong>.</p>
+      <input id="ipIn" class="url-input" type="text" spellcheck="false" placeholder="127.0.0.1  ·  169.254.169.254" value="127.0.0.1" />
+      <div class="ck-out" id="ipOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeIp">Close</button>
       </div>
     </div>
   </div>
