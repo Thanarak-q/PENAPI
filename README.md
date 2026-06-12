@@ -1,13 +1,14 @@
 # Swaggernaut
 
-**Version 1.11.0** · MIT · Node >= 18
+**Version 1.12.0** · MIT · Node >= 18
 
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
 request — then layer on a repeater, fuzzer/brute-forcer, access-control matrix,
 a sequence runner that chains requests by capturing response values into later
 steps, identity switching, tagged endpoint triage, guarded bypass checks, a JWT
-tamperer, and cURL import/export.
+tamperer, nested Attack/Tools menus, theme palettes with dark mode, an in-app
+guide, and cURL import/export.
 
 Zero npm dependencies — pure Node plus a static front end. `swaggernaut spec.json` and go.
 
@@ -117,10 +118,12 @@ what the UI renders.
 | **Attack Surface / Recon** | Passive static analysis of loaded endpoints and saved human request logs. Flags auth gaps, optional auth, IDOR/BOLA hints, risky params, mass-assignment fields, sensitive data seen in logs, spec-quality drift, and shadow endpoints without sending any request. |
 | **Request / Repeater** | Auto-fills path/query/header params and a schema-derived JSON body. Path params stay editable in the Params table and are substituted into `{tokens}` at send time. Raw `http`/`https` client gives full header control (including `Host`, `Content-Length`). |
 | **Identities** | Named header sets (Admin / User / Unauth …). Switch the active identity to send every request as that role. Set a header value to `null` to *strip* it. |
-| **Fuzzer / Brute** | Mark injection points with `§§` (wrap a value: `§admin§`) or the keyword `FUZZ`. Built-in payload sets (SQLi, XSS, traversal, cmdi, SSRF, NoSQLi, LFI, usernames, passwords, auth-bypass, host-header), a numeric range for IDOR enumeration, and custom wordlists. Concurrency + delay, live streaming, sortable results, anomaly highlighting. Risky runs require confirmation and server-side caps limit accidental floods. |
+| **Fuzzer / Brute** | Mark injection points with `§§` (wrap a value: `§admin§`) or the keyword `FUZZ`. Built-in payload sets (SQLi, XSS, traversal, cmdi, SSRF, NoSQLi, LFI, SSTI, XXE, CRLF, LDAP, XPath, GraphQL, open-redirect, email-injection, format-string/edge-case, usernames, passwords, auth-bypass, host-header), a numeric range for IDOR enumeration, and custom wordlists. Concurrency + delay, live streaming, sortable results, anomaly highlighting. Risky runs require confirmation and server-side caps limit accidental floods. |
 | **Access Matrix (BOLA/BFLA)** | Replay one request as every identity and diff outcomes. Low-priv/unauth identity getting `2xx` is flagged. Write-method replay requires confirmation. |
 | **Sequence Runner** | Chain requests into a multi-step flow. **Capture** a value from any response — a JSON body path (`data.id`), a response header, or the status — into a named variable, then reference it as `{{name}}` in any later step's URL, headers, or body (`{{baseUrl}}` is always available). Each step picks its own identity, and per-step **checks** (`eq`/`ne`/`contains`/`exists` on status/body/header) flag failures with optional stop-on-fail. Powers BOLA/IDOR setups, auth-token refresh, and stateful flows. Runs sequentially through the proxy, records each step to History, and exports results. Add a step from **Request → ⋯ → Send to Sequence**; sequences persist per session profile. |
 | **Quick Attacks** | Runs mutation variants — no-auth, empty/malformed bearer, verb swap, `X-HTTP-Method-Override`, `X-Original-URL`, spoofed `X-Forwarded-*`, trailing-slash, content-type confusion — after confirmation, flagging any that still succeed. |
+| **Nested Attack / Tools menus** | Payload and active-test helpers live under **Attack** with flyout groups for payloads and spoofing. **Tools** stays focused on token, crypto, conversion, and recon utilities, also grouped with nested flyouts. |
+| **Theme palettes + dark mode** | Top-bar swatches switch accent palettes, the mode button toggles light/dark, and preferences persist locally. **Help → User Guide…** opens the built-in workflow guide. |
 | **Auth Sweep** | Fires every spec endpoint as each identity to map authorization coverage. Every sweep shows an estimated request count and requires confirmation; write verbs are explicitly warned. |
 | **JWT Inspector** | Decode/edit a token client-side; shows alg, `exp`, claims; forge an `alg:none` / unsigned token to test signature-verification flaws. |
 | **Decoder** | Encode, decode, smart-decode, and hash text entirely client-side — Base64 / Base64URL, URL, hex, HTML entities, JWT decode, and SHA-1/256/384/512 hashing. **Smart decode** auto-detects the encoding; `⇅` chains the output back into the input; **From request** seeds the current body/URL. |
@@ -128,13 +131,28 @@ what the UI renders.
 | **Token Sequencer** | From **Tools → Token Sequencer…**, paste a sample of tokens to estimate randomness — uniqueness, length, charset, per-position Shannon entropy (bar chart), total bits, and a graded verdict that flags sequential or colliding tokens. Pure client-side. |
 | **Comparer** | From **Tools → Comparer…**, diff two pasted blobs (requests or responses) line- or word-by-word with an added/removed summary and colored output. Pure client-side. |
 | **Site Map** | From **View → Site Map…**, browse endpoints as a URL-path tree (shared prefixes merged, per-branch counts); click an operation to open it in the Request tab. |
-| **Match & Replace** | From **Tools → Match & Replace…**, define session-scoped rewrite rules applied to requests sent from the Request tab — literal/regex replace on URL or body, or set/remove a header (e.g. inject `X-Forwarded-For`). Saved per profile. |
-| **Content Discovery** | From **Tools → Content Discovery…**, brute-force common and custom paths off a base URL to surface unspecced/shadow endpoints. Uses the active identity, classifies outcomes (found / protected / redirect / missing), and is capped at 500 requests with a confirmation gate. |
+| **Match & Replace** | From **Attack → Match & Replace…**, define session-scoped rewrite rules applied to requests sent from the Request tab — literal/regex replace on URL or body, or set/remove a header (e.g. inject `X-Forwarded-For`). Saved per profile. |
+| **Content Discovery** | From **Attack → Content Discovery…**, brute-force common and custom paths off a base URL to surface unspecced/shadow endpoints. Uses the active identity, classifies outcomes (found / protected / redirect / missing), and is capped at 500 requests with a confirmation gate. |
 | **Traffic Search** | From **Edit → Search Traffic…**, grep all captured requests and responses (method, URL, headers, bodies) with a literal or regex query; results show which field matched. Pure client-side. |
 | **Timing Analysis** | From **Tools → Timing Analysis…**, per-endpoint response-time stats (count, min, avg, max) from session history, sorted slowest first — gaps between similar endpoints can reveal timing oracles. |
 | **Auth Builder** | From **Tools → Auth Builder…**, construct an `Authorization` header — **Basic** from user/password or **Bearer** from a token — and copy it into an identity. Pure client-side. |
 | **Random Generator** | From **Tools → Random Generator…**, generate CSPRNG values — UUID v4, random hex, URL-safe token, or a custom-length string — for nonces, cache-busters, and fuzzing. |
 | **Cookie Inspector** | From **Tools → Cookie Inspector…**, paste `Set-Cookie` values to parse each cookie and audit its security flags — missing HttpOnly / Secure / SameSite (and `SameSite=None`) are flagged. |
+| **Header Auditor** | From **Tools → Header Auditor…**, paste a raw response header block to audit security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy), tech-stack disclosure, and unsafe CORS — each flagged missing / weak / ok. |
+| **Hash Identifier** | From **Tools → Hash Identifier…**, paste a hash to guess likely algorithms (MD5/NTLM, SHA family, bcrypt, *crypt, Argon2, LDAP) from length, charset, and crypt prefix. Heuristic, client-side. |
+| **Timestamp Converter** | From **Tools → Timestamp Converter…**, convert a Unix epoch (s/ms) or ISO 8601 date into every representation plus a relative offset and expired/future flag — built for reading JWT `exp`/`iat`. |
+| **Param Analyzer** | From **Tools → Param Analyzer…**, paste a URL or query string to classify each parameter by likely attack class (open redirect, SSRF, path traversal, IDOR, secret, injection) — interesting params surface first. |
+| **Entropy Analyzer** | From **Tools → Entropy Analyzer…**, paste a single token/key to measure Shannon entropy, charset, and brute-force keyspace with a weak→strong verdict. For sampling many tokens use Token Sequencer. |
+| **Redirect & SSRF Payloads** | From **Attack → Payloads → Redirect & SSRF Payloads…**, generate open-redirect and SSRF filter-bypass strings (loopback obfuscation, cloud metadata, `gopher`/`dict`/`file`, OOB callback) for an authorized test. Generation only — nothing is sent. |
+| **JSON Flattener** | From **Tools → JSON Flattener…**, flatten a JSON response into `dot.path[i]` → value rows, highlight sensitive keys (password/token/email/…), filter to sensitive-only, and copy paths — great for spotting leaks and building Sequence extractors. |
+| **Body Converter** | From **Tools → Body Converter…**, re-encode a JSON object as form-urlencoded, query string, and multipart/form-data — for content-type confusion and parameter-pollution testing. |
+| **Injection Payloads** | From **Attack → Payloads → Injection Payloads…**, a categorized cheat sheet (XSS, SQLi, path traversal, SSTI, command injection, NoSQLi, XXE, CRLF, polyglot) with per-payload copy and a `{{M}}` marker for your OOB host / canary. Generation only — nothing is sent. |
+| **WAF Fingerprint** | From **Tools → WAF Fingerprint…**, paste response headers/body to detect the WAF/CDN in front of the API (Cloudflare, Akamai, AWS, Imperva, F5, Sucuri, Fastly, Azure, ModSecurity, …) from known signatures. |
+| **Status Reference** | From **Tools → Status Reference…**, search HTTP status codes by number/phrase/keyword — each entry adds a pentest note (403 → verb tampering, 500 → error-based injection, 502/504 → SSRF). |
+| **Wordlist Generator** | From **Attack → Payloads → Wordlist Generator…**, build fuzzing lists from a numeric range (step + zero-pad) or case/leet mutations, wrap with a prefix/suffix, and copy into the Fuzzer or Content Discovery. |
+| **IP Obfuscator** | From **Attack → Headers & spoofing → IP Obfuscator…**, convert an IPv4 address into decimal, octal, hex, dotted-hex, IPv6-mapped, and shorthand forms that bypass naive SSRF host filters — click to copy. |
+| **Attack Headers** | From **Attack → Headers & spoofing → Attack Headers…**, a searchable library of request-header tricks (IP spoofing, URL/path override, host/cache poisoning, scheme, auth-context, method override) with explanations and copy-as-`Name: value`. |
+| **User-Agent Library** | From **Attack → Headers & spoofing → User-Agent Library…**, a searchable set of UA strings (desktop, mobile, bot, tools) with per-entry copy — for testing UA-based routing, cloaking, and access logic. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |

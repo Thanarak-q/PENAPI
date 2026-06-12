@@ -1,7 +1,7 @@
 // Request tab: builder + repeater + response viewer.
 
-import { $, $$, el, statusClass, methodClass, fmtBytes, prettyJson, headersToText, copy } from './util.js';
-import { state, identityHeaders, pushHistory, tagsFor } from './state.js';
+import { $, $$, el, statusClass, fmtBytes, prettyJson, headersToText, copy } from './util.js';
+import { state, identityHeaders, pushHistory } from './state.js';
 import { sendProxy, buildCurl } from './api.js';
 import { applyRules } from './matchreplace-core.js';
 import { analyzeResponse } from './analyze.js';
@@ -118,7 +118,6 @@ export function loadEndpoint(ep) {
   syncReqBodyHighlight();
 
   renderSummary(ep);
-  renderCurrentEndpoint(ep);
   goTab('request');
 }
 
@@ -144,27 +143,7 @@ export function clearRequest() {
   $('#reqBody').value = '';
   syncReqBodyHighlight();
   $('#reqSummary').innerHTML = '';
-  const method = $('#currentMethod');
-  method.textContent = 'REQ';
-  method.className = 'method-badge';
-  $('#currentPath').textContent = 'New request';
-  $('#currentPath').title = '';
-  $('#currentSummary').textContent = '';
-  $('#currentTags').innerHTML = '';
   $('#reqUrl').focus();
-}
-
-function renderCurrentEndpoint(ep) {
-  const method = $('#currentMethod');
-  method.textContent = ep.method;
-  method.className = 'method-badge ' + methodClass(ep.method);
-  $('#currentPath').textContent = ep.path;
-  $('#currentPath').title = ep.path;
-  $('#currentSummary').textContent = ep.summary || ep.operationId || '';
-  const tags = [...ep.tags, ...tagsFor(ep.id)];
-  $('#currentTags').innerHTML = tags
-    .map((tag) => `<span class="endpoint-tag">${escapeHtml(tag)}</span>`)
-    .join('');
 }
 
 // --- Key/value tables ---------------------------------------------------

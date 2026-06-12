@@ -1,4 +1,4 @@
-// Classic application menu bar (File · Edit · View · Tools · Help).
+// Classic application menu bar (File · Edit · View · Attack · Tools · Help).
 // One menu open at a time; hovering a sibling while open switches to it;
 // click-outside / Esc / choosing an item closes.
 //
@@ -19,15 +19,50 @@ export function initMenubar(actionHandlers = {}) {
   if (!bar) return;
   const roots = $$('.menu-root', bar);
 
-  const closeAll = () => roots.forEach((r) => r.classList.remove('open'));
+  const closeSubmenus = (root = bar) => {
+    $$('.menu-sub.open, .menu-sub.flip-left', root).forEach((sub) => {
+      sub.classList.remove('open', 'flip-left');
+      $('.submenu-trigger', sub)?.setAttribute('aria-expanded', 'false');
+    });
+  };
+  const closeAll = () => {
+    roots.forEach((r) => {
+      r.classList.remove('open');
+      $('.menu-top', r)?.setAttribute('aria-expanded', 'false');
+    });
+    closeSubmenus();
+  };
   const open = (root) => {
     closeAll();
     root.classList.add('open');
+    $('.menu-top', root)?.setAttribute('aria-expanded', 'true');
   };
   const anyOpen = () => roots.some((r) => r.classList.contains('open'));
+  const setSubmenuOpen = (sub, isOpen) => {
+    sub.classList.toggle('open', isOpen);
+    sub.classList.remove('flip-left');
+    $('.submenu-trigger', sub)?.setAttribute('aria-expanded', String(isOpen));
+  };
+  const closeSiblingSubmenus = (root, except) => {
+    $$('.menu-sub.open', root).forEach((openSub) => {
+      if (openSub !== except) setSubmenuOpen(openSub, false);
+    });
+  };
+  const setFlyoutDirection = (sub) => {
+    const drop = $('.submenu-drop', sub);
+    if (!drop) return;
+    sub.classList.remove('flip-left');
+    const width = drop.offsetWidth || 210;
+    const gap = 8;
+    if (sub.getBoundingClientRect().right + gap + width > window.innerWidth) {
+      sub.classList.add('flip-left');
+    }
+  };
 
   roots.forEach((root) => {
     const top = $('.menu-top', root);
+    top.setAttribute('aria-haspopup', 'menu');
+    top.setAttribute('aria-expanded', 'false');
     top.addEventListener('click', (e) => {
       e.stopPropagation();
       root.classList.contains('open') ? closeAll() : open(root);
@@ -37,7 +72,33 @@ export function initMenubar(actionHandlers = {}) {
     });
   });
 
-  $$('.menu-item', bar).forEach((item) => {
+  $$('.submenu-trigger', bar).forEach((trigger) => {
+    trigger.setAttribute('aria-haspopup', 'menu');
+    trigger.setAttribute('aria-expanded', 'false');
+    const sub = trigger.closest('.menu-sub');
+    const root = trigger.closest('.menu-root');
+
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!root.classList.contains('open')) open(root);
+
+      const shouldOpen = !sub.classList.contains('open');
+      closeSiblingSubmenus(root, sub);
+      setSubmenuOpen(sub, shouldOpen);
+      if (shouldOpen) setFlyoutDirection(sub);
+    });
+
+    sub.addEventListener('mouseenter', () => {
+      if (root.classList.contains('open')) {
+        closeSiblingSubmenus(root, sub);
+        setSubmenuOpen(sub, true);
+      }
+      setFlyoutDirection(sub);
+    });
+  });
+
+  $$('.menu-item:not(.submenu-trigger)', bar).forEach((item) => {
     item.addEventListener('click', () => {
       if (item.dataset.act) runAct(item.dataset.act);
       closeAll();

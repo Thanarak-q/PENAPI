@@ -157,7 +157,7 @@ function renderExtractBlock(step) {
   return el('div', { class: 'seq-block' }, [
     el('div', { class: 'seq-block-head' }, [
       el('span', { class: 'seq-label', text: 'Capture' }),
-      el('button', { class: 'btn ghost tiny', text: '+ value', onclick: () => { step.extract.push({ name: '', source: 'body', path: '' }); persistSteps(); draw(); } }),
+      el('button', { class: 'btn ghost tiny', text: '+ value', title: 'Capture a value from this step response', onclick: () => { step.extract.push({ name: '', source: 'body', path: '' }); persistSteps(); draw(); } }),
     ]),
     rows,
   ]);
@@ -185,7 +185,7 @@ function renderAssertBlock(step) {
   return el('div', { class: 'seq-block' }, [
     el('div', { class: 'seq-block-head' }, [
       el('span', { class: 'seq-label', text: 'Check' }),
-      el('button', { class: 'btn ghost tiny', text: '+ check', onclick: () => { step.assert.push({ source: 'status', path: '', op: 'eq', value: '200' }); persistSteps(); draw(); } }),
+      el('button', { class: 'btn ghost tiny', text: '+ check', title: 'Add an assertion for this step response', onclick: () => { step.assert.push({ source: 'status', path: '', op: 'eq', value: '200' }); persistSteps(); draw(); } }),
     ]),
     rows,
   ]);

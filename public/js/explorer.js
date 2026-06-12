@@ -299,14 +299,14 @@ function renderTagManager() {
         el('span', { class: 'tm-name', text: tag }),
         el('span', { class: 'tm-count', text: `${count} endpoint${count > 1 ? 's' : ''}` }),
         el('button', {
-          class: 'btn tiny', text: 'Rename',
+          class: 'btn tiny', text: 'Rename', title: 'Rename this focus tag everywhere',
           onclick: () => {
             const next = prompt(`Rename tag "${tag}" to:`, tag);
             if (next && renameTag(tag, next)) { renderTagManager(); renderExplorer(); }
           },
         }),
         el('button', {
-          class: 'btn tiny danger', text: 'Delete',
+          class: 'btn tiny danger', text: 'Delete', title: 'Delete this focus tag from every endpoint',
           onclick: () => {
             if (confirm(`Delete tag "${tag}" from all ${count} endpoint(s)?`)) {
               deleteTag(tag); renderTagManager(); renderExplorer();

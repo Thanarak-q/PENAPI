@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Swaggernaut — Pentest API Workbench</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23fbfbfa'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23e5341a'/%3E%3C/svg%3E" />
+  <script>
+    try {
+      const theme = JSON.parse(localStorage.getItem('swaggernaut.theme.v1') || '{}');
+      if (theme.mode) document.documentElement.dataset.theme = theme.mode;
+      if (theme.palette) document.documentElement.dataset.palette = theme.palette;
+    } catch {}
+  </script>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -18,61 +25,105 @@
 
     <nav class="menubar" id="menubar" aria-label="Main menu">
       <div class="menu-root">
-        <button class="menu-top" type="button">File</button>
+        <button class="menu-top" type="button" title="Load specs, import cURL, and manage saved sessions">File</button>
         <div class="menu-drop">
-          <button class="menu-item" id="loadSpecBtn">Load Spec…</button>
-          <button class="menu-item" id="importCurlBtn">Import cURL…</button>
+          <button class="menu-item" id="loadSpecBtn" title="Load an OpenAPI or Swagger JSON spec">Load Spec…</button>
+          <button class="menu-item" id="importCurlBtn" title="Parse a cURL command into the request editor">Import cURL…</button>
           <div class="menu-sep"></div>
-          <button class="menu-item" data-act="session-save">Save Session <span class="menu-key">⌘S</span></button>
-          <button class="menu-item" data-act="session-open">Sessions…</button>
-          <button class="menu-item" data-act="session-import">Open Session…</button>
-          <button class="menu-item" data-act="session-export">Export Session…</button>
+          <button class="menu-item" data-act="session-save" title="Save the current session profile">Save Session <span class="menu-key">⌘S</span></button>
+          <button class="menu-item" data-act="session-open" title="Open the session profile manager">Sessions…</button>
+          <button class="menu-item" data-act="session-import" title="Import a saved session JSON file">Open Session…</button>
+          <button class="menu-item" data-act="session-export" title="Export the active session profile as JSON">Export Session…</button>
         </div>
       </div>
       <div class="menu-root">
-        <button class="menu-top" type="button">Edit</button>
+        <button class="menu-top" type="button" title="Find endpoints, search traffic, and manage identities">Edit</button>
         <div class="menu-drop">
-          <button class="menu-item" data-act="find">Find Endpoint <span class="menu-key">/</span></button>
-          <button class="menu-item" data-act="search">Search Traffic…</button>
-          <button class="menu-item" data-act="clear-filters">Clear Filters</button>
-          <button class="menu-item" data-act="click:clearReq">New / Clear Request</button>
+          <button class="menu-item" data-act="find" title="Focus the endpoint search box">Find Endpoint <span class="menu-key">/</span></button>
+          <button class="menu-item" data-act="search" title="Search captured requests and responses">Search Traffic…</button>
+          <button class="menu-item" data-act="clear-filters" title="Clear endpoint sidebar filters">Clear Filters</button>
+          <button class="menu-item" data-act="click:clearReq" title="Reset the request editor to a blank request">New / Clear Request</button>
           <div class="menu-sep"></div>
-          <button class="menu-item" id="manageIdentities">Manage Identities…</button>
+          <button class="menu-item" id="manageIdentities" title="Edit identity header sets for access-control tests">Manage Identities…</button>
         </div>
       </div>
       <div class="menu-root">
-        <button class="menu-top" type="button">View</button>
+        <button class="menu-top" type="button" title="Open navigation views and the command palette">View</button>
         <div class="menu-drop">
-          <button class="menu-item" data-act="sitemap">Site Map…</button>
-          <button class="menu-item" data-act="tags">Tag Manager…</button>
-          <button class="menu-item" data-act="palette">Command Palette <span class="menu-key">⌘K</span></button>
+          <button class="menu-item" data-act="sitemap" title="Browse endpoints grouped by URL path">Site Map…</button>
+          <button class="menu-item" data-act="tags" title="Rename or remove custom focus tags">Tag Manager…</button>
+          <button class="menu-item" data-act="palette" title="Open the command palette">Command Palette <span class="menu-key">⌘K</span></button>
         </div>
       </div>
       <div class="menu-root">
-        <button class="menu-top" type="button">Tools</button>
+        <button class="menu-top" type="button" title="Run attack helpers, payload libraries, and discovery tools">Attack</button>
         <div class="menu-drop">
-          <button class="menu-item" id="jwtBtn">JWT Inspector…</button>
-          <button class="menu-item" data-act="click:quickAttackBtn">Quick Attacks</button>
-          <button class="menu-item" data-act="click:codeBtn">Copy as code…</button>
+          <button class="menu-item" data-act="click:quickAttackBtn" title="Run one-click request mutation checks">Quick Attacks…</button>
           <div class="menu-sep"></div>
-          <button class="menu-item" data-act="click:toFuzzerBtn">Send to Fuzzer</button>
-          <button class="menu-item" data-act="click:toMatrixBtn">Send to Access Matrix</button>
+          <div class="menu-sub">
+            <button class="menu-item submenu-trigger" type="button" title="Open generated payload and wordlist helpers">Payloads<span class="submenu-caret">›</span></button>
+            <div class="submenu-drop">
+              <button class="menu-item" data-act="payloadlib" title="Browse copy-only injection payloads">Injection Payloads…</button>
+              <button class="menu-item" data-act="redirect" title="Generate redirect and SSRF bypass strings">Redirect &amp; SSRF Payloads…</button>
+              <button class="menu-item" data-act="wordlist" title="Generate fuzzing wordlists from ranges or mutations">Wordlist Generator…</button>
+            </div>
+          </div>
+          <div class="menu-sub">
+            <button class="menu-item submenu-trigger" type="button" title="Open header, user-agent, and IP spoofing helpers">Headers &amp; spoofing<span class="submenu-caret">›</span></button>
+            <div class="submenu-drop">
+              <button class="menu-item" data-act="attackhdr" title="Browse request headers for spoofing and override tests">Attack Headers…</button>
+              <button class="menu-item" data-act="useragent" title="Copy representative browser, bot, and tool user agents">User-Agent Library…</button>
+              <button class="menu-item" data-act="ipobf" title="Generate alternate encodings for IPv4 addresses">IP Obfuscator…</button>
+            </div>
+          </div>
           <div class="menu-sep"></div>
-          <button class="menu-item" data-act="sequencer">Token Sequencer…</button>
-          <button class="menu-item" data-act="comparer">Comparer…</button>
-          <button class="menu-item" data-act="matchreplace">Match &amp; Replace…</button>
-          <button class="menu-item" data-act="discovery">Content Discovery…</button>
-          <button class="menu-item" data-act="timing">Timing Analysis…</button>
-          <button class="menu-item" data-act="auth">Auth Builder…</button>
-          <button class="menu-item" data-act="random">Random Generator…</button>
-          <button class="menu-item" data-act="cookie">Cookie Inspector…</button>
+          <button class="menu-item" data-act="matchreplace" title="Rewrite outgoing requests before they are sent">Match &amp; Replace…</button>
+          <button class="menu-item" data-act="discovery" title="Probe common paths with real GET requests">Content Discovery…</button>
         </div>
       </div>
       <div class="menu-root">
-        <button class="menu-top" type="button">Help</button>
+        <button class="menu-top" type="button" title="Open local analyzers, converters, and reference tools">Tools</button>
         <div class="menu-drop">
-          <button class="menu-item" data-act="shortcuts">Keyboard Shortcuts…</button>
-          <button class="menu-item" data-act="about">About Swaggernaut</button>
+          <div class="menu-sub">
+            <button class="menu-item submenu-trigger" type="button" title="Open token, entropy, hash, and auth utilities">Tokens &amp; crypto<span class="submenu-caret">›</span></button>
+            <div class="submenu-drop">
+              <button class="menu-item" id="jwtBtn" title="Decode, edit, sign, and test JWTs locally">JWT Inspector…</button>
+              <button class="menu-item" data-act="sequencer" title="Estimate randomness across a sample of tokens">Token Sequencer…</button>
+              <button class="menu-item" data-act="entropy" title="Measure entropy for a single secret-like value">Entropy Analyzer…</button>
+              <button class="menu-item" data-act="hashid" title="Guess hash algorithms from length and format">Hash Identifier…</button>
+              <button class="menu-item" data-act="auth" title="Build Authorization header values locally">Auth Builder…</button>
+              <button class="menu-item" data-act="random" title="Generate random IDs, hex values, and tokens">Random Generator…</button>
+            </div>
+          </div>
+          <div class="menu-sub">
+            <button class="menu-item submenu-trigger" type="button" title="Open body, JSON, and timestamp converters">Encode &amp; convert<span class="submenu-caret">›</span></button>
+            <div class="submenu-drop">
+              <button class="menu-item" data-act="bodyconv" title="Convert JSON into form, query, and multipart shapes">Body Converter…</button>
+              <button class="menu-item" data-act="jsonflat" title="Flatten JSON into dot-path rows">JSON Flattener…</button>
+              <button class="menu-item" data-act="timestamp" title="Convert Unix and ISO timestamps">Timestamp Converter…</button>
+            </div>
+          </div>
+          <div class="menu-sub">
+            <button class="menu-item submenu-trigger" type="button" title="Open passive analysis and reference helpers">Recon &amp; analysis<span class="submenu-caret">›</span></button>
+            <div class="submenu-drop">
+              <button class="menu-item" data-act="headers" title="Audit response security headers">Header Auditor…</button>
+              <button class="menu-item" data-act="cookie" title="Inspect Set-Cookie security attributes">Cookie Inspector…</button>
+              <button class="menu-item" data-act="waf" title="Identify common WAF and CDN signals">WAF Fingerprint…</button>
+              <button class="menu-item" data-act="params" title="Classify query parameters by likely attack surface">Param Analyzer…</button>
+              <button class="menu-item" data-act="timing" title="Review response timing patterns from history">Timing Analysis…</button>
+              <button class="menu-item" data-act="comparer" title="Diff two requests, responses, or text blobs">Comparer…</button>
+              <button class="menu-item" data-act="status" title="Look up HTTP status meanings and pentest notes">Status Reference…</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="menu-root">
+        <button class="menu-top" type="button" title="Open shortcuts and app information">Help</button>
+        <div class="menu-drop">
+          <button class="menu-item" data-act="guide" title="Open the user guide and testing advice">User Guide…</button>
+          <div class="menu-sep"></div>
+          <button class="menu-item" data-act="shortcuts" title="Show keyboard shortcuts">Keyboard Shortcuts…</button>
+          <button class="menu-item" data-act="about" title="Show app version and local-only notes">About Swaggernaut</button>
         </div>
       </div>
     </nav>
@@ -81,6 +132,13 @@
       <span class="brand-sub" id="specTitle" title="Loaded spec">loading spec…</span>
       <input id="baseUrl" class="topbar-target" type="text" placeholder="Target — https://host" spellcheck="false" title="Target base URL" />
       <select id="identitySelect" title="Active identity — headers attached to every request"></select>
+      <div class="theme-palette" id="themePalette" role="group" aria-label="Color palette">
+        <button class="theme-swatch" type="button" data-palette="signal" title="Signal red palette" aria-label="Signal red palette"></button>
+        <button class="theme-swatch" type="button" data-palette="ocean" title="Ocean blue palette" aria-label="Ocean blue palette"></button>
+        <button class="theme-swatch" type="button" data-palette="volt" title="Volt green palette" aria-label="Volt green palette"></button>
+        <button class="theme-swatch" type="button" data-palette="grape" title="Grape violet palette" aria-label="Grape violet palette"></button>
+      </div>
+      <button class="theme-mode" id="themeMode" type="button" title="Toggle dark theme" aria-pressed="false">Dark</button>
       <kbd class="palette-hint-key" title="Command palette">⌘K</kbd>
       <span class="status-dot" id="connDot" title="Server connection"></span>
     </div>
@@ -96,11 +154,11 @@
         </div>
         <div class="filter-bar" id="filterBar">
           <div class="filter-methods" id="filterMethods">
-            <button class="mchip m-get" data-m="GET" type="button">GET</button>
-            <button class="mchip m-post" data-m="POST" type="button">POST</button>
-            <button class="mchip m-put" data-m="PUT" type="button">PUT</button>
-            <button class="mchip m-patch" data-m="PATCH" type="button">PATCH</button>
-            <button class="mchip m-delete" data-m="DELETE" type="button">DEL</button>
+            <button class="mchip m-get" data-m="GET" type="button" title="Filter endpoints to GET requests">GET</button>
+            <button class="mchip m-post" data-m="POST" type="button" title="Filter endpoints to POST requests">POST</button>
+            <button class="mchip m-put" data-m="PUT" type="button" title="Filter endpoints to PUT requests">PUT</button>
+            <button class="mchip m-patch" data-m="PATCH" type="button" title="Filter endpoints to PATCH requests">PATCH</button>
+            <button class="mchip m-delete" data-m="DELETE" type="button" title="Filter endpoints to DELETE requests">DEL</button>
           </div>
           <div class="filter-selects">
             <select id="filterTag" title="Filter by tag"><option value="">All tags</option></select>
@@ -115,7 +173,7 @@
             <label class="check"><input type="checkbox" id="flagIdor"> idor</label>
             <label class="check"><input type="checkbox" id="flagDeprecated"> deprecated</label>
             <label class="check"><input type="checkbox" id="flagPinned"> pinned</label>
-            <button class="btn tiny ghost" id="clearFilters" type="button">clear</button>
+            <button class="btn tiny ghost" id="clearFilters" type="button" title="Clear method, tag, auth, and flag filters">clear</button>
           </div>
         </div>
         <div class="meta" id="endpointCount"></div>
@@ -160,14 +218,6 @@
 
       <!-- REQUEST TAB -->
       <section class="panel active" data-panel="request">
-        <div class="current-endpoint" id="currentEndpoint">
-          <div class="current-main">
-            <span class="method-badge" id="currentMethod">REQ</span>
-            <span class="current-path" id="currentPath">Pick an endpoint</span>
-            <span class="current-summary" id="currentSummary"></span>
-          </div>
-          <div class="current-tags" id="currentTags"></div>
-        </div>
         <div class="split">
           <div class="req-editor">
             <div class="editor-sections">
@@ -201,7 +251,7 @@
           <div class="res-view">
             <div class="res-bar">
               <div class="res-status" id="resStatus">
-                <span class="muted">No response yet. Pick an endpoint and Send.</span>
+                <span class="muted">No response yet. Build a request and Send.</span>
               </div>
               <div class="res-find" id="resFindWrap">
                 <span class="resp-find-count" id="resFindCount"></span>
@@ -266,8 +316,8 @@
               <label class="check"><input id="fuzzRedirects" type="checkbox" /> follow redirects</label>
             </div>
             <div class="fuzz-actions">
-              <button class="btn primary" id="fuzzStart">Start attack</button>
-              <button class="btn danger" id="fuzzStop" disabled>Stop</button>
+              <button class="btn primary" id="fuzzStart" title="Start fuzzing; sends requests to the configured target">Start attack</button>
+              <button class="btn danger" id="fuzzStop" title="Stop the active fuzzing run" disabled>Stop</button>
               <span class="fuzz-progress" id="fuzzProgress"></span>
             </div>
           </div>
@@ -304,7 +354,7 @@
             <select id="matrixMethod" class="method-select"></select>
             <input id="matrixUrl" type="text" class="url-input" spellcheck="false" />
             <button class="btn ghost tiny" id="matrixLoad">← Load current request</button>
-            <button class="btn primary" id="matrixRun">Run matrix</button>
+            <button class="btn primary" id="matrixRun" title="Replay this request as each configured identity">Run matrix</button>
           </div>
           <input id="matrixFilter" type="search" placeholder="filter identity / body…" />
         </div>
@@ -366,10 +416,10 @@
         <div class="seq-toolbar">
           <button class="btn ghost tiny" id="seqAddStep">+ Step</button>
           <button class="btn ghost tiny" id="seqAddFromReq">+ From current request</button>
-          <button class="btn ghost tiny" id="seqClear">Clear</button>
+          <button class="btn ghost tiny" id="seqClear" title="Remove every step from the sequence">Clear</button>
           <span class="seq-spacer"></span>
-          <button class="btn primary" id="seqRun">Run sequence</button>
-          <button class="btn ghost" id="seqStop" disabled>Stop</button>
+          <button class="btn primary" id="seqRun" title="Run sequence steps from top to bottom">Run sequence</button>
+          <button class="btn ghost" id="seqStop" title="Stop the active sequence run" disabled>Stop</button>
         </div>
         <div class="seq-steps" id="seqSteps"></div>
         <div class="table-wrap">
@@ -431,8 +481,8 @@
             <label>concurrency <input id="sweepConc" type="number" value="3" min="1" max="10"></label>
           </div>
           <div class="fuzz-actions">
-            <button class="btn primary" id="sweepStart">Start sweep</button>
-            <button class="btn danger" id="sweepStop" disabled>Stop</button>
+            <button class="btn primary" id="sweepStart" title="Start the auth sweep; sends requests across selected endpoints">Start sweep</button>
+            <button class="btn danger" id="sweepStop" title="Stop the active auth sweep" disabled>Stop</button>
             <span class="fuzz-progress" id="sweepProgress"></span>
           </div>
         </div>
@@ -452,7 +502,7 @@
       <!-- HISTORY TAB -->
       <section class="panel" data-panel="history">
         <div class="results-toolbar">
-          <button class="btn ghost tiny" id="clearHistory">Clear history</button>
+          <button class="btn ghost tiny" id="clearHistory" title="Clear captured request history for this session">Clear history</button>
           <span class="meta" id="historyCount"></span>
         </div>
         <div class="table-wrap">
@@ -585,8 +635,8 @@
       <label class="check"><input type="checkbox" id="dscBuiltin" checked> Built-in common paths</label>
       <textarea id="dscCustom" class="mono-area" rows="4" spellcheck="false" placeholder="extra paths, one per line (# comments allowed)"></textarea>
       <div class="dsc-controls">
-        <button class="btn primary" id="dscRun">Run</button>
-        <button class="btn ghost" id="dscStop" disabled>Stop</button>
+        <button class="btn primary" id="dscRun" title="Start content discovery; sends GET requests to the base URL">Run</button>
+        <button class="btn ghost" id="dscStop" title="Stop the active content discovery run" disabled>Stop</button>
         <label class="check"><input type="checkbox" id="dscInteresting" checked> interesting only</label>
         <span class="meta" id="dscProgress"></span>
       </div>
@@ -679,7 +729,7 @@
       <textarea id="rndOut" class="code code-out" spellcheck="false" readonly placeholder="generated values…"></textarea>
       <div class="modal-actions">
         <button class="btn primary" id="rndCopy">Copy all</button>
-        <button class="btn ghost" id="rndClear">Clear</button>
+        <button class="btn ghost" id="rndClear" title="Clear generated random values">Clear</button>
         <button class="btn ghost" id="closeRnd">Close</button>
       </div>
     </div>
@@ -694,6 +744,228 @@
       <div class="modal-actions">
         <button class="btn primary" id="ckRun">Inspect</button>
         <button class="btn ghost" id="closeCk">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="hdrModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Header Auditor <span class="muted">— response security headers</span></h2>
+      <p class="hint">Paste a raw HTTP <strong>response</strong> header block. Missing or weak security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy), tech-stack disclosure, and unsafe CORS are flagged.</p>
+      <textarea id="hdrIn" class="code code-out" spellcheck="false" placeholder="HTTP/1.1 200 OK&#10;Content-Type: text/html&#10;Server: nginx&#10;Content-Security-Policy: default-src 'self'"></textarea>
+      <div class="ck-out" id="hdrOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="hdrRun">Audit</button>
+        <button class="btn ghost" id="closeHdr">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="hidModal" hidden>
+    <div class="modal">
+      <h2>Hash Identifier <span class="muted">— guess the digest</span></h2>
+      <p class="hint">Paste a hash. Likely algorithms are guessed from length, character set, and crypt prefix. Heuristic — several algorithms can share a length.</p>
+      <input id="hidIn" class="url-input" type="text" spellcheck="false" placeholder="5f4dcc3b5aa765d61d8327deb882cf99" />
+      <div class="ck-out" id="hidOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="hidRun">Identify</button>
+        <button class="btn ghost" id="closeHid">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="tsModal" hidden>
+    <div class="modal">
+      <h2>Timestamp Converter <span class="muted">— epoch ⇄ ISO</span></h2>
+      <p class="hint">Enter a Unix epoch (seconds or milliseconds) or an ISO 8601 date to see every representation and how long until / since it. Handy for JWT <code>exp</code> / <code>iat</code> claims.</p>
+      <div class="req-line">
+        <input id="tsIn" class="url-input" type="text" spellcheck="false" placeholder="1735689600  ·  2025-01-01T00:00:00Z" />
+        <button class="btn ghost" id="tsNow" title="Insert current time">Now</button>
+      </div>
+      <div class="ck-out" id="tsOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="tsRun">Convert</button>
+        <button class="btn ghost" id="closeTs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="paModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Param Analyzer <span class="muted">— triage query params</span></h2>
+      <p class="hint">Paste a URL or query string. Each parameter is classified by the attack class its name/value suggests — open redirect, SSRF, path traversal, IDOR, secret, injection — so you know what to fuzz first.</p>
+      <textarea id="paIn" class="code code-out" spellcheck="false" placeholder="https://api.example.com/v1/files?id=42&redirect=/home&file=report.pdf&token=eyJ..."></textarea>
+      <div class="ck-out" id="paOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="paRun">Analyze</button>
+        <button class="btn ghost" id="closePa">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="enModal" hidden>
+    <div class="modal">
+      <h2>Entropy Analyzer <span class="muted">— measure one secret</span></h2>
+      <p class="hint">Paste a single session token, API key, or nonce. Shannon entropy and an optimistic brute-force keyspace are computed from its length and character set — a quick check before you trust a value as a secret. For sampling many tokens, use <strong>Token Sequencer</strong>.</p>
+      <input id="enIn" class="url-input" type="text" spellcheck="false" placeholder="e.g. a session cookie or bearer token" />
+      <div class="ck-out" id="enOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="enRun">Analyze</button>
+        <button class="btn ghost" id="closeEn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="rdModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Redirect &amp; SSRF Payloads <span class="muted">— filter-bypass strings</span></h2>
+      <p class="hint">Generate classic open-redirect and SSRF bypass payloads for an <strong>authorized</strong> test. Set your attacker/OOB host and the target host; nothing is sent — copy a payload into a <code>redirect</code> / <code>url</code> parameter yourself.</p>
+      <div class="req-line">
+        <input id="rdAttacker" class="url-input" type="text" spellcheck="false" placeholder="attacker / OOB host — evil.com" value="evil.com" />
+        <input id="rdTarget" class="url-input" type="text" spellcheck="false" placeholder="target host — victim.com" value="victim.com" />
+      </div>
+      <div class="ck-out" id="rdOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="rdCopy">Copy all</button>
+        <button class="btn ghost" id="closeRd">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="jfModal" hidden>
+    <div class="modal modal-wide">
+      <h2>JSON Flattener <span class="muted">— paths &amp; leaked fields</span></h2>
+      <p class="hint">Paste a JSON response to flatten it into <code>dot.path[i]</code> → value rows. Keys that look sensitive (password, token, api_key, email, …) are highlighted — useful for spotting leaks and locating a value to extract in a <strong>Sequence</strong> step.</p>
+      <textarea id="jfIn" class="code code-out" spellcheck="false" placeholder='{"user":{"id":7,"email":"a@b.com"},"token":"eyJ..."}'></textarea>
+      <label class="check"><input type="checkbox" id="jfOnly"> sensitive only</label>
+      <div class="ck-out" id="jfOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="jfRun">Flatten</button>
+        <button class="btn ghost" id="jfCopy">Copy paths</button>
+        <button class="btn ghost" id="closeJf">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="bcModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Body Converter <span class="muted">— JSON → form / query / multipart</span></h2>
+      <p class="hint">Paste a JSON object to re-encode the same data as <code>x-www-form-urlencoded</code>, a query string, and <code>multipart/form-data</code> — for probing content-type confusion and parameter pollution. Nested values are JSON-encoded so they survive.</p>
+      <textarea id="bcIn" class="code code-out" spellcheck="false" placeholder='{"username":"admin","role":"user"}'></textarea>
+      <div class="ck-out" id="bcOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="bcRun">Convert</button>
+        <button class="btn ghost" id="closeBc">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="plModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Injection Payloads <span class="muted">— authorized testing cheat sheet</span></h2>
+      <p class="hint">Categorized test strings for XSS, SQLi, path traversal, SSTI, and command injection. Set a marker to replace <code>{{M}}</code> (your OOB host or a unique reflection canary). Generation only — nothing is sent; copy a payload into a request yourself.</p>
+      <div class="req-line">
+        <input id="plMarker" class="url-input" type="text" spellcheck="false" placeholder="marker for {{M}} — e.g. oob.attacker.test or a canary" />
+      </div>
+      <div class="ck-out" id="plOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closePl">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="wfModal" hidden>
+    <div class="modal modal-wide">
+      <h2>WAF Fingerprint <span class="muted">— what's in front of the API</span></h2>
+      <p class="hint">Paste a response's headers (and optionally a body snippet, e.g. a block page) to detect common WAFs / CDNs / reverse proxies — Cloudflare, Akamai, AWS, Imperva, F5, Sucuri, Fastly, Azure, ModSecurity, and more.</p>
+      <textarea id="wfHeaders" class="code code-out" spellcheck="false" placeholder="Server: cloudflare&#10;cf-ray: 7a1b2c3d4e5f"></textarea>
+      <textarea id="wfBody" class="code code-out" spellcheck="false" placeholder="optional body snippet (block page text)"></textarea>
+      <div class="ck-out" id="wfOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="wfRun">Fingerprint</button>
+        <button class="btn ghost" id="closeWf">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="stModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Status Reference <span class="muted">— codes with a pentest note</span></h2>
+      <p class="hint">Search HTTP status codes by number, phrase, or keyword. Each entry adds a short note on what the code means for testing (e.g. 403 → verb/header tampering, 500 → error-based injection, 502/504 → SSRF).</p>
+      <input id="stIn" class="url-input" type="text" spellcheck="false" placeholder="403  ·  forbidden  ·  ssrf" />
+      <div class="ck-out" id="stOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeSt">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="wlModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Wordlist Generator <span class="muted">— ranges &amp; mutations</span></h2>
+      <p class="hint">Build a fuzzing wordlist — a numeric range (with zero-padding) or case/leet mutations of base words — then wrap each entry with a prefix/suffix. Copy it into the <strong>Fuzzer</strong> or <strong>Content Discovery</strong>.</p>
+      <div class="wl-controls">
+        <select id="wlMode" class="method-select">
+          <option value="range">Numeric range</option>
+          <option value="mutate">Word mutations</option>
+        </select>
+        <span id="wlRangeRow" class="wl-controls">
+          <input id="wlStart" class="wl-num" type="number" value="1" title="start" />
+          <input id="wlEnd" class="wl-num" type="number" value="100" title="end" />
+          <input id="wlStep" class="wl-num" type="number" value="1" title="step" />
+          <input id="wlPad" class="wl-num" type="number" value="0" title="zero-pad width" />
+        </span>
+        <span id="wlMutateRow" class="wl-controls" hidden>
+          <label class="check"><input type="checkbox" id="wlLeet"> leet</label>
+        </span>
+      </div>
+      <textarea id="wlBase" class="code code-out" spellcheck="false" placeholder="base words for mutation mode — one per line&#10;admin&#10;root&#10;test" hidden></textarea>
+      <div class="wl-controls">
+        <input id="wlPrefix" type="text" placeholder="prefix" spellcheck="false" />
+        <input id="wlSuffix" type="text" placeholder="suffix" spellcheck="false" />
+        <span class="meta" id="wlCount"></span>
+      </div>
+      <textarea id="wlOut" class="code output" spellcheck="false" readonly></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="wlGen">Generate</button>
+        <button class="btn ghost" id="wlCopy">Copy</button>
+        <button class="btn ghost" id="closeWl">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="ipModal" hidden>
+    <div class="modal">
+      <h2>IP Obfuscator <span class="muted">— SSRF filter-bypass forms</span></h2>
+      <p class="hint">Enter an IPv4 address to see every equivalent encoding (decimal, octal, hex, dotted-hex, IPv6-mapped, shorthand) that bypasses naive host filters. Click any value to copy. Pairs with <strong>Redirect &amp; SSRF Payloads</strong>.</p>
+      <input id="ipIn" class="url-input" type="text" spellcheck="false" placeholder="127.0.0.1  ·  169.254.169.254" value="127.0.0.1" />
+      <div class="ck-out" id="ipOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeIp">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="ahModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Attack Headers <span class="muted">— request-header tricks</span></h2>
+      <p class="hint">A categorized library of request headers useful in testing — IP spoofing, URL/path override, host-header &amp; cache poisoning, scheme, auth-context, and method override. Copy a <code>Name: value</code> line and add it via the Request tab or <strong>Match &amp; Replace</strong>.</p>
+      <input id="ahIn" class="url-input" type="text" spellcheck="false" placeholder="search — x-forwarded, host, override, auth…" />
+      <div class="ck-out" id="ahOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeAh">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="uaModal" hidden>
+    <div class="modal modal-wide">
+      <h2>User-Agent Library <span class="muted">— UA strings for testing</span></h2>
+      <p class="hint">Representative User-Agent strings (desktop, mobile, bot/crawler, tools) for testing UA-based routing, cloaking, and access logic. Copy one and set it via the Request tab or <strong>Match &amp; Replace</strong>.</p>
+      <input id="uaIn" class="url-input" type="text" spellcheck="false" placeholder="search — chrome, googlebot, curl, mobile…" />
+      <div class="ck-out" id="uaOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeUa">Close</button>
       </div>
     </div>
   </div>
@@ -713,7 +985,7 @@
         </section>
       </div>
       <div class="modal-actions">
-        <button class="btn primary" id="historyReplay">Replay</button>
+        <button class="btn primary" id="historyReplay" title="Load this history entry back into the request editor">Replay</button>
         <button class="btn ghost" id="closeHistoryDetail">Close</button>
       </div>
     </div>
@@ -727,7 +999,7 @@
       <label class="block">From URL (fetched server-side, no CORS)
         <span class="inline-row">
           <input id="specUrl" type="text" class="url-input" placeholder="https://target/swagger.json" spellcheck="false" />
-          <button class="btn primary" id="specUrlLoad">Fetch</button>
+          <button class="btn primary" id="specUrlLoad" title="Fetch the OpenAPI spec URL through the local server">Fetch</button>
         </span>
       </label>
       <label class="block">From file
@@ -827,14 +1099,14 @@
         <textarea id="jwtWordlist" class="code small" spellcheck="false" placeholder="one candidate secret per line — secret, password, changeme, 123456 …"></textarea>
         <input type="file" id="jwtWordlistFile" accept=".txt,text/plain" hidden />
         <div class="jwt-row">
-          <button class="btn primary tiny" id="jwtBrute" type="button">Run brute-force</button>
+          <button class="btn primary tiny" id="jwtBrute" type="button" title="Try each wordlist entry as the HMAC secret locally">Run brute-force</button>
           <button class="btn tiny" id="jwtBruteStop" type="button" disabled>Stop</button>
           <span class="jwt-result" id="jwtBruteResult"></span>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn ghost" id="jwtForgeNone" type="button">Forge alg:none</button>
+        <button class="btn ghost" id="jwtForgeNone" type="button" title="Create an alg:none JWT for authorized verification-bypass tests">Forge alg:none</button>
         <button class="btn ghost" id="jwtApplyIdentity" type="button">Set as identity bearer</button>
         <button class="btn ghost" id="jwtCopyHeader" type="button">Copy Authorization header</button>
         <button class="btn primary" id="jwtCopy" type="button">Copy token</button>

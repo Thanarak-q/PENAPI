@@ -20,6 +20,21 @@ import { initTiming, openTiming } from './timing.js';
 import { initAuth, openAuth } from './auth.js';
 import { initRandom, openRandom } from './random.js';
 import { initCookie, openCookie } from './cookie.js';
+import { initHeaders, openHeaders } from './headers.js';
+import { initHashId, openHashId } from './hashid.js';
+import { initTimestamp, openTimestamp } from './timestamp.js';
+import { initParams, openParams } from './params.js';
+import { initEntropy, openEntropy } from './entropy.js';
+import { initRedirect, openRedirect } from './redirect.js';
+import { initJsonFlat, openJsonFlat } from './jsonflat.js';
+import { initBodyConv, openBodyConv } from './bodyconv.js';
+import { initPayloadLib, openPayloadLib } from './payloads-lib.js';
+import { initWaf, openWaf } from './waf.js';
+import { initStatus, openStatus } from './status.js';
+import { initWordlist, openWordlist } from './wordlist.js';
+import { initIpObf, openIpObf } from './ipobf.js';
+import { initAttackHdr, openAttackHdr } from './attackhdr.js';
+import { initUserAgent, openUserAgent } from './useragent.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -29,12 +44,14 @@ import { initSpecLoader, setSpecSourceLabel } from './spec.js';
 import { initRecon, renderRecon } from './recon.js';
 import { initPalette, openPalette } from './palette.js';
 import { initMenubar } from './menubar.js';
+import { initTheme } from './theme.js';
 import {
   initSession, updateProfileLabel,
   saveSession, openSessions, exportSession, importSession,
 } from './session.js';
 
 async function boot() {
+  initTheme();
   initRequest();
   await initFuzzer();
   initMatrix();
@@ -51,6 +68,21 @@ async function boot() {
   initAuth();
   initRandom();
   initCookie();
+  initHeaders();
+  initHashId();
+  initTimestamp();
+  initParams();
+  initEntropy();
+  initRedirect();
+  initJsonFlat();
+  initBodyConv();
+  initPayloadLib();
+  initWaf();
+  initStatus();
+  initWordlist();
+  initIpObf();
+  initAttackHdr();
+  initUserAgent();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -77,7 +109,23 @@ async function boot() {
     auth: openAuth,
     random: openRandom,
     cookie: openCookie,
+    headers: openHeaders,
+    hashid: openHashId,
+    timestamp: openTimestamp,
+    params: openParams,
+    entropy: openEntropy,
+    redirect: openRedirect,
+    jsonflat: openJsonFlat,
+    bodyconv: openBodyConv,
+    payloadlib: openPayloadLib,
+    waf: openWaf,
+    status: openStatus,
+    wordlist: openWordlist,
+    ipobf: openIpObf,
+    attackhdr: openAttackHdr,
+    useragent: openUserAgent,
     'clear-filters': clearFilters,
+    guide: () => window.open('/guide.html', '_blank', 'noopener'),
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {
       $('#aboutVer').textContent = $('#brandVer').textContent || '';

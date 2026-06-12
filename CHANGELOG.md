@@ -3,6 +3,27 @@
 All notable changes to Swaggernaut are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## 1.12.0
+
+### Added
+- **Attack menu with nested flyouts** — payload generation, spoofing helpers,
+  Match & Replace, Content Discovery, and Quick Attacks now live under a
+  top-level **Attack** menu. Payloads and header/spoofing tools are grouped in
+  second-level flyout menus.
+- **Nested Tools flyouts** — standalone utilities are grouped under
+  **Tokens & crypto**, **Encode & convert**, and **Recon & analysis** instead of
+  one long flat dropdown.
+- **Theme palettes and dark mode** — the top bar now includes palette swatches
+  and a light/dark toggle. Preferences persist locally before the UI paints.
+- **User Guide** — **Help → User Guide…** opens a local guide page covering the
+  safe workflow, active-test tools, dark mode, and palettes.
+- **Hover help** — compact icon and short-label buttons now expose `title`
+  hints so their purpose is visible on hover.
+
+### Changed
+- Removed the unused request-header endpoint strip that displayed
+  "Pick an endpoint" before a request was selected.
+
 ## 1.10.0
 
 ### Added
@@ -57,7 +78,123 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 
 ## Unreleased
 
+### Changed
+- **Tools menu organized and de-duplicated** — the menu is split into labeled
+  *Payloads & attack*, *Tokens & crypto*, *Encode & convert*, and
+  *Recon & analysis* sections, and the dropdown scrolls if it would exceed the
+  viewport. The request-context actions that were mirrored here (Quick Attacks,
+  Copy as code, Send to Fuzzer / Access Matrix) were **removed** — they remain
+  in the request's `⋯` overflow menu, which is the single correct home for
+  actions that operate on the request you're editing. JWT Inspector (a
+  standalone tool) moved into *Tokens & crypto*.
+
 ### Added
+- **More Quick Attack variants** — the one-click attack runner now also tries
+  path-normalization ACL bypasses (`/.` trailing dot, `%2f` encoded slash,
+  case-swapped path, leading double slash), a scheme downgrade
+  (`X-Forwarded-Proto: http`), extra method-override headers, wildcard `Accept`,
+  and a JSON→XML content-type swap. `lib/attacks.js` is now covered by a
+  `node --test` suite (variant gating, path rewriting, header stripping).
+- **Six more Fuzzer payload sets** — **LDAP Injection**, **XPath Injection**,
+  **GraphQL Introspection**, **Open Redirect**, **Email Header Injection**, and
+  **Format String / Edge Cases** — bringing the built-in sets to 20. All surface
+  automatically in the Fuzzer dropdown and are covered by the `lib/payloads.js`
+  integrity tests.
+- **Injection Payloads cheat sheet expanded** — added **NoSQLi**, **XXE**,
+  **CRLF / header**, and **Polyglot** categories (with `{{M}}` marker support for
+  OOB exfil / canaries), keeping the client-side cheat sheet aligned with the
+  Fuzzer's built-in sets.
+- **Fuzzer payload sets expanded** — three new built-in sets: **SSTI** (template
+  injection across Jinja2/Twig/SpEL/Razor), **XXE** (file read, SSRF, and
+  out-of-band parameter-entity exfiltration), and **CRLF / Header Injection**.
+  The **SQLi** set gains cross-engine time-based probes (MySQL/Postgres/Oracle)
+  and comment/whitespace WAF-bypass variants. New sets appear automatically in
+  the Fuzzer's payload-set dropdown. `lib/payloads.js` is now covered by a
+  `node --test` suite (set integrity, de-duplication, `getSet` copy-safety,
+  `numericRange` bounds/caps).
+- **User-Agent Library** — under **Tools → User-Agent Library…**, a searchable
+  set of representative User-Agent strings (desktop, mobile, bot/crawler, tools)
+  for testing UA-based routing, cloaking, and access logic, with per-entry copy.
+  Library is unit-tested via `node --test` (`public/js/useragent-core.js`).
+- **Attack Headers** — under **Tools → Attack Headers…**, a searchable,
+  categorized library of request headers useful in testing (IP spoofing,
+  URL/path override, host-header & cache poisoning, scheme, auth-context, method
+  override), each with a sample value, an explanation, and copy as a
+  `Name: value` line for the Request tab or Match & Replace. Library is
+  unit-tested via `node --test` (`public/js/attackhdr-core.js`).
+- **IP Obfuscator** — under **Tools → IP Obfuscator…**, convert an IPv4 address
+  into every equivalent encoding (decimal, octal, hex, dotted-hex/octal,
+  IPv6-mapped, loopback shorthand) that bypasses naive SSRF host filters;
+  click-to-copy. Pairs with **Redirect & SSRF Payloads**. Conversion is
+  unit-tested via `node --test` (`public/js/ipobf-core.js`).
+- **Wordlist Generator** — under **Tools → Wordlist Generator…**, build fuzzing
+  lists from a numeric range (with step and zero-padding) or case/leet mutations
+  of base words, then wrap each entry with a prefix/suffix and copy it into the
+  Fuzzer or Content Discovery. Output is capped to keep ranges safe. Logic is
+  unit-tested via `node --test` (`public/js/wordlist-core.js`).
+- **Status Reference** — under **Tools → Status Reference…**, a searchable HTTP
+  status-code table (by number, phrase, or keyword) where each entry carries a
+  short pentest note — e.g. 403 → verb/header tampering, 500 → error-based
+  injection, 502/504 → SSRF, 429 → rate-limit scoping. Logic is unit-tested via
+  `node --test` (`public/js/status-core.js`).
+- **WAF Fingerprint** — under **Tools → WAF Fingerprint…**, paste a response's
+  headers (and optional body snippet) to detect common WAFs / CDNs / reverse
+  proxies — Cloudflare, Akamai, AWS (CloudFront/ALB/WAF), Imperva, F5 BIG-IP,
+  Sucuri, Fastly, Azure, ModSecurity, Barracuda, and more — from header and body
+  signatures. Logic is unit-tested via `node --test` (`public/js/waf-core.js`).
+- **Injection Payloads** — under **Tools → Injection Payloads…**, a categorized
+  cheat sheet of test strings (XSS, SQLi, path traversal, SSTI, command
+  injection) with per-payload copy. A marker field substitutes `{{M}}` with your
+  OOB host or a unique reflection canary. Generation only — nothing is sent.
+  Library is unit-tested via `node --test` (`public/js/payloads-lib-core.js`).
+- **Body Converter** — under **Tools → Body Converter…**, paste a JSON object to
+  re-encode the same data as `application/x-www-form-urlencoded`, a query
+  string, and `multipart/form-data` (per-block copy) — for probing content-type
+  confusion and parameter pollution. Nested values are JSON-encoded so they
+  survive the round trip. Logic is unit-tested via `node --test`
+  (`public/js/bodyconv-core.js`).
+- **JSON Flattener** — under **Tools → JSON Flattener…**, paste a JSON response
+  to flatten it into `dot.path[i]` → value leaf rows with each leaf's type, and
+  auto-highlight keys that look sensitive (password, token, api_key, email, …).
+  A **sensitive only** toggle and **Copy paths** make it quick to spot leaks and
+  locate a value to extract in a Sequence step. Logic is unit-tested via
+  `node --test` (`public/js/jsonflat-core.js`).
+- **Redirect & SSRF Payloads** — under **Tools → Redirect & SSRF Payloads…**,
+  generate classic open-redirect (scheme-relative, backslash, userinfo `@`,
+  subdomain, encoded) and SSRF filter-bypass strings (loopback obfuscations in
+  octal/decimal/hex, cloud metadata endpoints, `gopher://`/`dict://`/`file://`,
+  and an OOB callback to your host) for an authorized test. Generation only —
+  nothing is sent. Logic is unit-tested via `node --test`
+  (`public/js/redirect-core.js`).
+- **Entropy Analyzer** — under **Tools → Entropy Analyzer…**, paste a single
+  token / API key / session ID to measure its Shannon entropy, observed
+  character set, and an optimistic brute-force keyspace, with a weak / fair /
+  good / strong verdict — a fast single-value check (use **Token Sequencer** for
+  sampling many). Logic is unit-tested via `node --test`
+  (`public/js/entropy-core.js`).
+- **Param Analyzer** — under **Tools → Param Analyzer…**, paste a URL or query
+  string to classify each parameter by the attack class its name/value suggests
+  (open redirect, SSRF, path traversal, IDOR, auth/secret, injection,
+  privilege), surfacing the most interesting params first so you know what to
+  fuzz. Logic is unit-tested via `node --test` (`public/js/params-core.js`).
+- **Timestamp Converter** — under **Tools → Timestamp Converter…**, enter a Unix
+  epoch (seconds or milliseconds) or an ISO 8601 date to see every
+  representation (Unix s/ms, ISO, UTC) plus a human-relative offset and an
+  expired/future flag — handy for reading JWT `exp`/`iat` claims. A **Now**
+  button inserts the current time. Logic is unit-tested via `node --test`
+  (`public/js/timestamp-core.js`).
+- **Hash Identifier** — under **Tools → Hash Identifier…**, paste a hash to
+  guess likely algorithms from length, character set, and crypt prefix
+  (MD5/NTLM, SHA-1/256/384/512, SHA-3, bcrypt, md5/sha256/sha512crypt, Argon2,
+  LDAP {SSHA}, salted forms). Heuristic and fully client-side; logic is
+  unit-tested via `node --test` (`public/js/hashid-core.js`).
+- **Header Auditor** — under **Tools → Header Auditor…**, paste a raw HTTP
+  response header block to audit it for missing or weak security headers
+  (**CSP** incl. `unsafe-inline`/`unsafe-eval`, **HSTS** max-age, **X-Content-Type-Options**,
+  **X-Frame-Options** / CSP `frame-ancestors`, **Referrer-Policy**), tech-stack
+  disclosure (`Server`, `X-Powered-By`, …), and unsafe CORS (`Access-Control-Allow-Origin: *`,
+  worse with `Allow-Credentials: true`). Parser/audit are unit-tested via
+  `node --test` (`public/js/headers-core.js`).
 - **Cookie Inspector** — under **Tools → Cookie Inspector…**, paste one or more
   `Set-Cookie` header values to parse each cookie and audit its security
   attributes, flagging missing **HttpOnly**, **Secure**, and **SameSite** (and
