@@ -58,6 +58,12 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Attack Headers** — under **Tools → Attack Headers…**, a searchable,
+  categorized library of request headers useful in testing (IP spoofing,
+  URL/path override, host-header & cache poisoning, scheme, auth-context, method
+  override), each with a sample value, an explanation, and copy as a
+  `Name: value` line for the Request tab or Match & Replace. Library is
+  unit-tested via `node --test` (`public/js/attackhdr-core.js`).
 - **IP Obfuscator** — under **Tools → IP Obfuscator…**, convert an IPv4 address
   into every equivalent encoding (decimal, octal, hex, dotted-hex/octal,
   IPv6-mapped, loopback shorthand) that bypasses naive SSRF host filters;

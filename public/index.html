@@ -79,6 +79,7 @@
           <button class="menu-item" data-act="status">Status Reference…</button>
           <button class="menu-item" data-act="wordlist">Wordlist Generator…</button>
           <button class="menu-item" data-act="ipobf">IP Obfuscator…</button>
+          <button class="menu-item" data-act="attackhdr">Attack Headers…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -905,6 +906,18 @@
       <div class="ck-out" id="ipOut"></div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeIp">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="ahModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Attack Headers <span class="muted">— request-header tricks</span></h2>
+      <p class="hint">A categorized library of request headers useful in testing — IP spoofing, URL/path override, host-header &amp; cache poisoning, scheme, auth-context, and method override. Copy a <code>Name: value</code> line and add it via the Request tab or <strong>Match &amp; Replace</strong>.</p>
+      <input id="ahIn" class="url-input" type="text" spellcheck="false" placeholder="search — x-forwarded, host, override, auth…" />
+      <div class="ck-out" id="ahOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeAh">Close</button>
       </div>
     </div>
   </div>

@@ -148,6 +148,7 @@ what the UI renders.
 | **Status Reference** | From **Tools → Status Reference…**, search HTTP status codes by number/phrase/keyword — each entry adds a pentest note (403 → verb tampering, 500 → error-based injection, 502/504 → SSRF). |
 | **Wordlist Generator** | From **Tools → Wordlist Generator…**, build fuzzing lists from a numeric range (step + zero-pad) or case/leet mutations, wrap with a prefix/suffix, and copy into the Fuzzer or Content Discovery. |
 | **IP Obfuscator** | From **Tools → IP Obfuscator…**, convert an IPv4 address into decimal, octal, hex, dotted-hex, IPv6-mapped, and shorthand forms that bypass naive SSRF host filters — click to copy. |
+| **Attack Headers** | From **Tools → Attack Headers…**, a searchable library of request-header tricks (IP spoofing, URL/path override, host/cache poisoning, scheme, auth-context, method override) with explanations and copy-as-`Name: value`. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |

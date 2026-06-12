@@ -969,6 +969,12 @@ mark { background: var(--accent); color: #fff; border-radius: 1px; padding: 0 1p
 .wl-controls .wl-num { width: 5rem; }
 #wlOut { width: 100%; min-height: 180px; }
 
+/* Attack Headers */
+.ah-row { padding: var(--s1) 0; border-bottom: 1px solid var(--line); }
+.ah-head { display: flex; align-items: center; gap: var(--s2); }
+.ah-name { font-family: var(--mono); font-weight: 700; color: var(--ink); }
+.ah-sample { font-family: var(--mono); font-size: var(--text-xs); color: var(--accent); flex: 1 1 auto; }
+
 /* =======================================================================
    Generic tool layouts (fuzzer / sweep / recon / matrix)
    ======================================================================= */
