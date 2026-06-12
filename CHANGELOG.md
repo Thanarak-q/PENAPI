@@ -58,6 +58,10 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Injection Payloads cheat sheet expanded** — added **NoSQLi**, **XXE**,
+  **CRLF / header**, and **Polyglot** categories (with `{{M}}` marker support for
+  OOB exfil / canaries), keeping the client-side cheat sheet aligned with the
+  Fuzzer's built-in sets.
 - **Fuzzer payload sets expanded** — three new built-in sets: **SSTI** (template
   injection across Jinja2/Twig/SpEL/Razor), **XXE** (file read, SSRF, and
   out-of-band parameter-entity exfiltration), and **CRLF / Header Injection**.

