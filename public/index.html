@@ -70,6 +70,7 @@
           <button class="menu-item" data-act="hashid">Hash Identifier…</button>
           <button class="menu-item" data-act="timestamp">Timestamp Converter…</button>
           <button class="menu-item" data-act="params">Param Analyzer…</button>
+          <button class="menu-item" data-act="entropy">Entropy Analyzer…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -753,6 +754,19 @@
       <div class="modal-actions">
         <button class="btn primary" id="paRun">Analyze</button>
         <button class="btn ghost" id="closePa">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="enModal" hidden>
+    <div class="modal">
+      <h2>Entropy Analyzer <span class="muted">— measure one secret</span></h2>
+      <p class="hint">Paste a single session token, API key, or nonce. Shannon entropy and an optimistic brute-force keyspace are computed from its length and character set — a quick check before you trust a value as a secret. For sampling many tokens, use <strong>Token Sequencer</strong>.</p>
+      <input id="enIn" class="url-input" type="text" spellcheck="false" placeholder="e.g. a session cookie or bearer token" />
+      <div class="ck-out" id="enOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="enRun">Analyze</button>
+        <button class="btn ghost" id="closeEn">Close</button>
       </div>
     </div>
   </div>

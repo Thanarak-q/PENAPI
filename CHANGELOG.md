@@ -58,6 +58,12 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Entropy Analyzer** — under **Tools → Entropy Analyzer…**, paste a single
+  token / API key / session ID to measure its Shannon entropy, observed
+  character set, and an optimistic brute-force keyspace, with a weak / fair /
+  good / strong verdict — a fast single-value check (use **Token Sequencer** for
+  sampling many). Logic is unit-tested via `node --test`
+  (`public/js/entropy-core.js`).
 - **Param Analyzer** — under **Tools → Param Analyzer…**, paste a URL or query
   string to classify each parameter by the attack class its name/value suggests
   (open redirect, SSRF, path traversal, IDOR, auth/secret, injection,
