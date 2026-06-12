@@ -14,57 +14,231 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body class="guide-page">
-  <main class="guide-shell">
-    <header class="guide-hero">
-      <a class="guide-back" href="/">Back to workbench</a>
-      <h1>Swaggernaut Guide</h1>
-      <p>Practical advice for using the workbench safely: load a spec, build requests, choose identities, then move from passive review to controlled active testing.</p>
-    </header>
+  <header class="guide-topbar">
+    <a class="guide-brand" href="/">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Swaggernaut</span>
+      <small>Docs</small>
+    </a>
+    <nav class="guide-toplinks" aria-label="Guide shortcuts">
+      <a href="#quick-start">Quick start</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#attack-tools">Attack tools</a>
+      <a href="#reference">Reference</a>
+    </nav>
+    <a class="guide-open" href="/">Open workbench</a>
+  </header>
 
-    <section class="guide-section">
-      <h2>Start safely</h2>
-      <ul>
-        <li>Use Swaggernaut only on systems where you have explicit authorization to test.</li>
-        <li>Set the Target base URL before sending requests, and confirm the active identity before running matrix, sweep, fuzzer, or discovery actions.</li>
-        <li>Start with GET-only and passive views when testing a fragile environment. Treat POST, PUT, PATCH, and DELETE as potentially mutating.</li>
-      </ul>
-    </section>
+  <div class="guide-layout">
+    <aside class="guide-sidebar" aria-label="Guide contents">
+      <div class="guide-sidebar-title">Contents</div>
+      <a href="#overview">Overview</a>
+      <a href="#quick-start">Start safely</a>
+      <a href="#workflow">Suggested workflow</a>
+      <a href="#attack-tools">Attack tools</a>
+      <a href="#reference">Tool reference</a>
+      <a href="#themes">Dark mode and palettes</a>
+      <a href="#shortcuts">Shortcuts</a>
+    </aside>
 
-    <section class="guide-section">
-      <h2>Suggested workflow</h2>
-      <ol>
-        <li><strong>Load a spec.</strong> Use File -> Load Spec, then scan the sidebar for unauthenticated, deprecated, or body-heavy operations.</li>
-        <li><strong>Set identities.</strong> Create Admin, User, and Unauth header sets so matrix and sweep results have useful contrast.</li>
-        <li><strong>Review Attack Surface.</strong> Use the passive findings to pick likely BOLA, missing-auth, SSRF, and mass-assignment candidates.</li>
-        <li><strong>Repeat one request.</strong> Confirm baseline behavior in Request before sending it to Fuzzer, Access Matrix, or Sequence.</li>
-        <li><strong>Escalate carefully.</strong> Run Quick Attacks, Content Discovery, Auth Sweep, and Fuzzer only when the target and method are safe for active traffic.</li>
-      </ol>
-    </section>
+    <main class="guide-doc">
+      <section class="guide-hero" id="overview">
+        <p class="guide-kicker">User Guide</p>
+        <h1>Swaggernaut Guide</h1>
+        <p class="guide-lede">
+          A practical docs page for running the workbench without guessing:
+          load a spec, prepare identities, inspect passive findings, then move
+          into controlled active testing.
+        </p>
 
-    <section class="guide-section guide-grid">
-      <article>
-        <h2>Dark mode</h2>
-        <p>The Dark button in the top bar switches the entire workbench to a low-glare palette. It is saved locally in your browser and applies to this guide page too.</p>
-      </article>
-      <article>
-        <h2>Color palettes</h2>
-        <p>The four swatches next to the target controls change the accent color. Use them to separate screen recordings, projects, or long sessions without changing request data.</p>
-      </article>
-    </section>
+        <div class="guide-hero-grid" aria-label="Core workflow">
+          <div>
+            <span>01</span>
+            <strong>Spec</strong>
+            <p>Load OpenAPI or Swagger JSON from disk, URL, or paste.</p>
+          </div>
+          <div>
+            <span>02</span>
+            <strong>Request</strong>
+            <p>Confirm the target URL, parameters, body, and active identity.</p>
+          </div>
+          <div>
+            <span>03</span>
+            <strong>Attack</strong>
+            <p>Use matrix, fuzzer, sequence, and discovery only when in scope.</p>
+          </div>
+          <div>
+            <span>04</span>
+            <strong>Evidence</strong>
+            <p>Review history, analysis, and exports before writing findings.</p>
+          </div>
+        </div>
+      </section>
 
-    <section class="guide-section">
-      <h2>Advice for active tools</h2>
-      <dl class="guide-list">
-        <dt>Fuzzer</dt>
-        <dd>Mark one injection point with <code>§value§</code> or <code>FUZZ</code>. Keep concurrency low until you know the endpoint is stable.</dd>
-        <dt>Access Matrix</dt>
-        <dd>Best for one request at a time. A low-privilege or unauthenticated <code>2xx</code> response is the signal to investigate.</dd>
-        <dt>Auth Sweep</dt>
-        <dd>Use GET first. Add mutating methods only when the target environment can tolerate repeated writes.</dd>
-        <dt>Content Discovery</dt>
-        <dd>Runs real GET requests against the base URL. Keep custom wordlists focused and stop when noise outweighs signal.</dd>
-      </dl>
-    </section>
-  </main>
+      <section class="guide-section" id="quick-start">
+        <div class="guide-section-head">
+          <p>Quick start</p>
+          <h2>Start safely</h2>
+        </div>
+        <div class="guide-callout">
+          <strong>Authorized testing only.</strong>
+          <span>Swaggernaut sends real traffic from the host running it. Confirm permission, target, identity, and request count before active tools run.</span>
+        </div>
+        <ol class="guide-steps">
+          <li>
+            <strong>Load a spec</strong>
+            <span>Use <code>File -> Load Spec...</code>, pass a file or URL to the CLI, or paste a spec at runtime.</span>
+          </li>
+          <li>
+            <strong>Set the target</strong>
+            <span>Check the Target base URL before every run. A wrong base URL is the easiest way to test the wrong system.</span>
+          </li>
+          <li>
+            <strong>Create identities</strong>
+            <span>Keep at least Admin, User, and Unauth profiles so access checks have useful contrast.</span>
+          </li>
+          <li>
+            <strong>Baseline one request</strong>
+            <span>Send a normal request first, then compare fuzzer, matrix, or quick-attack results against that baseline.</span>
+          </li>
+        </ol>
+      </section>
+
+      <section class="guide-section" id="workflow">
+        <div class="guide-section-head">
+          <p>Workflow</p>
+          <h2>Suggested workflow</h2>
+        </div>
+        <div class="guide-panels">
+          <article>
+            <h3>Passive first</h3>
+            <p>Start in Explorer and Attack Surface. Look for unauthenticated operations, optional auth, ID-like path tokens, risky parameter names, and sensitive response fields.</p>
+          </article>
+          <article>
+            <h3>Repeat before testing</h3>
+            <p>Open one operation in Request, fill generated params, inspect headers, and confirm the normal response shape before sending it anywhere else.</p>
+          </article>
+          <article>
+            <h3>Escalate one tool at a time</h3>
+            <p>Use Access Matrix for role contrast, Sequence for stateful flows, and Fuzzer only after the endpoint is stable enough for repeated traffic.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="guide-section" id="attack-tools">
+        <div class="guide-section-head">
+          <p>Active testing</p>
+          <h2>Attack tools</h2>
+        </div>
+        <div class="guide-tool-list">
+          <div>
+            <h3>Fuzzer</h3>
+            <p>Mark one injection point with <code>§value§</code> or <code>FUZZ</code>. Start with low concurrency and a small payload set.</p>
+          </div>
+          <div>
+            <h3>Access Matrix</h3>
+            <p>Replay the same request as every identity. A low-privilege or unauthenticated <code>2xx</code> response is the signal to investigate.</p>
+          </div>
+          <div>
+            <h3>Sequence Runner</h3>
+            <p>Capture values from earlier responses and reuse them later with <code>{{name}}</code>. Use this for BOLA, token refresh, and multi-step flows.</p>
+          </div>
+          <div>
+            <h3>Content Discovery</h3>
+            <p>Runs real GET requests against the base URL. Keep wordlists focused and stop when noise outweighs signal.</p>
+          </div>
+          <div>
+            <h3>Quick Attacks</h3>
+            <p>Tries controlled mutation variants such as missing auth, method override, path normalization, and spoofed forwarding headers.</p>
+          </div>
+          <div>
+            <h3>Auth Sweep</h3>
+            <p>Maps authorization coverage across many endpoints. Use GET first and review the estimated request count before confirming.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="guide-section" id="reference">
+        <div class="guide-section-head">
+          <p>Reference</p>
+          <h2>Where tools live</h2>
+        </div>
+        <div class="guide-table-wrap">
+          <table class="guide-table">
+            <thead>
+              <tr>
+                <th>Need</th>
+                <th>Menu path</th>
+                <th>Use it for</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Need">Payloads</td>
+                <td data-label="Menu path"><code>Attack -> Payloads</code></td>
+                <td data-label="Use it for">Injection payloads, redirect/SSRF strings, and wordlists.</td>
+              </tr>
+              <tr>
+                <td data-label="Need">Spoofing</td>
+                <td data-label="Menu path"><code>Attack -> Headers &amp; spoofing</code></td>
+                <td data-label="Use it for">Attack headers, User-Agent strings, and IP obfuscation.</td>
+              </tr>
+              <tr>
+                <td data-label="Need">Request rewriting</td>
+                <td data-label="Menu path"><code>Attack -> Match &amp; Replace...</code></td>
+                <td data-label="Use it for">Session-scoped URL, body, and header transformations.</td>
+              </tr>
+              <tr>
+                <td data-label="Need">Token analysis</td>
+                <td data-label="Menu path"><code>Tools -> Tokens &amp; crypto</code></td>
+                <td data-label="Use it for">JWT, entropy, token sequencing, hashes, auth builder, random values.</td>
+              </tr>
+              <tr>
+                <td data-label="Need">Conversion</td>
+                <td data-label="Menu path"><code>Tools -> Encode &amp; convert</code></td>
+                <td data-label="Use it for">Body converter, JSON flattener, and timestamp converter.</td>
+              </tr>
+              <tr>
+                <td data-label="Need">Recon utilities</td>
+                <td data-label="Menu path"><code>Tools -> Recon &amp; analysis</code></td>
+                <td data-label="Use it for">Header audit, cookie audit, WAF fingerprinting, params, timing, comparer, and status codes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="guide-section" id="themes">
+        <div class="guide-section-head">
+          <p>Appearance</p>
+          <h2>Dark mode and color palettes</h2>
+        </div>
+        <div class="guide-panels guide-panels-two">
+          <article>
+            <h3>Dark mode</h3>
+            <p>The Dark button in the top bar switches the workbench to a low-glare theme. It is saved locally and applies to this guide page too.</p>
+          </article>
+          <article>
+            <h3>Color palettes</h3>
+            <p>The four swatches next to the target controls change the accent color. Use palettes to separate projects, screen recordings, or long sessions.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="guide-section" id="shortcuts">
+        <div class="guide-section-head">
+          <p>Navigation</p>
+          <h2>Shortcuts</h2>
+        </div>
+        <div class="guide-shortcuts">
+          <div><kbd>Ctrl/Cmd + K</kbd><span>Open command palette</span></div>
+          <div><kbd>Ctrl/Cmd + Enter</kbd><span>Send the current request</span></div>
+          <div><kbd>/</kbd><span>Focus endpoint filter</span></div>
+          <div><kbd>Alt + 1...8</kbd><span>Jump to a tab</span></div>
+          <div><kbd>Esc</kbd><span>Close open menus and dialogs</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>

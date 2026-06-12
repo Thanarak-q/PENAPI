@@ -110,13 +110,24 @@ test('theme controls expose palette and dark mode choices', () => {
   assert.ok(source('public/js/theme.js').includes('swaggernaut.theme.v1'));
 });
 
-test('help menu links to an advice-oriented user guide page', () => {
+test('help menu links to a documentation-style user guide page', () => {
   const help = menuSection('Help');
   assert.ok(help.includes('data-act="guide"'), 'Help menu includes guide action');
   assert.ok(source('public/js/main.js').includes("window.open('/guide.html'"));
 
   const guide = source('public/guide.html');
-  for (const text of ['Swaggernaut Guide', 'Start safely', 'Suggested workflow', 'Dark mode', 'Color palettes']) {
+  for (const text of [
+    'guide-sidebar',
+    'Swaggernaut Guide',
+    'Start safely',
+    'Suggested workflow',
+    'Attack tools',
+    'Where tools live',
+    'Attack -> Payloads',
+    'Tools -> Tokens &amp; crypto',
+    'Dark mode',
+    'Color palettes',
+  ]) {
     assert.ok(guide.includes(text), `guide includes ${text}`);
   }
 });
