@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Timing Analysis** — under **Tools → Timing Analysis…**, see per-endpoint
+  response-time stats (count, min, average with a bar, max) aggregated from this
+  session's history, sorted slowest first. Large gaps between similar endpoints
+  can indicate a timing oracle (e.g. login slower for valid usernames).
+  Aggregation is unit-tested via `node --test` (`public/js/timing-core.js`).
 - **Traffic Search** — under **Edit → Search Traffic…**, grep every request and
   response captured this session (method, URL, headers, bodies) with a literal
   or regex query to surface tokens, emails, or stack traces anywhere in the

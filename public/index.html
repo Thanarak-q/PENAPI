@@ -62,6 +62,7 @@
           <button class="menu-item" data-act="comparer">Comparer…</button>
           <button class="menu-item" data-act="matchreplace">Match &amp; Replace…</button>
           <button class="menu-item" data-act="discovery">Content Discovery…</button>
+          <button class="menu-item" data-act="timing">Timing Analysis…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -615,6 +616,22 @@
       </div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeSrch">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="tmModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Timing Analysis <span class="muted" id="tmCount"></span></h2>
+      <p class="hint">Per-endpoint response times from this session's history. Large gaps between similar endpoints can indicate a timing oracle (e.g. login slower for valid users).</p>
+      <div class="table-wrap">
+        <table class="results" id="tmTable">
+          <thead><tr><th>Method</th><th>URL</th><th>n</th><th>Min</th><th>Avg</th><th>Max</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeTm">Close</button>
       </div>
     </div>
   </div>
