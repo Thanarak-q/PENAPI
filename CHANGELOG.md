@@ -58,6 +58,10 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Auth Builder** — under **Tools → Auth Builder…**, construct an
+  `Authorization` header value: **Basic** from a user/password (Base64-encoded
+  in the browser) or **Bearer** from a token, then copy it into an identity.
+  Unit-tested via `node --test` (`public/js/auth-core.js`).
 - **Timing Analysis** — under **Tools → Timing Analysis…**, see per-endpoint
   response-time stats (count, min, average with a bar, max) aggregated from this
   session's history, sorted slowest first. Large gaps between similar endpoints

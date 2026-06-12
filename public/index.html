@@ -63,6 +63,7 @@
           <button class="menu-item" data-act="matchreplace">Match &amp; Replace…</button>
           <button class="menu-item" data-act="discovery">Content Discovery…</button>
           <button class="menu-item" data-act="timing">Timing Analysis…</button>
+          <button class="menu-item" data-act="auth">Auth Builder…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -632,6 +633,31 @@
       </div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeTm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="authModal" hidden>
+    <div class="modal">
+      <h2>Auth Builder <span class="muted">— Authorization header</span></h2>
+      <p class="hint">Construct an <code>Authorization</code> header value, then copy it into an identity. Encoding runs in the browser.</p>
+      <div class="auth-grid">
+        <label class="seq-label">Basic</label>
+        <div class="auth-row">
+          <input id="authUser" type="text" spellcheck="false" placeholder="user" />
+          <input id="authPass" type="text" spellcheck="false" placeholder="password" />
+          <button class="btn ghost tiny" id="authBasic">Build</button>
+        </div>
+        <label class="seq-label">Bearer</label>
+        <div class="auth-row">
+          <input id="authToken" type="text" spellcheck="false" placeholder="token" />
+          <button class="btn ghost tiny" id="authBearer">Build</button>
+        </div>
+      </div>
+      <textarea id="authOut" class="code code-out" spellcheck="false" readonly placeholder="Authorization: …"></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="authCopy">Copy</button>
+        <button class="btn ghost" id="closeAuth">Close</button>
       </div>
     </div>
   </div>

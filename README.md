@@ -132,6 +132,7 @@ what the UI renders.
 | **Content Discovery** | From **Tools → Content Discovery…**, brute-force common and custom paths off a base URL to surface unspecced/shadow endpoints. Uses the active identity, classifies outcomes (found / protected / redirect / missing), and is capped at 500 requests with a confirmation gate. |
 | **Traffic Search** | From **Edit → Search Traffic…**, grep all captured requests and responses (method, URL, headers, bodies) with a literal or regex query; results show which field matched. Pure client-side. |
 | **Timing Analysis** | From **Tools → Timing Analysis…**, per-endpoint response-time stats (count, min, avg, max) from session history, sorted slowest first — gaps between similar endpoints can reveal timing oracles. |
+| **Auth Builder** | From **Tools → Auth Builder…**, construct an `Authorization` header — **Basic** from user/password or **Bearer** from a token — and copy it into an identity. Pure client-side. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
