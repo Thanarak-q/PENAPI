@@ -16,8 +16,23 @@ Zero npm dependencies — pure Node plus a static front end. `swaggernaut spec.j
 
 ## Install
 
+Run once without installing:
+
 ```bash
-git clone https://github.com/Thanarak-q/PENAPI.git Swaggernaut
+npx @thanarak-q/swaggernaut
+```
+
+Install from npm:
+
+```bash
+npm install -g @thanarak-q/swaggernaut
+swaggernaut --version
+```
+
+Install from source:
+
+```bash
+git clone https://github.com/Thanarak-q/Swaggernaut.git
 cd Swaggernaut
 # put a launcher on your PATH so `swaggernaut` works anywhere
 printf '#!/usr/bin/env bash\nexec node "%s/server.js" "$@"\n' "$PWD" > ~/.local/bin/swaggernaut

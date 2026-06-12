@@ -1,14 +1,38 @@
 {
-  "name": "swaggernaut",
+  "name": "@thanarak-q/swaggernaut",
   "version": "1.10.0",
   "description": "Pentest-oriented API workbench — loads an OpenAPI/Swagger spec and adds offensive testing tooling (repeater, fuzzer/brute-force, access-control matrix, cURL import).",
   "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thanarak-q/Swaggernaut.git"
+  },
+  "homepage": "https://github.com/Thanarak-q/Swaggernaut#readme",
+  "bugs": {
+    "url": "https://github.com/Thanarak-q/Swaggernaut/issues"
+  },
+  "keywords": [
+    "swagger",
+    "openapi",
+    "api-security",
+    "pentest",
+    "fuzzer",
+    "repeater"
+  ],
   "scripts": {
     "start": "node server.js"
   },
   "bin": {
     "swaggernaut": "server.js"
   },
+  "files": [
+    "server.js",
+    "lib/",
+    "public/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=18"
   },
