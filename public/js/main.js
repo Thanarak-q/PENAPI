@@ -23,6 +23,7 @@ import { initCookie, openCookie } from './cookie.js';
 import { initHeaders, openHeaders } from './headers.js';
 import { initHashId, openHashId } from './hashid.js';
 import { initTimestamp, openTimestamp } from './timestamp.js';
+import { initParams, openParams } from './params.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -57,6 +58,7 @@ async function boot() {
   initHeaders();
   initHashId();
   initTimestamp();
+  initParams();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -86,6 +88,7 @@ async function boot() {
     headers: openHeaders,
     hashid: openHashId,
     timestamp: openTimestamp,
+    params: openParams,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

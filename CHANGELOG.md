@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Param Analyzer** — under **Tools → Param Analyzer…**, paste a URL or query
+  string to classify each parameter by the attack class its name/value suggests
+  (open redirect, SSRF, path traversal, IDOR, auth/secret, injection,
+  privilege), surfacing the most interesting params first so you know what to
+  fuzz. Logic is unit-tested via `node --test` (`public/js/params-core.js`).
 - **Timestamp Converter** — under **Tools → Timestamp Converter…**, enter a Unix
   epoch (seconds or milliseconds) or an ISO 8601 date to see every
   representation (Unix s/ms, ISO, UTC) plus a human-relative offset and an

@@ -925,6 +925,13 @@ mark { background: var(--accent); color: #fff; border-radius: 1px; padding: 0 1p
 .ts-key { flex: 0 0 84px; color: var(--ink-soft); }
 .ts-val { color: var(--ink); user-select: all; }
 
+/* Param Analyzer */
+.pa-row { border-bottom: 1px solid var(--line); padding: var(--s2) 0; }
+.pa-head { display: flex; align-items: baseline; gap: var(--s2); }
+.pa-name { font-family: var(--mono); font-weight: 700; color: var(--ink); }
+.pa-val { font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%; }
+.pa-tags { display: flex; flex-wrap: wrap; gap: var(--s1); margin: var(--s1) 0; }
+
 /* =======================================================================
    Generic tool layouts (fuzzer / sweep / recon / matrix)
    ======================================================================= */

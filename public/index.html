@@ -69,6 +69,7 @@
           <button class="menu-item" data-act="headers">Header Auditor…</button>
           <button class="menu-item" data-act="hashid">Hash Identifier…</button>
           <button class="menu-item" data-act="timestamp">Timestamp Converter…</button>
+          <button class="menu-item" data-act="params">Param Analyzer…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -739,6 +740,19 @@
       <div class="modal-actions">
         <button class="btn primary" id="tsRun">Convert</button>
         <button class="btn ghost" id="closeTs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="paModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Param Analyzer <span class="muted">— triage query params</span></h2>
+      <p class="hint">Paste a URL or query string. Each parameter is classified by the attack class its name/value suggests — open redirect, SSRF, path traversal, IDOR, secret, injection — so you know what to fuzz first.</p>
+      <textarea id="paIn" class="code code-out" spellcheck="false" placeholder="https://api.example.com/v1/files?id=42&redirect=/home&file=report.pdf&token=eyJ..."></textarea>
+      <div class="ck-out" id="paOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="paRun">Analyze</button>
+        <button class="btn ghost" id="closePa">Close</button>
       </div>
     </div>
   </div>
