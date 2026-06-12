@@ -19,13 +19,13 @@ Zero npm dependencies — pure Node plus a static front end. `swaggernaut spec.j
 Run once without installing:
 
 ```bash
-npx @thanarak-q/swaggernaut
+npx @rockwine/swaggernaut
 ```
 
 Install from npm:
 
 ```bash
-npm install -g @thanarak-q/swaggernaut
+npm install -g @rockwine/swaggernaut
 swaggernaut --version
 ```
 

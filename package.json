@@ -1,5 +1,5 @@
 {
-  "name": "@thanarak-q/swaggernaut",
+  "name": "@rockwine/swaggernaut",
   "version": "1.10.0",
   "description": "Pentest-oriented API workbench — loads an OpenAPI/Swagger spec and adds offensive testing tooling (repeater, fuzzer/brute-force, access-control matrix, cURL import).",
   "main": "server.js",
