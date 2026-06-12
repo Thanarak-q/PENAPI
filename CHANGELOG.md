@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Match & Replace** — under **Tools → Match & Replace…**, define session-scoped
+  rewrite rules applied to requests sent from the Request tab before they leave:
+  literal/regex replace on the URL or body, or set/remove a header (e.g. inject
+  `X-Forwarded-For` on every send). Rules are saved per session profile. The
+  transform is unit-tested via `node --test` (`public/js/matchreplace-core.js`).
 - **Site Map** — under **View → Site Map…**, browse the loaded spec's endpoints
   as a URL-path tree (shared prefixes merged, per-branch operation counts) — a
   hierarchical lens complementary to the tag-grouped explorer. Click any

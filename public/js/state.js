@@ -23,6 +23,7 @@ const PROFILE_FIELDS = [
   'pinned',
   'endpointTags',
   'sequence',
+  'matchReplace',
 ];
 
 function blankProfile() {
@@ -38,6 +39,7 @@ function blankProfile() {
     pinned: [], // endpoint ids the user has bookmarked
     endpointTags: {}, // endpoint id -> user-defined focus tags
     sequence: { steps: [] }, // saved Sequence Runner steps
+    matchReplace: [], // Match & Replace rewrite rules
   };
 }
 

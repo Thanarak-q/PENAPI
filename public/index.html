@@ -59,6 +59,7 @@
           <div class="menu-sep"></div>
           <button class="menu-item" data-act="sequencer">Token Sequencer…</button>
           <button class="menu-item" data-act="comparer">Comparer…</button>
+          <button class="menu-item" data-act="matchreplace">Match &amp; Replace…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -551,6 +552,19 @@
       <div class="sm-tree" id="smTree"></div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeSm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="mrModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Match &amp; Replace <span class="muted" id="mrCount"></span></h2>
+      <p class="hint">Rewrite requests sent from the Request tab before they leave. URL/body rules do a literal or regex replace; header rules set a header (empty value removes it). Saved per session profile.</p>
+      <div class="mr-rules" id="mrRules"></div>
+      <div class="modal-actions">
+        <button class="btn ghost tiny" id="mrAdd">+ Rule</button>
+        <span class="mr-spacer"></span>
+        <button class="btn ghost" id="closeMr">Close</button>
       </div>
     </div>
   </div>

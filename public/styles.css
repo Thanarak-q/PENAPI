@@ -1584,3 +1584,11 @@ table.results tbody tr.anomaly:hover { background: #f1e4c8; }
 .sm-op { display: flex; align-items: center; gap: var(--s2); cursor: pointer; padding: 1px var(--s2) 1px 0; }
 .sm-op:hover { background: var(--accent-soft); }
 .sm-op-path { font-family: var(--mono); color: var(--ink-soft); }
+
+/* --- Match & Replace modal -------------------------------------------- */
+.mr-rules { display: flex; flex-direction: column; gap: 4px; margin: var(--s2) 0; }
+.mr-rule { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.mr-rule .k { flex: 0 0 160px; }
+.mr-rule .v { flex: 1 1 160px; min-width: 120px; }
+.mr-regex { font-size: var(--text-2xs); color: var(--ink-soft); }
+.mr-spacer { flex: 1 1 auto; }

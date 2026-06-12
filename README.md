@@ -128,6 +128,7 @@ what the UI renders.
 | **Token Sequencer** | From **Tools → Token Sequencer…**, paste a sample of tokens to estimate randomness — uniqueness, length, charset, per-position Shannon entropy (bar chart), total bits, and a graded verdict that flags sequential or colliding tokens. Pure client-side. |
 | **Comparer** | From **Tools → Comparer…**, diff two pasted blobs (requests or responses) line- or word-by-word with an added/removed summary and colored output. Pure client-side. |
 | **Site Map** | From **View → Site Map…**, browse endpoints as a URL-path tree (shared prefixes merged, per-branch counts); click an operation to open it in the Request tab. |
+| **Match & Replace** | From **Tools → Match & Replace…**, define session-scoped rewrite rules applied to requests sent from the Request tab — literal/regex replace on URL or body, or set/remove a header (e.g. inject `X-Forwarded-For`). Saved per profile. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
@@ -170,7 +171,6 @@ Planned additions, in rough priority:
 | Planned | What it does |
 |---|---|
 | **Content discovery** | Brute-force paths and directories off the base URL to surface unspecced/shadow endpoints; reuses the fuzzer engine and caps. |
-| **Match & replace** | Rewrite rules applied to outgoing requests (headers/body regex) at the proxy layer — e.g. inject a header on every send. |
 
 Out of scope by design: an intercepting MITM proxy and an out-of-band
 interaction service — both need infrastructure beyond a zero-dependency local

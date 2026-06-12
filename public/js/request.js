@@ -3,6 +3,7 @@
 import { $, $$, el, statusClass, methodClass, fmtBytes, prettyJson, headersToText, copy } from './util.js';
 import { state, identityHeaders, pushHistory, tagsFor } from './state.js';
 import { sendProxy, buildCurl } from './api.js';
+import { applyRules } from './matchreplace-core.js';
 import { analyzeResponse } from './analyze.js';
 import { goTab } from './util.js';
 import { toFetch, toPython, toHttpie } from './codegen.js';
@@ -207,8 +208,10 @@ function escapeRegExp(text) {
 // --- Send + response ----------------------------------------------------
 
 export async function sendCurrent() {
-  const req = getCurrentRequest();
-  if (!req.url) return;
+  const built = getCurrentRequest();
+  if (!built.url) return;
+  // Apply session Match & Replace rules to the outgoing request.
+  const req = applyRules(built, state.matchReplace);
   $('#sendBtn').disabled = true;
   $('#resStatus').innerHTML = '<span class="muted">Sending…</span>';
   const data = await sendProxy({ ...req, followRedirects: false });
