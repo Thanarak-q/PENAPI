@@ -124,6 +124,17 @@ what the UI renders.
 | **Auth Sweep** | Fires every spec endpoint as each identity to map authorization coverage. Every sweep shows an estimated request count and requires confirmation; write verbs are explicitly warned. |
 | **JWT Inspector** | Decode/edit a token client-side; shows alg, `exp`, claims; forge an `alg:none` / unsigned token to test signature-verification flaws. |
 | **Decoder** | Encode, decode, smart-decode, and hash text entirely client-side — Base64 / Base64URL, URL, hex, HTML entities, JWT decode, and SHA-1/256/384/512 hashing. **Smart decode** auto-detects the encoding; `⇅` chains the output back into the input; **From request** seeds the current body/URL. |
+| **CSRF PoC generator** | From **Request → ⋯ → Generate CSRF PoC…**, build a self-submitting HTML page from the current request to test for missing CSRF protection. Handles GET, form-urlencoded, and JSON bodies (via the `text/plain` trick), flags caveats like a non-cookie `Authorization` header, and HTML-escapes all values. Copy or download the `.html`. |
+| **Token Sequencer** | From **Tools → Token Sequencer…**, paste a sample of tokens to estimate randomness — uniqueness, length, charset, per-position Shannon entropy (bar chart), total bits, and a graded verdict that flags sequential or colliding tokens. Pure client-side. |
+| **Comparer** | From **Tools → Comparer…**, diff two pasted blobs (requests or responses) line- or word-by-word with an added/removed summary and colored output. Pure client-side. |
+| **Site Map** | From **View → Site Map…**, browse endpoints as a URL-path tree (shared prefixes merged, per-branch counts); click an operation to open it in the Request tab. |
+| **Match & Replace** | From **Tools → Match & Replace…**, define session-scoped rewrite rules applied to requests sent from the Request tab — literal/regex replace on URL or body, or set/remove a header (e.g. inject `X-Forwarded-For`). Saved per profile. |
+| **Content Discovery** | From **Tools → Content Discovery…**, brute-force common and custom paths off a base URL to surface unspecced/shadow endpoints. Uses the active identity, classifies outcomes (found / protected / redirect / missing), and is capped at 500 requests with a confirmation gate. |
+| **Traffic Search** | From **Edit → Search Traffic…**, grep all captured requests and responses (method, URL, headers, bodies) with a literal or regex query; results show which field matched. Pure client-side. |
+| **Timing Analysis** | From **Tools → Timing Analysis…**, per-endpoint response-time stats (count, min, avg, max) from session history, sorted slowest first — gaps between similar endpoints can reveal timing oracles. |
+| **Auth Builder** | From **Tools → Auth Builder…**, construct an `Authorization` header — **Basic** from user/password or **Bearer** from a token — and copy it into an identity. Pure client-side. |
+| **Random Generator** | From **Tools → Random Generator…**, generate CSPRNG values — UUID v4, random hex, URL-safe token, or a custom-length string — for nonces, cache-busters, and fuzzing. |
+| **Cookie Inspector** | From **Tools → Cookie Inspector…**, paste `Set-Cookie` values to parse each cookie and audit its security flags — missing HttpOnly / Secure / SameSite (and `SameSite=None`) are flagged. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |
@@ -159,18 +170,7 @@ anything on its own.
 - **SQLi probe** — mark a query value `§1§`, choose *SQL Injection*; time-based payloads surface as outliers in the Time column.
 - **BOLA via chained flow** — in the **Sequence** tab: step 1 `POST /api/orders` as *Admin*, capture `data.id` → `orderId`; step 2 `GET /api/orders/{{orderId}}` as *User* with a check `status eq 403`. A `2xx` on step 2 flags broken object-level auth.
 
-## Roadmap
-
-Planned additions, in rough priority:
-
-| Planned | What it does |
-|---|---|
-| **Comparer** | Word/byte-level diff of two requests or responses — pick any two from History or a Sequence run. Pure client-side. |
-| **Sequencer** | Entropy/randomness analysis of a set of captured tokens (session IDs, CSRF, reset tokens). Pure client-side stats. |
-| **Content discovery** | Brute-force paths and directories off the base URL to surface unspecced/shadow endpoints; reuses the fuzzer engine and caps. |
-| **Match & replace** | Rewrite rules applied to outgoing requests (headers/body regex) at the proxy layer — e.g. inject a header on every send. |
-| **CSRF PoC generator** | Generate a self-submitting HTML form from any request to test CSRF protections. Pure client-side. |
-| **Site map tree** | Tree view of discovered/visited endpoints with per-node request/response history. |
+## Scope
 
 Out of scope by design: an intercepting MITM proxy and an out-of-band
 interaction service — both need infrastructure beyond a zero-dependency local

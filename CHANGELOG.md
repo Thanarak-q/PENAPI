@@ -55,6 +55,71 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 - Accessibility: visible focus rings on all controls and `prefers-reduced-motion`
   support.
 
+## Unreleased
+
+### Added
+- **Cookie Inspector** — under **Tools → Cookie Inspector…**, paste one or more
+  `Set-Cookie` header values to parse each cookie and audit its security
+  attributes, flagging missing **HttpOnly**, **Secure**, and **SameSite** (and
+  warning on `SameSite=None`). Parser/audit are unit-tested via `node --test`
+  (`public/js/cookie-core.js`).
+- **Random Generator** — under **Tools → Random Generator…**, generate
+  cryptographically-random values (UUID v4, random hex, URL-safe token, custom
+  random string) for nonces, cache-busters, and fuzzing; each click appends a
+  line, copy them all out. Uses the platform CSPRNG; unit-tested via
+  `node --test` (`public/js/random-core.js`).
+- **Auth Builder** — under **Tools → Auth Builder…**, construct an
+  `Authorization` header value: **Basic** from a user/password (Base64-encoded
+  in the browser) or **Bearer** from a token, then copy it into an identity.
+  Unit-tested via `node --test` (`public/js/auth-core.js`).
+- **Timing Analysis** — under **Tools → Timing Analysis…**, see per-endpoint
+  response-time stats (count, min, average with a bar, max) aggregated from this
+  session's history, sorted slowest first. Large gaps between similar endpoints
+  can indicate a timing oracle (e.g. login slower for valid usernames).
+  Aggregation is unit-tested via `node --test` (`public/js/timing-core.js`).
+- **Traffic Search** — under **Edit → Search Traffic…**, grep every request and
+  response captured this session (method, URL, headers, bodies) with a literal
+  or regex query to surface tokens, emails, or stack traces anywhere in the
+  session. Results show where each match landed. Pure client-side; engine is
+  unit-tested via `node --test` (`public/js/search-core.js`).
+- **Content Discovery** — under **Tools → Content Discovery…**, brute-force a
+  built-in list of common paths (plus your own wordlist) off a base URL to find
+  unspecced/shadow endpoints. Sends real GET requests as the active identity,
+  classifies each outcome (found / protected / redirect / missing / error), and
+  is capped at 500 requests behind a confirmation gate. Candidate building and
+  classification are unit-tested via `node --test`
+  (`public/js/discovery-core.js`).
+- **Match & Replace** — under **Tools → Match & Replace…**, define session-scoped
+  rewrite rules applied to requests sent from the Request tab before they leave:
+  literal/regex replace on the URL or body, or set/remove a header (e.g. inject
+  `X-Forwarded-For` on every send). Rules are saved per session profile. The
+  transform is unit-tested via `node --test` (`public/js/matchreplace-core.js`).
+- **Site Map** — under **View → Site Map…**, browse the loaded spec's endpoints
+  as a URL-path tree (shared prefixes merged, per-branch operation counts) — a
+  hierarchical lens complementary to the tag-grouped explorer. Click any
+  operation to open it in the Request tab. Tree builder is unit-tested via
+  `node --test` (`public/js/sitemap-core.js`).
+- **Comparer** — under **Tools → Comparer…**, diff two pasted blobs (requests or
+  responses) at line or word granularity via an LCS diff, with an
+  added/removed/unchanged summary and colored output. Makes subtle differences
+  between two responses (an extra field, a flipped flag) obvious. Pure
+  client-side; diff engine is unit-tested via `node --test`
+  (`public/js/comparer-core.js`).
+- **Token Sequencer** — under **Tools → Token Sequencer…**, paste a sample of
+  tokens (session IDs, CSRF, reset tokens) to estimate their randomness:
+  sample/uniqueness counts, fixed vs. varying length, charset size, a
+  per-character-position Shannon-entropy bar chart, total entropy in bits, and a
+  graded verdict (predictable / weak / moderate / strong) that flags sequential
+  tokens and duplicate collisions. Pure client-side; engine is unit-tested via
+  `node --test` (`public/js/sequencer-core.js`).
+- **CSRF PoC generator** — from **Request → ⋯ → Generate CSRF PoC…**, turn the
+  current request into a self-submitting HTML page to test whether an endpoint
+  is missing CSRF protection. Handles GET (query → form fields), form-urlencoded
+  POST, and JSON POST (via the `text/plain` form trick), flags caveats (e.g. an
+  `Authorization` header that a browser form can't set), and HTML-escapes every
+  value. Copy or download the `.html`. Pure client-side; generator is
+  unit-tested via `node --test` (`public/js/csrf-core.js`).
+
 ## 1.11.0
 
 ### Added
@@ -95,6 +160,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   history without replaying; replay remains an explicit action.
 - **Request/response syntax color** — JSON-style attribute/value highlighting in
   request and response bodies plus colored response headers.
+
+### Changed
+- **De-duplicated navigation** — the View menu no longer repeats the tab list
+  (which had also drifted out of sync); the tab bar is the single source for
+  switching panels. Tag Manager and Command Palette remain under View.
 
 ### Changed
 - **Safer active testing defaults** — Quick Attacks, Fuzzer, Matrix, and Sweep

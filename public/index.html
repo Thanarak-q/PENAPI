@@ -33,6 +33,7 @@
         <button class="menu-top" type="button">Edit</button>
         <div class="menu-drop">
           <button class="menu-item" data-act="find">Find Endpoint <span class="menu-key">/</span></button>
+          <button class="menu-item" data-act="search">Search Traffic…</button>
           <button class="menu-item" data-act="clear-filters">Clear Filters</button>
           <button class="menu-item" data-act="click:clearReq">New / Clear Request</button>
           <div class="menu-sep"></div>
@@ -42,13 +43,7 @@
       <div class="menu-root">
         <button class="menu-top" type="button">View</button>
         <div class="menu-drop">
-          <button class="menu-item" data-act="tab:request">Request</button>
-          <button class="menu-item" data-act="tab:fuzzer">Fuzzer</button>
-          <button class="menu-item" data-act="tab:recon">Attack Surface</button>
-          <button class="menu-item" data-act="tab:matrix">Access Matrix</button>
-          <button class="menu-item" data-act="tab:sweep">Auth Sweep</button>
-          <button class="menu-item" data-act="tab:history">History</button>
-          <div class="menu-sep"></div>
+          <button class="menu-item" data-act="sitemap">Site Map…</button>
           <button class="menu-item" data-act="tags">Tag Manager…</button>
           <button class="menu-item" data-act="palette">Command Palette <span class="menu-key">⌘K</span></button>
         </div>
@@ -62,6 +57,15 @@
           <div class="menu-sep"></div>
           <button class="menu-item" data-act="click:toFuzzerBtn">Send to Fuzzer</button>
           <button class="menu-item" data-act="click:toMatrixBtn">Send to Access Matrix</button>
+          <div class="menu-sep"></div>
+          <button class="menu-item" data-act="sequencer">Token Sequencer…</button>
+          <button class="menu-item" data-act="comparer">Comparer…</button>
+          <button class="menu-item" data-act="matchreplace">Match &amp; Replace…</button>
+          <button class="menu-item" data-act="discovery">Content Discovery…</button>
+          <button class="menu-item" data-act="timing">Timing Analysis…</button>
+          <button class="menu-item" data-act="auth">Auth Builder…</button>
+          <button class="menu-item" data-act="random">Random Generator…</button>
+          <button class="menu-item" data-act="cookie">Cookie Inspector…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -146,6 +150,7 @@
               <button class="menu-item" id="toMatrixBtn" title="Send this request to the Access Matrix">Send to Access Matrix</button>
               <button class="menu-item" id="toSequenceBtn" title="Add this request as a step in the Sequence Runner">Send to Sequence</button>
               <button class="menu-item" id="codeBtn" title="Copy as code — cURL / fetch / Python / HTTPie">Copy as code…</button>
+              <button class="menu-item" id="csrfBtn" title="Generate a self-submitting CSRF proof-of-concept page">Generate CSRF PoC…</button>
               <div class="menu-sep"></div>
               <button class="menu-item" id="clearReq" title="Clear the request editor to a blank request">New / clear request</button>
             </div>
@@ -490,6 +495,205 @@
       <div class="modal-actions">
         <button class="btn primary" id="codeCopy">Copy</button>
         <button class="btn ghost" id="closeCode">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="csrfModal" hidden>
+    <div class="modal">
+      <h2>CSRF PoC <span class="muted">— current request</span></h2>
+      <p class="hint">A self-submitting HTML page that fires this request cross-site. Host it and open it as a logged-in victim — if the action goes through, the endpoint is missing CSRF protection.</p>
+      <div class="csrf-notes" id="csrfNotes"></div>
+      <textarea id="csrfOut" class="code code-out" spellcheck="false" readonly></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="csrfCopy">Copy</button>
+        <button class="btn ghost" id="csrfDownload">Download .html</button>
+        <button class="btn ghost" id="closeCsrf">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="tokModal" hidden>
+    <div class="modal">
+      <h2>Token Sequencer <span class="muted">— randomness estimate</span></h2>
+      <p class="hint">Paste a sample of tokens (one per line) — session IDs, CSRF tokens, reset tokens. The more samples, the better the estimate. Nothing is sent.</p>
+      <textarea id="tokInput" class="code code-out" spellcheck="false" placeholder="one token per line…"></textarea>
+      <div class="tok-report" id="tokReport" hidden></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="tokAnalyze">Analyze</button>
+        <button class="btn ghost" id="closeTok">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="cmpModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Comparer <span class="muted">— diff two blobs</span></h2>
+      <p class="hint">Paste two requests or responses and diff them line- or word-by-word. Nothing is sent.</p>
+      <div class="cmp-inputs">
+        <textarea id="cmpA" class="code code-out" spellcheck="false" placeholder="A — paste a request or response…"></textarea>
+        <textarea id="cmpB" class="code code-out" spellcheck="false" placeholder="B — paste a request or response…"></textarea>
+      </div>
+      <div class="cmp-controls">
+        <label>Mode
+          <select id="cmpMode" class="mini-select">
+            <option value="line">Line</option>
+            <option value="word">Word</option>
+          </select>
+        </label>
+        <span class="meta" id="cmpSummary"></span>
+      </div>
+      <div class="cmp-result" id="cmpResult" hidden></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="cmpRun">Compare</button>
+        <button class="btn ghost" id="closeCmp">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="smModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Site Map <span class="muted" id="smTitle"></span></h2>
+      <p class="hint">Endpoints from the loaded spec, organized by URL path. Click an operation to open it in the Request tab.</p>
+      <div class="sm-tree" id="smTree"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeSm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="mrModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Match &amp; Replace <span class="muted" id="mrCount"></span></h2>
+      <p class="hint">Rewrite requests sent from the Request tab before they leave. URL/body rules do a literal or regex replace; header rules set a header (empty value removes it). Saved per session profile.</p>
+      <div class="mr-rules" id="mrRules"></div>
+      <div class="modal-actions">
+        <button class="btn ghost tiny" id="mrAdd">+ Rule</button>
+        <span class="mr-spacer"></span>
+        <button class="btn ghost" id="closeMr">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="dscModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Content Discovery <span class="muted">— brute paths</span></h2>
+      <p class="hint">Fires real GET requests for each path against the base URL to find unspecced/shadow endpoints. <strong>Authorized testing only.</strong> Uses the active identity; capped at 500 requests.</p>
+      <div class="req-line small">
+        <input id="dscBase" type="text" class="url-input" spellcheck="false" placeholder="https://target/base" />
+      </div>
+      <label class="check"><input type="checkbox" id="dscBuiltin" checked> Built-in common paths</label>
+      <textarea id="dscCustom" class="mono-area" rows="4" spellcheck="false" placeholder="extra paths, one per line (# comments allowed)"></textarea>
+      <div class="dsc-controls">
+        <button class="btn primary" id="dscRun">Run</button>
+        <button class="btn ghost" id="dscStop" disabled>Stop</button>
+        <label class="check"><input type="checkbox" id="dscInteresting" checked> interesting only</label>
+        <span class="meta" id="dscProgress"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="results" id="dscTable">
+          <thead><tr><th>Path</th><th>Status</th><th>Outcome</th><th>Length</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeDsc">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="srchModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Search Traffic <span class="muted" id="srchCount"></span></h2>
+      <p class="hint">Grep every request and response captured this session — method, URL, headers, and bodies. Find tokens, emails, stack traces, anything.</p>
+      <div class="srch-bar">
+        <input id="srchQuery" type="search" class="url-input" spellcheck="false" placeholder="search…" />
+        <label class="check"><input type="checkbox" id="srchRegex"> regex</label>
+        <label class="check"><input type="checkbox" id="srchCase"> case</label>
+      </div>
+      <div class="table-wrap">
+        <table class="results" id="srchTable">
+          <thead><tr><th>Method</th><th>URL</th><th>Status</th><th>Matched in</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeSrch">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="tmModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Timing Analysis <span class="muted" id="tmCount"></span></h2>
+      <p class="hint">Per-endpoint response times from this session's history. Large gaps between similar endpoints can indicate a timing oracle (e.g. login slower for valid users).</p>
+      <div class="table-wrap">
+        <table class="results" id="tmTable">
+          <thead><tr><th>Method</th><th>URL</th><th>n</th><th>Min</th><th>Avg</th><th>Max</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeTm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="authModal" hidden>
+    <div class="modal">
+      <h2>Auth Builder <span class="muted">— Authorization header</span></h2>
+      <p class="hint">Construct an <code>Authorization</code> header value, then copy it into an identity. Encoding runs in the browser.</p>
+      <div class="auth-grid">
+        <label class="seq-label">Basic</label>
+        <div class="auth-row">
+          <input id="authUser" type="text" spellcheck="false" placeholder="user" />
+          <input id="authPass" type="text" spellcheck="false" placeholder="password" />
+          <button class="btn ghost tiny" id="authBasic">Build</button>
+        </div>
+        <label class="seq-label">Bearer</label>
+        <div class="auth-row">
+          <input id="authToken" type="text" spellcheck="false" placeholder="token" />
+          <button class="btn ghost tiny" id="authBearer">Build</button>
+        </div>
+      </div>
+      <textarea id="authOut" class="code code-out" spellcheck="false" readonly placeholder="Authorization: …"></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="authCopy">Copy</button>
+        <button class="btn ghost" id="closeAuth">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="rndModal" hidden>
+    <div class="modal">
+      <h2>Random Generator <span class="muted">— nonces &amp; test data</span></h2>
+      <p class="hint">Cryptographically-random values for nonces, cache-busters, and fuzzing. Each click appends a line.</p>
+      <div class="rnd-controls">
+        <button class="btn ghost tiny" id="rndUuid">UUID v4</button>
+        <button class="btn ghost tiny" id="rndHex">Hex (16B)</button>
+        <button class="btn ghost tiny" id="rndToken">Token (24)</button>
+        <span class="rnd-sep"></span>
+        <input id="rndLen" type="number" min="1" max="256" value="16" class="rnd-len" />
+        <button class="btn ghost tiny" id="rndStr">Random string</button>
+      </div>
+      <textarea id="rndOut" class="code code-out" spellcheck="false" readonly placeholder="generated values…"></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="rndCopy">Copy all</button>
+        <button class="btn ghost" id="rndClear">Clear</button>
+        <button class="btn ghost" id="closeRnd">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="ckModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Cookie Inspector <span class="muted">— Set-Cookie audit</span></h2>
+      <p class="hint">Paste <code>Set-Cookie</code> header values (one per line). Missing HttpOnly / Secure / SameSite protections are flagged.</p>
+      <textarea id="ckIn" class="code code-out" spellcheck="false" placeholder="sid=…; Path=/; HttpOnly; Secure; SameSite=Lax"></textarea>
+      <div class="ck-out" id="ckOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="ckRun">Inspect</button>
+        <button class="btn ghost" id="closeCk">Close</button>
       </div>
     </div>
   </div>
