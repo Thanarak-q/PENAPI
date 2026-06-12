@@ -127,6 +127,7 @@
           <button class="tab" data-tab="fuzzer" data-desc="Brute-force / fuzz an injection point. Mark it with §§ or FUZZ, then run a payload set, an ID range (IDOR), or a custom wordlist. Anomalies are highlighted.">Fuzzer</button>
           <button class="tab" data-tab="recon" data-desc="Static analysis of the spec — surfaces unauthenticated, mutating, IDOR and mass-assignment candidates so you know what to hit first.">Attack Surface</button>
           <button class="tab" data-tab="matrix" data-desc="Replay one request as every identity at once to find broken object/function-level authorization (BOLA / BFLA).">Access Matrix</button>
+          <button class="tab" data-tab="sequence" data-desc="Chain requests into a multi-step flow — capture a value from one response (e.g. an id or token) and feed it into later steps. Powers BOLA setups, token refresh, and stateful flows.">Sequence</button>
           <button class="tab" data-tab="sweep" data-desc="Fire every endpoint in the spec as each identity to map authorization coverage across the whole API.">Auth Sweep</button>
           <span class="tab-sep"></span>
           <button class="tab" data-tab="history" data-desc="Every request you've sent this session — replay any of them or review past responses.">History</button>
@@ -142,6 +143,7 @@
               <button class="menu-item" id="quickAttackBtn" title="Run one-click attack variants">Quick Attacks</button>
               <button class="menu-item" id="toFuzzerBtn" title="Send this request to the Fuzzer">Send to Fuzzer</button>
               <button class="menu-item" id="toMatrixBtn" title="Send this request to the Access Matrix">Send to Access Matrix</button>
+              <button class="menu-item" id="toSequenceBtn" title="Add this request as a step in the Sequence Runner">Send to Sequence</button>
               <button class="menu-item" id="codeBtn" title="Copy as code — cURL / fetch / Python / HTTPie">Copy as code…</button>
               <div class="menu-sep"></div>
               <button class="menu-item" id="clearReq" title="Clear the request editor to a blank request">New / clear request</button>
@@ -312,26 +314,52 @@
         </div>
       </section>
 
+      <!-- SEQUENCE RUNNER TAB -->
+      <section class="panel" data-panel="sequence">
+        <p class="hint">Chain requests into a flow. <strong>Capture</strong> a value from a response (e.g. <code>data.id</code>) into a variable, then reference it as <code>{{name}}</code> in any later step's URL, headers, or body. <code>{{baseUrl}}</code> is always available. Runs steps top-to-bottom.</p>
+        <div class="seq-toolbar">
+          <button class="btn ghost tiny" id="seqAddStep">+ Step</button>
+          <button class="btn ghost tiny" id="seqAddFromReq">+ From current request</button>
+          <button class="btn ghost tiny" id="seqClear">Clear</button>
+          <span class="seq-spacer"></span>
+          <button class="btn primary" id="seqRun">Run sequence</button>
+          <button class="btn ghost" id="seqStop" disabled>Stop</button>
+        </div>
+        <div class="seq-steps" id="seqSteps"></div>
+        <div class="table-wrap">
+          <table class="results" id="seqTable">
+            <thead>
+              <tr><th>#</th><th>Method</th><th>URL</th><th>Status</th><th>Time</th><th>Captured</th><th>Checks</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- RECON / ATTACK SURFACE TAB -->
       <section class="panel" data-panel="recon">
-        <p class="hint">Spec analysis to prioritize targets — <strong>mutating + unauth</strong> ops and <strong>IDOR candidates</strong> first. Click → to open one.</p>
+        <p class="hint">Passive analysis of the loaded endpoints and saved human request logs. No requests are sent from this view. Click → to open an endpoint.</p>
         <div class="recon-cards" id="reconCards"></div>
         <div class="results-toolbar">
           <label>Show
             <select id="reconFilter">
               <option value="auto">Highest-risk first</option>
-              <option value="dangerous">Mutating + unauth</option>
-              <option value="unauth">No security defined</option>
-              <option value="idor">IDOR candidates</option>
-              <option value="body">Has request body</option>
-              <option value="deprecated">Deprecated</option>
+              <option value="high">High severity</option>
+              <option value="medium">Medium severity</option>
+              <option value="security">Security</option>
+              <option value="idor">IDOR / BOLA</option>
+              <option value="injection">Injection / SSRF</option>
+              <option value="data">Sensitive data</option>
+              <option value="quality">Spec quality</option>
+              <option value="logs">Request logs</option>
             </select>
           </label>
-          <input id="reconTextFilter" type="search" placeholder="filter path…" />
+          <input id="reconTextFilter" type="search" placeholder="filter finding, path, evidence…" />
+          <span class="meta" id="reconCount"></span>
         </div>
         <div class="table-wrap">
           <table class="results" id="reconTable">
-            <thead><tr><th>Method</th><th>Path</th><th>Sec</th><th>Flags</th><th></th></tr></thead>
+            <thead><tr><th>Severity</th><th>Source</th><th>Method</th><th>Path / Log</th><th>Finding</th><th>Evidence</th><th></th></tr></thead>
             <tbody></tbody>
           </table>
         </div>

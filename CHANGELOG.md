@@ -58,6 +58,13 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Expanded passive static analysis** — the Attack Surface tab now produces a
+  severity-ranked report from loaded endpoints and saved human request logs:
+  auth gaps, optional auth, IDOR/BOLA hints, risky params, mass-assignment
+  fields, sensitive log data, shadow endpoints, server-error logs, and
+  spec-quality drift. This view does not send or replay requests.
+- **Built-in test harness** — added `npm test` using Node's native test runner
+  for the static-analysis engine.
 - **Request workspace polish** — request actions now live in the request header
   with a visible current-endpoint context bar.
 - **Editable path params** — path params appear in the Params table and are

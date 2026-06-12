@@ -7,6 +7,7 @@ import { initExplorer, renderExplorer, clearFilters, openTagManager } from './ex
 import { initRequest, loadEndpoint, sendCurrent } from './request.js';
 import { initFuzzer, sendToFuzzer } from './fuzzer.js';
 import { initMatrix, sendToMatrix } from './matrix.js';
+import { initSequence, sendToSequence, renderSequence } from './sequence.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -25,6 +26,7 @@ async function boot() {
   initRequest();
   await initFuzzer();
   initMatrix();
+  initSequence();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -70,6 +72,7 @@ function onProfileChange() {
   renderIdentityChecks();
   renderExplorer();
   renderHistory();
+  renderSequence();
   updateProfileLabel();
 }
 
@@ -137,6 +140,7 @@ function wireTabs() {
 function wireCrossTab() {
   $('#toFuzzerBtn').addEventListener('click', sendToFuzzer);
   $('#toMatrixBtn').addEventListener('click', sendToMatrix);
+  $('#toSequenceBtn').addEventListener('click', sendToSequence);
 }
 
 // Keyboard shortcuts for a faster workflow.

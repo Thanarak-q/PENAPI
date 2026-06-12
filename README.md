@@ -5,7 +5,8 @@
 A Swagger/Scalar-style API explorer built for **offensive security testing**.
 Point it at any OpenAPI/Swagger spec and every operation becomes a ready-to-fire
 request — then layer on a repeater, fuzzer/brute-forcer, access-control matrix,
-identity switching, tagged endpoint triage, guarded bypass checks, a JWT
+a sequence runner that chains requests by capturing response values into later
+steps, identity switching, tagged endpoint triage, guarded bypass checks, a JWT
 tamperer, and cURL import/export.
 
 Zero npm dependencies — pure Node plus a static front end. `swaggernaut spec.json` and go.
@@ -113,7 +114,7 @@ what the UI renders.
 | Feature | What it's for |
 |---|---|
 | **Endpoint explorer** | Operations grouped by tag, with method, summary, generated example body, and a flag when an operation has **no security defined**. Add custom focus tags with `#`, pin endpoints with ★, and search by either built-in or custom tags. |
-| **Attack Surface / Recon** | Static analysis of the spec: counts of unauthenticated ops, mutating+unauth ops, IDOR candidates (path ids), mass-assignment candidates (request bodies), deprecated ops, and a sortable, prioritized target list. |
+| **Attack Surface / Recon** | Passive static analysis of loaded endpoints and saved human request logs. Flags auth gaps, optional auth, IDOR/BOLA hints, risky params, mass-assignment fields, sensitive data seen in logs, spec-quality drift, and shadow endpoints without sending any request. |
 | **Request / Repeater** | Auto-fills path/query/header params and a schema-derived JSON body. Path params stay editable in the Params table and are substituted into `{tokens}` at send time. Raw `http`/`https` client gives full header control (including `Host`, `Content-Length`). |
 | **Identities** | Named header sets (Admin / User / Unauth …). Switch the active identity to send every request as that role. Set a header value to `null` to *strip* it. |
 | **Fuzzer / Brute** | Mark injection points with `§§` (wrap a value: `§admin§`) or the keyword `FUZZ`. Built-in payload sets (SQLi, XSS, traversal, cmdi, SSRF, NoSQLi, LFI, usernames, passwords, auth-bypass, host-header), a numeric range for IDOR enumeration, and custom wordlists. Concurrency + delay, live streaming, sortable results, anomaly highlighting. Risky runs require confirmation and server-side caps limit accidental floods. |
@@ -142,6 +143,10 @@ Actions that send multiple real requests now have guardrails:
   identities.
 - **Auth Sweep** confirms every run with estimated request count and caps
   concurrency to `10`.
+
+The **Attack Surface / Recon** analysis is passive. It reads the loaded spec plus
+browser-local request history and never sends, replays, fuzzes, or probes
+anything on its own.
 
 ## Examples
 
