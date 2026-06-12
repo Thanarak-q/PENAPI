@@ -58,6 +58,13 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Redirect & SSRF Payloads** — under **Tools → Redirect & SSRF Payloads…**,
+  generate classic open-redirect (scheme-relative, backslash, userinfo `@`,
+  subdomain, encoded) and SSRF filter-bypass strings (loopback obfuscations in
+  octal/decimal/hex, cloud metadata endpoints, `gopher://`/`dict://`/`file://`,
+  and an OOB callback to your host) for an authorized test. Generation only —
+  nothing is sent. Logic is unit-tested via `node --test`
+  (`public/js/redirect-core.js`).
 - **Entropy Analyzer** — under **Tools → Entropy Analyzer…**, paste a single
   token / API key / session ID to measure its Shannon entropy, observed
   character set, and an optimistic brute-force keyspace, with a weak / fair /

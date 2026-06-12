@@ -25,6 +25,7 @@ import { initHashId, openHashId } from './hashid.js';
 import { initTimestamp, openTimestamp } from './timestamp.js';
 import { initParams, openParams } from './params.js';
 import { initEntropy, openEntropy } from './entropy.js';
+import { initRedirect, openRedirect } from './redirect.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -61,6 +62,7 @@ async function boot() {
   initTimestamp();
   initParams();
   initEntropy();
+  initRedirect();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -92,6 +94,7 @@ async function boot() {
     timestamp: openTimestamp,
     params: openParams,
     entropy: openEntropy,
+    redirect: openRedirect,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

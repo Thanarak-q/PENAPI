@@ -71,6 +71,7 @@
           <button class="menu-item" data-act="timestamp">Timestamp Converter…</button>
           <button class="menu-item" data-act="params">Param Analyzer…</button>
           <button class="menu-item" data-act="entropy">Entropy Analyzer…</button>
+          <button class="menu-item" data-act="redirect">Redirect &amp; SSRF Payloads…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -767,6 +768,22 @@
       <div class="modal-actions">
         <button class="btn primary" id="enRun">Analyze</button>
         <button class="btn ghost" id="closeEn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="rdModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Redirect &amp; SSRF Payloads <span class="muted">— filter-bypass strings</span></h2>
+      <p class="hint">Generate classic open-redirect and SSRF bypass payloads for an <strong>authorized</strong> test. Set your attacker/OOB host and the target host; nothing is sent — copy a payload into a <code>redirect</code> / <code>url</code> parameter yourself.</p>
+      <div class="req-line">
+        <input id="rdAttacker" class="url-input" type="text" spellcheck="false" placeholder="attacker / OOB host — evil.com" value="evil.com" />
+        <input id="rdTarget" class="url-input" type="text" spellcheck="false" placeholder="target host — victim.com" value="victim.com" />
+      </div>
+      <div class="ck-out" id="rdOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="rdCopy">Copy all</button>
+        <button class="btn ghost" id="closeRd">Close</button>
       </div>
     </div>
   </div>
