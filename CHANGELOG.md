@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Status Reference** — under **Tools → Status Reference…**, a searchable HTTP
+  status-code table (by number, phrase, or keyword) where each entry carries a
+  short pentest note — e.g. 403 → verb/header tampering, 500 → error-based
+  injection, 502/504 → SSRF, 429 → rate-limit scoping. Logic is unit-tested via
+  `node --test` (`public/js/status-core.js`).
 - **WAF Fingerprint** — under **Tools → WAF Fingerprint…**, paste a response's
   headers (and optional body snippet) to detect common WAFs / CDNs / reverse
   proxies — Cloudflare, Akamai, AWS (CloudFront/ALB/WAF), Imperva, F5 BIG-IP,

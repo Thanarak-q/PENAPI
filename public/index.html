@@ -76,6 +76,7 @@
           <button class="menu-item" data-act="bodyconv">Body Converter…</button>
           <button class="menu-item" data-act="payloadlib">Injection Payloads…</button>
           <button class="menu-item" data-act="waf">WAF Fingerprint…</button>
+          <button class="menu-item" data-act="status">Status Reference…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -844,6 +845,18 @@
       <div class="modal-actions">
         <button class="btn primary" id="wfRun">Fingerprint</button>
         <button class="btn ghost" id="closeWf">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="stModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Status Reference <span class="muted">— codes with a pentest note</span></h2>
+      <p class="hint">Search HTTP status codes by number, phrase, or keyword. Each entry adds a short note on what the code means for testing (e.g. 403 → verb/header tampering, 500 → error-based injection, 502/504 → SSRF).</p>
+      <input id="stIn" class="url-input" type="text" spellcheck="false" placeholder="403  ·  forbidden  ·  ssrf" />
+      <div class="ck-out" id="stOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeSt">Close</button>
       </div>
     </div>
   </div>

@@ -954,6 +954,15 @@ mark { background: var(--accent); color: #fff; border-radius: 1px; padding: 0 1p
 .pl-row { display: flex; align-items: center; gap: var(--s2); padding: 2px 0; border-bottom: 1px solid var(--line); }
 .pl-payload { flex: 1 1 auto; font-family: var(--mono); font-size: var(--text-xs); color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: all; }
 
+/* HTTP Status Reference */
+.st-row { display: flex; gap: var(--s2); padding: var(--s1) 0; border-bottom: 1px solid var(--line); }
+.st-code { flex: 0 0 auto; align-self: flex-start; font-family: var(--mono); font-weight: 700; padding: 1px 6px; border-radius: var(--radius); }
+.st-2xx { background: var(--ok-soft); color: var(--ok); }
+.st-3xx { background: #eef2ff; color: #3949ab; }
+.st-4xx { background: #fff4e0; color: #9a6a00; }
+.st-5xx { background: var(--accent); color: #fff; }
+.st-phrase { font-weight: 700; font-size: var(--text-sm); }
+
 /* =======================================================================
    Generic tool layouts (fuzzer / sweep / recon / matrix)
    ======================================================================= */

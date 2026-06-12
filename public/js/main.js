@@ -30,6 +30,7 @@ import { initJsonFlat, openJsonFlat } from './jsonflat.js';
 import { initBodyConv, openBodyConv } from './bodyconv.js';
 import { initPayloadLib, openPayloadLib } from './payloads-lib.js';
 import { initWaf, openWaf } from './waf.js';
+import { initStatus, openStatus } from './status.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -71,6 +72,7 @@ async function boot() {
   initBodyConv();
   initPayloadLib();
   initWaf();
+  initStatus();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -107,6 +109,7 @@ async function boot() {
     bodyconv: openBodyConv,
     payloadlib: openPayloadLib,
     waf: openWaf,
+    status: openStatus,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {
