@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Cookie Inspector** — under **Tools → Cookie Inspector…**, paste one or more
+  `Set-Cookie` header values to parse each cookie and audit its security
+  attributes, flagging missing **HttpOnly**, **Secure**, and **SameSite** (and
+  warning on `SameSite=None`). Parser/audit are unit-tested via `node --test`
+  (`public/js/cookie-core.js`).
 - **Random Generator** — under **Tools → Random Generator…**, generate
   cryptographically-random values (UUID v4, random hex, URL-safe token, custom
   random string) for nonces, cache-busters, and fuzzing; each click appends a

@@ -65,6 +65,7 @@
           <button class="menu-item" data-act="timing">Timing Analysis…</button>
           <button class="menu-item" data-act="auth">Auth Builder…</button>
           <button class="menu-item" data-act="random">Random Generator…</button>
+          <button class="menu-item" data-act="cookie">Cookie Inspector…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -680,6 +681,19 @@
         <button class="btn primary" id="rndCopy">Copy all</button>
         <button class="btn ghost" id="rndClear">Clear</button>
         <button class="btn ghost" id="closeRnd">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="ckModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Cookie Inspector <span class="muted">— Set-Cookie audit</span></h2>
+      <p class="hint">Paste <code>Set-Cookie</code> header values (one per line). Missing HttpOnly / Secure / SameSite protections are flagged.</p>
+      <textarea id="ckIn" class="code code-out" spellcheck="false" placeholder="sid=…; Path=/; HttpOnly; Secure; SameSite=Lax"></textarea>
+      <div class="ck-out" id="ckOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="ckRun">Inspect</button>
+        <button class="btn ghost" id="closeCk">Close</button>
       </div>
     </div>
   </div>
