@@ -64,6 +64,7 @@
           <button class="menu-item" data-act="discovery">Content Discovery…</button>
           <button class="menu-item" data-act="timing">Timing Analysis…</button>
           <button class="menu-item" data-act="auth">Auth Builder…</button>
+          <button class="menu-item" data-act="random">Random Generator…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -658,6 +659,27 @@
       <div class="modal-actions">
         <button class="btn primary" id="authCopy">Copy</button>
         <button class="btn ghost" id="closeAuth">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="rndModal" hidden>
+    <div class="modal">
+      <h2>Random Generator <span class="muted">— nonces &amp; test data</span></h2>
+      <p class="hint">Cryptographically-random values for nonces, cache-busters, and fuzzing. Each click appends a line.</p>
+      <div class="rnd-controls">
+        <button class="btn ghost tiny" id="rndUuid">UUID v4</button>
+        <button class="btn ghost tiny" id="rndHex">Hex (16B)</button>
+        <button class="btn ghost tiny" id="rndToken">Token (24)</button>
+        <span class="rnd-sep"></span>
+        <input id="rndLen" type="number" min="1" max="256" value="16" class="rnd-len" />
+        <button class="btn ghost tiny" id="rndStr">Random string</button>
+      </div>
+      <textarea id="rndOut" class="code code-out" spellcheck="false" readonly placeholder="generated values…"></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="rndCopy">Copy all</button>
+        <button class="btn ghost" id="rndClear">Clear</button>
+        <button class="btn ghost" id="closeRnd">Close</button>
       </div>
     </div>
   </div>

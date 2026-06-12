@@ -133,6 +133,7 @@ what the UI renders.
 | **Traffic Search** | From **Edit → Search Traffic…**, grep all captured requests and responses (method, URL, headers, bodies) with a literal or regex query; results show which field matched. Pure client-side. |
 | **Timing Analysis** | From **Tools → Timing Analysis…**, per-endpoint response-time stats (count, min, avg, max) from session history, sorted slowest first — gaps between similar endpoints can reveal timing oracles. |
 | **Auth Builder** | From **Tools → Auth Builder…**, construct an `Authorization` header — **Basic** from user/password or **Bearer** from a token — and copy it into an identity. Pure client-side. |
+| **Random Generator** | From **Tools → Random Generator…**, generate CSPRNG values — UUID v4, random hex, URL-safe token, or a custom-length string — for nonces, cache-busters, and fuzzing. |
 | **cURL import / Copy as code** | Paste a `curl` from your browser DevTools or an intercepting proxy to populate the Request tab; copy any request back out as `curl`, `fetch`, Python `requests`, or HTTPie. |
 | **Response Analysis** | Each response is passively checked for missing security headers (HSTS/CSP/XFO/etc.), permissive or credentialed CORS, tech-disclosure banners, and weak cookie flags — shown in the **Analysis** subtab with severity. |
 | **Findings export** | Export fuzzer, sweep, and matrix results to CSV / Markdown / JSON straight from the results toolbar — drop them into a report. |

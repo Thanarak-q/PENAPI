@@ -1613,3 +1613,9 @@ table.results tbody tr.anomaly:hover { background: #f1e4c8; }
 .auth-row { display: flex; gap: var(--s2); align-items: center; }
 .auth-row input { flex: 1 1 auto; min-width: 0; }
 #authOut { min-height: 56px; }
+
+/* --- Random Generator modal ------------------------------------------- */
+.rnd-controls { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s2); }
+.rnd-sep { width: 1px; height: 20px; background: var(--line); }
+.rnd-len { width: 64px; }
+#rndOut { min-height: 120px; }

@@ -18,6 +18,7 @@ import { initDiscovery, openDiscovery } from './discovery.js';
 import { initSearch, openSearch } from './search.js';
 import { initTiming, openTiming } from './timing.js';
 import { initAuth, openAuth } from './auth.js';
+import { initRandom, openRandom } from './random.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
 import { initAttacks } from './attacks.js';
@@ -47,6 +48,7 @@ async function boot() {
   initSearch();
   initTiming();
   initAuth();
+  initRandom();
   initHistory();
   initExplorer(loadEndpoint);
   initAttacks();
@@ -71,6 +73,7 @@ async function boot() {
     search: openSearch,
     timing: openTiming,
     auth: openAuth,
+    random: openRandom,
     'clear-filters': clearFilters,
     shortcuts: () => ($('#shortcutsModal').hidden = false),
     about: () => {

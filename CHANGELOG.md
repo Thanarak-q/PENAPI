@@ -58,6 +58,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **Random Generator** — under **Tools → Random Generator…**, generate
+  cryptographically-random values (UUID v4, random hex, URL-safe token, custom
+  random string) for nonces, cache-busters, and fuzzing; each click appends a
+  line, copy them all out. Uses the platform CSPRNG; unit-tested via
+  `node --test` (`public/js/random-core.js`).
 - **Auth Builder** — under **Tools → Auth Builder…**, construct an
   `Authorization` header value: **Basic** from a user/password (Base64-encoded
   in the browser) or **Bearer** from a token, then copy it into an identity.
