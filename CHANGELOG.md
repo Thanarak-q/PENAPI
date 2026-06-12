@@ -58,10 +58,14 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Changed
-- **Tools menu organized into labeled groups** — the menu (now ~28 entries) is
-  split into *Current request*, *Payloads & attack*, *Tokens & crypto*,
-  *Encode & convert*, and *Recon & analysis* sections with headings, and the
-  dropdown scrolls if it would exceed the viewport. No tools were removed.
+- **Tools menu organized and de-duplicated** — the menu is split into labeled
+  *Payloads & attack*, *Tokens & crypto*, *Encode & convert*, and
+  *Recon & analysis* sections, and the dropdown scrolls if it would exceed the
+  viewport. The request-context actions that were mirrored here (Quick Attacks,
+  Copy as code, Send to Fuzzer / Access Matrix) were **removed** — they remain
+  in the request's `⋯` overflow menu, which is the single correct home for
+  actions that operate on the request you're editing. JWT Inspector (a
+  standalone tool) moved into *Tokens & crypto*.
 
 ### Added
 - **More Quick Attack variants** — the one-click attack runner now also tries
