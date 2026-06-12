@@ -16,20 +16,7 @@ Zero npm dependencies — pure Node plus a static front end. `swaggernaut spec.j
 
 ## Install
 
-Run once without installing:
-
-```bash
-npx @rockwine/swaggernaut
-```
-
-Install from npm:
-
-```bash
-npm install -g @rockwine/swaggernaut
-swaggernaut --version
-```
-
-Install from source:
+Install from GitHub source:
 
 ```bash
 git clone https://github.com/Thanarak-q/Swaggernaut.git
@@ -40,7 +27,15 @@ chmod +x ~/.local/bin/swaggernaut
 swaggernaut --version
 ```
 
-Requires Node.js >= 18 (uses the built-in global `fetch`). No other dependencies.
+If GitHub asks for a username when cloning, the repo is private or your GitHub
+session does not have access. Use SSH instead if your key is configured:
+
+```bash
+git clone git@github.com:Thanarak-q/Swaggernaut.git
+```
+
+Requires Node.js >= 18 (uses the built-in global `fetch`). No npm install is
+required.
 
 ## Updating
 
