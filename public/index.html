@@ -80,6 +80,7 @@
           <button class="menu-item" data-act="wordlist">Wordlist Generator…</button>
           <button class="menu-item" data-act="ipobf">IP Obfuscator…</button>
           <button class="menu-item" data-act="attackhdr">Attack Headers…</button>
+          <button class="menu-item" data-act="useragent">User-Agent Library…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -918,6 +919,18 @@
       <div class="ck-out" id="ahOut"></div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeAh">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="uaModal" hidden>
+    <div class="modal modal-wide">
+      <h2>User-Agent Library <span class="muted">— UA strings for testing</span></h2>
+      <p class="hint">Representative User-Agent strings (desktop, mobile, bot/crawler, tools) for testing UA-based routing, cloaking, and access logic. Copy one and set it via the Request tab or <strong>Match &amp; Replace</strong>.</p>
+      <input id="uaIn" class="url-input" type="text" spellcheck="false" placeholder="search — chrome, googlebot, curl, mobile…" />
+      <div class="ck-out" id="uaOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeUa">Close</button>
       </div>
     </div>
   </div>

@@ -58,6 +58,10 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## Unreleased
 
 ### Added
+- **User-Agent Library** — under **Tools → User-Agent Library…**, a searchable
+  set of representative User-Agent strings (desktop, mobile, bot/crawler, tools)
+  for testing UA-based routing, cloaking, and access logic, with per-entry copy.
+  Library is unit-tested via `node --test` (`public/js/useragent-core.js`).
 - **Attack Headers** — under **Tools → Attack Headers…**, a searchable,
   categorized library of request headers useful in testing (IP spoofing,
   URL/path override, host-header & cache poisoning, scheme, auth-context, method
