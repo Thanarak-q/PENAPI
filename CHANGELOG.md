@@ -65,6 +65,22 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   readers announce it correctly.
 
 ### Fixed
+- **Utility hardening (with new test coverage)** — patched real bugs in the
+  shared helpers and added `node --test` suites for previously untested modules:
+  - **Clipboard copy** now falls back to a hidden-textarea `execCommand` path
+    when the async Clipboard API is unavailable (non-secure context, e.g. the
+    tool served over plain HTTP on a LAN via `--host`), so copy buttons work
+    everywhere; `toast()` no longer throws if its element is missing.
+  - **Copy-as-code → Python** produced invalid code for multi-line bodies (a
+    literal newline inside a single-quoted string); newlines/tabs are now
+    escaped.
+  - **cURL import** no longer crashes on malformed input (a trailing `-H` or
+    `-u` threw); value reads are guarded.
+  - **Set-Cookie** response headers are kept one-per-line instead of being
+    comma-joined (which corrupted cookies whose values contain commas and broke
+    the Cookie Inspector).
+  - Added test suites for `util`, `codegen`, `curl`, `httpClient` (with local
+    integration tests), and `specParser` (which also now surfaces `TRACE`).
 - **History Limit now persists correctly** — a hard-coded 200-entry cap in
   `state.js` silently overrode the configured limit when saving to localStorage,
   so values above 200 had no effect after a reload. Persistence now honors the
