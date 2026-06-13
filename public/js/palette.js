@@ -39,7 +39,15 @@ const ACTIONS = [
  * only one place to maintain open-modal logic.
  */
 function buildMenuItems() {
-  const SKIP = new Set(['palette', 'click:quickAttackBtn']);
+  // Skip `palette` (recursive) and any data-act the static ACTIONS list already
+  // covers (Quick Attacks, Send to Fuzzer/Matrix) so re-adding those to a menu
+  // can never produce duplicate palette entries.
+  const SKIP = new Set([
+    'palette',
+    'click:quickAttackBtn',
+    'click:toFuzzerBtn',
+    'click:toMatrixBtn',
+  ]);
   return $$('#menubar .menu-item[data-act]').reduce((acc, item) => {
     const act = item.dataset.act;
     if (SKIP.has(act)) return acc;

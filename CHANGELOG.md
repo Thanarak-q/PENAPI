@@ -5,6 +5,20 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 
 ## 1.12.0
 
+### Fixed
+- **History Limit now persists correctly** — a hard-coded 200-entry cap in
+  `state.js` silently overrode the configured limit when saving to localStorage,
+  so values above 200 had no effect after a reload. Persistence now honors the
+  History Limit setting.
+- **Secret Scanner never leaks a credential in the preview** — short basic-auth
+  URLs (e.g. `http://u:p@host`) were previewed verbatim; the credential portion
+  is now masked (`https://••••@`), and other short matches are fully masked.
+- **Secret Scanner coverage** — added a GitHub fine-grained PAT (`github_pat_`)
+  detector and the JWT detector now also catches `alg:none` unsigned tokens
+  (empty signature segment).
+- **Command Palette** — hardened against duplicate entries if request-action
+  menu items are ever re-added (defensive skip list).
+
 ### Added
 - **Three more Fuzzer payload sets** — JWT Attack Tokens, OAuth redirect_uri Bypass, and Web Cache Deception.
 - **Secret Scanner** (`Attack → Secret Scanner…`) — paste a response body, JS bundle, or config file to scan for leaked credentials using 12 regex-based detectors: AWS Access Key IDs, Google API Keys, GitHub tokens, Slack tokens, Stripe live secret keys, SendGrid API keys, JWTs, private-key header blocks, basic-auth credentials in URLs, bearer tokens, generic assigned `api_key`/`secret`/`token`/`password` assignments, and email addresses. Matched secrets are previewed with the middle redacted. Runs fully client-side. DOM-free detectors are unit-tested.

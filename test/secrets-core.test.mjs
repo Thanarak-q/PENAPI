@@ -29,6 +29,18 @@ test('detects a JWT', () => {
   assert.ok(findings.some((f) => f.type === 'JWT'), 'found JWT');
 });
 
+test('detects an alg:none unsigned JWT (empty signature segment)', () => {
+  const unsigned = 'eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiJ9.';
+  const findings = scanSecrets(`token=${unsigned}`);
+  assert.ok(findings.some((f) => f.type === 'JWT'), 'found unsigned JWT');
+});
+
+test('detects a GitHub fine-grained PAT (github_pat_)', () => {
+  const pat = 'github_pat_' + '11ABCDEFG0aBcDeFgHiJkLmNoPqRsTuVwXyZ';
+  const findings = scanSecrets('GH_TOKEN=' + pat);
+  assert.ok(findings.some((f) => f.type === 'GitHub Fine-grained PAT'), 'found fine-grained PAT');
+});
+
 test('detects a private key header block', () => {
   const findings = scanSecrets('-----BEGIN RSA PRIVATE KEY-----\nMIIE...\n-----END RSA PRIVATE KEY-----');
   assert.ok(findings.some((f) => f.type === 'Private Key Block'), 'found private key block');
@@ -66,14 +78,20 @@ test('returns [] for empty or whitespace-only input', () => {
 
 // -- Preview redaction -------------------------------------------------------
 
-test('preview redacts long matches but leaves short ones intact', () => {
-  // AWS key is 20 chars (AKIA + 16) — well above the 12-char threshold.
+test('preview keeps first/last 4 chars of a long match, full match preserved', () => {
   const findings = scanSecrets(FAKE_AWS_KEY);
   const f = findings.find((x) => x.type === 'AWS Access Key ID');
   assert.ok(f, 'finding exists');
   assert.equal(f.preview, 'AKIA…MPLE', 'preview is first4 + ellipsis + last4');
-  // full match is preserved
-  assert.equal(f.match, FAKE_AWS_KEY);
+  assert.equal(f.match, FAKE_AWS_KEY, 'full match is preserved for copy');
+});
+
+test('preview fully masks a basic-auth password (never leaks the credential)', () => {
+  const findings = scanSecrets('https://admin:hunter2@internal.example.com/api');
+  const f = findings.find((x) => x.type === 'Basic Auth in URL');
+  assert.ok(f, 'finding exists');
+  assert.equal(f.preview, 'https://••••@', 'credential portion is masked');
+  assert.ok(!f.preview.includes('hunter2'), 'password is not present in the preview');
 });
 
 // -- summarizeSecrets --------------------------------------------------------

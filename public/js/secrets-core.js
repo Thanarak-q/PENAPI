@@ -20,6 +20,11 @@ const DETECTORS = [
     re: /\bgh[poustr]_[0-9A-Za-z]{36}\b/g,
   },
   {
+    type: 'GitHub Fine-grained PAT',
+    severity: 'high',
+    re: /\bgithub_pat_[0-9A-Za-z_]{20,}\b/g,
+  },
+  {
     type: 'Slack Token',
     severity: 'high',
     re: /\bxox[baprs]-[0-9A-Za-z-]{10,}\b/g,
@@ -37,7 +42,9 @@ const DETECTORS = [
   {
     type: 'JWT',
     severity: 'medium',
-    re: /\beyJ[0-9A-Za-z_-]{8,}\.eyJ[0-9A-Za-z_-]{8,}\.[0-9A-Za-z_-]+\b/g,
+    // Trailing segment is optional so `alg:none` unsigned tokens (empty
+    // signature, e.g. `eyJ….eyJ….`) are also caught.
+    re: /\beyJ[0-9A-Za-z_-]{8,}\.eyJ[0-9A-Za-z_-]{8,}\.[0-9A-Za-z_-]*/g,
   },
   {
     type: 'Private Key Block',
@@ -66,9 +73,15 @@ const DETECTORS = [
   },
 ];
 
-// Redact the middle of a long match so the preview doesn't splash full secrets.
-function redact(str) {
-  if (str.length <= 12) return str;
+// Redact a match so the preview never splashes a full secret. Basic-auth URLs
+// embed the password right before the `@`, so a generic first/last slice would
+// still leak it — mask the whole credential for that type. Other short matches
+// are fully masked; longer ones keep just the first/last few chars for context.
+function redact(str, type) {
+  if (type === 'Basic Auth in URL') {
+    return str.replace(/(:\/\/)[^@]*@/, '$1••••@');
+  }
+  if (str.length <= 8) return '•'.repeat(str.length);
   return str.slice(0, 4) + '…' + str.slice(-4);
 }
 
@@ -88,7 +101,7 @@ export function scanSecrets(text) {
       const key = type + '\x00' + match;
       if (seen.has(key)) continue;
       seen.add(key);
-      findings.push({ type, severity, match, index: m.index, preview: redact(match) });
+      findings.push({ type, severity, match, index: m.index, preview: redact(match, type) });
     }
   }
   return findings;
