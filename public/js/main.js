@@ -235,12 +235,22 @@ function wireCrossTab() {
   $('#toSequenceBtn').addEventListener('click', sendToSequence);
 }
 
-// Click-outside-to-close for every modal: clicking the dark backdrop (but not
-// the modal itself) dismisses it, matching the command palette's behavior and
-// the global Esc handler. The palette manages its own backdrop (it resets
-// state on close), so it is left to its own handler.
+// One boot-time pass over every modal: (1) give the dialog ARIA semantics so
+// screen readers announce it as a labelled modal dialog, and (2) wire
+// click-outside-to-close — clicking the dark backdrop (but not the modal
+// itself) dismisses it, matching the command palette and the global Esc
+// handler. The palette manages its own backdrop (it resets state on close).
 function wireModalDismiss() {
   $$('.modal-backdrop').forEach((backdrop) => {
+    const dialog = backdrop.querySelector('.modal');
+    if (dialog) {
+      dialog.setAttribute('role', 'dialog');
+      dialog.setAttribute('aria-modal', 'true');
+      const heading = dialog.querySelector('h2');
+      if (heading && !dialog.hasAttribute('aria-label')) {
+        dialog.setAttribute('aria-label', heading.textContent.trim());
+      }
+    }
     if (backdrop.id === 'paletteBackdrop') return;
     backdrop.addEventListener('click', (e) => {
       if (e.target === backdrop) backdrop.hidden = true;

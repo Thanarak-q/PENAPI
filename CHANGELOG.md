@@ -9,6 +9,9 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 - **Click-outside-to-close on every modal** — clicking the dark backdrop now
   dismisses any tool modal (previously only the command palette did this),
   matching the global Esc-to-close behavior.
+- **Modal accessibility** — every modal now carries `role="dialog"`,
+  `aria-modal="true"`, and an `aria-label` derived from its heading, so screen
+  readers announce it correctly.
 
 ### Fixed
 - **History Limit now persists correctly** — a hard-coded 200-entry cap in
