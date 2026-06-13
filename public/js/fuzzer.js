@@ -19,8 +19,20 @@ export async function initFuzzer() {
   const data = await fetchPayloadSets();
   for (const s of data.sets || []) payloadSetCounts[s.key] = s.count || 0;
   const sel = $('#payloadSet');
-  sel.innerHTML = '<option value="">— none —</option>' +
-    (data.sets || []).map((s) => `<option value="${s.key}">${s.label} (${s.count})</option>`).join('');
+  // Group sets into <optgroup>s by category, preserving server order.
+  const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const groups = new Map();
+  for (const s of data.sets || []) {
+    const cat = s.category || 'Other';
+    if (!groups.has(cat)) groups.set(cat, []);
+    groups.get(cat).push(s);
+  }
+  const optgroups = [...groups.entries()].map(([cat, sets]) =>
+    `<optgroup label="${esc(cat)}">` +
+    sets.map((s) => `<option value="${esc(s.key)}">${esc(s.label)} (${s.count})</option>`).join('') +
+    '</optgroup>'
+  ).join('');
+  sel.innerHTML = '<option value="">— none —</option>' + optgroups;
 
   $('#loadFromRequest').addEventListener('click', loadFromRequest);
   $('#fuzzStart').addEventListener('click', start);

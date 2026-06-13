@@ -28,6 +28,10 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   (on top of the GitHub fine-grained PAT and `alg:none` JWT additions).
 
 ### Changed
+- **Fuzzer payload-set picker grouped into submenus** — the set dropdown is now
+  organized into `<optgroup>` categories (Injection · Path & files · SSRF &
+  redirect · Access & auth · API & modern · Wordlists & fuzz) instead of one
+  long flat list. Each set carries a `category` exposed via `/api/payloads`.
 - **Injection Payloads cheat sheet** — a per-category **Copy all** button, plus
   new **Deserialization**, **File upload**, and **Prompt injection** categories
   to mirror the new Fuzzer sets.
