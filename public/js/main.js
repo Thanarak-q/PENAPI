@@ -48,6 +48,7 @@ import { initPalette, openPalette } from './palette.js';
 import { initMenubar } from './menubar.js';
 import { initTheme } from './theme.js';
 import { initSettings, openSettings } from './settings.js';
+import { initClickjacking, openClickjacking } from './clickjacking.js';
 import {
   initSession, updateProfileLabel,
   saveSession, openSessions, exportSession, importSession,
@@ -58,6 +59,7 @@ async function boot() {
   initRequest();
   await initFuzzer();
   initSettings();
+  initClickjacking();
   initMatrix();
   initSequence();
   initDecoder();
@@ -127,6 +129,7 @@ async function boot() {
     payloadlib: openPayloadLib,
     waf: openWaf,
     secrets: openSecrets,
+    clickjacking: openClickjacking,
     status: openStatus,
     graphql: openGraphql,
     wordlist: openWordlist,

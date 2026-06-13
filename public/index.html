@@ -83,6 +83,7 @@
           <button class="menu-item" data-act="matchreplace" title="Rewrite outgoing requests before they are sent">Match &amp; Replace…</button>
           <button class="menu-item" data-act="discovery" title="Probe common paths with real GET requests">Content Discovery…</button>
           <button class="menu-item" data-act="secrets" title="Scan pasted text for leaked credentials and secrets">Secret Scanner…</button>
+          <button class="menu-item" data-act="clickjacking" title="Generate a clickjacking proof-of-concept iframe overlay page">Clickjacking PoC…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -999,6 +1000,34 @@
       <div class="modal-actions">
         <button class="btn primary" id="secRun">Scan</button>
         <button class="btn ghost" id="closeSec">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clickjacking PoC modal -->
+  <div class="modal-backdrop" id="cjModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Clickjacking PoC <span class="muted">— iframe overlay</span></h2>
+      <p class="hint">Generates a proof-of-concept page: a near-invisible iframe over a decoy element. <strong>Authorized testing only.</strong> Only works if the target lacks <code>X-Frame-Options</code> or <code>CSP frame-ancestors</code> — check with the Header Auditor first.</p>
+      <div class="inline-row">
+        <input id="cjUrl" type="text" class="url-input" spellcheck="false" placeholder="https://target/page" />
+      </div>
+      <div class="inline-row">
+        <input id="cjDecoy" type="text" class="url-input" spellcheck="false" placeholder="Decoy button text" />
+      </div>
+      <div class="inline-row">
+        <label style="font-size:var(--text-sm);color:var(--ink-soft);align-self:center;">Opacity (0–1)</label>
+        <input id="cjOpacity" type="number" min="0" max="1" step="0.0001" value="0.0001" style="width:90px;" />
+        <label style="font-size:var(--text-sm);color:var(--ink-soft);align-self:center;">Top (px)</label>
+        <input id="cjTop" type="number" value="0" style="width:70px;" />
+        <label style="font-size:var(--text-sm);color:var(--ink-soft);align-self:center;">Left (px)</label>
+        <input id="cjLeft" type="number" value="0" style="width:70px;" />
+      </div>
+      <textarea id="cjOut" class="code code-out" spellcheck="false" readonly></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="cjCopy">Copy</button>
+        <button class="btn ghost" id="cjPreview">Open preview</button>
+        <button class="btn ghost" id="closeCj">Close</button>
       </div>
     </div>
   </div>
