@@ -32,10 +32,11 @@ export function statusClass(code) {
 }
 
 export function fmtBytes(n) {
-  if (n == null) return '–';
-  if (n < 1024) return n + ' B';
-  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
-  return (n / 1024 / 1024).toFixed(2) + ' MB';
+  if (n == null || !Number.isFinite(Number(n))) return '–';
+  const bytes = Number(n);
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
 }
 
 export function prettyJson(text) {
@@ -67,6 +68,7 @@ export function textToHeaders(text) {
 let toastTimer = null;
 export function toast(msg, isErr = false) {
   const t = $('#toast');
+  if (!t) return; // tolerate being called before the toast element exists
   t.textContent = msg;
   t.classList.toggle('err', isErr);
   t.hidden = false;
@@ -75,11 +77,43 @@ export function toast(msg, isErr = false) {
 }
 
 export async function copy(text) {
+  const value = String(text ?? '');
+  // Preferred path: the async Clipboard API (requires a secure context —
+  // https or localhost). Falls back to execCommand for plain-HTTP LAN use,
+  // which is common for a tool served with `--host`.
   try {
-    await navigator.clipboard.writeText(text);
-    toast('Copied to clipboard');
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(value);
+      toast('Copied to clipboard');
+      return true;
+    }
   } catch {
-    toast('Copy failed', true);
+    /* fall through to the legacy path */
+  }
+  if (legacyCopy(value)) {
+    toast('Copied to clipboard');
+    return true;
+  }
+  toast('Copy failed — select and copy manually', true);
+  return false;
+}
+
+// Hidden-textarea + execCommand fallback. Returns whether the copy succeeded.
+function legacyCopy(value) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = value;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
   }
 }
 
