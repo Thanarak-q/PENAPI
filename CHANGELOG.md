@@ -19,14 +19,17 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   password), and detection of GraphQL, file-upload, and management/debug
   (`/actuator`, `/internal`, `/debug`, `.git`, …) surfaces.
 - **Payload sets greatly deepened** — the built-in Fuzzer sets grew from a
-  handful of probes each to ~430 payloads total. Notably: **SQLi** (error-based
+  handful of probes each to ~460 payloads total. Notably: **SQLi** (error-based
   extractvalue/updatexml, UNION extraction, engine-specific, GBK/IFS bypasses,
   OOB DNS), **XSS** (broad event-handler/tag variety, exfil, base64-eval),
   **Command Injection** (`${IFS}`/brace/backslash bypasses, OOB, Windows),
   **SSTI** (Jinja2/Twig/Freemarker/Smarty/ERB/Mako/SpEL/Nunjucks/Pug RCE
   gadgets), **SSRF** (AWS/GCP/Azure/Alibaba metadata, decimal/hex/octal IP
   obfuscation, gopher/dict/ftp), **NoSQLi**, **Path Traversal**, **LFI/RFI**
-  wrappers, **Prototype Pollution**, **LDAP**, **XPath**, and **Open Redirect**.
+  wrappers, **Prototype Pollution**, **LDAP**, **XPath**, **Open Redirect**,
+  **XXE** (OOB exfil, XInclude, billion-laughs, SVG), **CRLF** (response
+  splitting), **JWT** (kid traversal, embedded jwk, alg confusion), **File
+  Upload**, and **Web LLM** prompt injection.
 - **Clickjacking PoC generator** (`Attack → Clickjacking PoC…`) — build a
   clickjacking proof-of-concept page (decoy overlay + near-invisible iframe of a
   target URL) and open a live preview via a Blob URL. URL and decoy text are
