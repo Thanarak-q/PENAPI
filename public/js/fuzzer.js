@@ -7,6 +7,7 @@ import { textToHeaders } from './util.js';
 import { fetchPayloadSets, startFuzz } from './api.js';
 import { attachExport } from './export.js';
 import { goTab } from './util.js';
+import { getSettings } from './settings.js';
 
 let results = [];
 let abortFn = null;
@@ -92,7 +93,8 @@ function start() {
       writeMethod ? `${template.method} may modify data.` : 'GET/HEAD/OPTIONS can still be expensive on some APIs.',
       'Continue?',
     ].join('\n');
-    if (!confirm(warning)) return;
+    const ok = !getSettings().confirmRisky || confirm(warning);
+    if (!ok) return;
   }
 
   results = [];

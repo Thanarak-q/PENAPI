@@ -7,6 +7,7 @@
 // Swaggernaut/PenAPI blobs are migrated to `profiles.default`.
 
 import { textToHeaders } from './util.js';
+import { getSettings } from './settings.js';
 
 const SESSION_KEY = 'swaggernaut.session.v2';
 const LEGACY_KEY = 'swaggernaut.state.v1';
@@ -304,6 +305,6 @@ export function identityHeaders() {
 
 export function pushHistory(entry) {
   state.history.unshift({ ...entry, at: Date.now() });
-  state.history = state.history.slice(0, HISTORY_CAP);
+  state.history = state.history.slice(0, getSettings().historyLimit);
   save();
 }

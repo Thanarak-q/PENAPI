@@ -10,7 +10,9 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   fuzzer default concurrency and delay, history limit, and a confirm-before-risky
   toggle. Pure normalise/clamp logic lives in `settings-core.js` and is
   unit-tested; the Fuzzer's concurrency and delay inputs initialise from saved
-  defaults on load.
+  defaults on load. History recording now trims to the configured **History Limit**
+  on every push; the **Confirm risky runs** toggle gates the confirmation prompts
+  in Fuzzer, Access Matrix, and Auth Sweep (disabled = skip prompt and proceed).
 - **GraphQL Toolkit** (`Attack → Payloads → GraphQL Toolkit…`) — six copyable
   probe queries (full introspection, typename, root name, all type names,
   field-suggestion typo, batch) plus a client-side introspection JSON parser

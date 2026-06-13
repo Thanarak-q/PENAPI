@@ -8,6 +8,7 @@ import { getCurrentRequest } from './request.js';
 import { runMatrix } from './api.js';
 import { attachExport } from './export.js';
 import { goTab } from './util.js';
+import { getSettings } from './settings.js';
 
 let lastResults = [];
 
@@ -60,7 +61,8 @@ async function run() {
       'That may modify data multiple times.',
       'Continue?',
     ].join('\n');
-    if (!confirm(warning)) return;
+    const ok = !getSettings().confirmRisky || confirm(warning);
+    if (!ok) return;
   }
 
   $('#matrixRun').disabled = true;
