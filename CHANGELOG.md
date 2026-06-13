@@ -89,6 +89,13 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   standalone tool) moved into *Tokens & crypto*.
 
 ### Added
+- **Four more Fuzzer payload sets** — **Prototype Pollution** (`__proto__` /
+  `constructor` gadgets in JSON and query-string form), **Mass Assignment
+  Fields** (candidate privilege-escalation field names), **CORS Test Origins**
+  (ACAO-reflection probes using a `TARGET` placeholder host), and **Unicode /
+  Encoding Bypass** (overlong UTF-8, `%u` / double-encoding, fullwidth, RTL, and
+  null-byte filter evasions). All surface automatically in the Fuzzer dropdown
+  and are covered by the `lib/payloads.js` integrity tests.
 - **More Quick Attack variants** — the one-click attack runner now also tries
   path-normalization ACL bypasses (`/.` trailing dot, `%2f` encoded slash,
   case-swapped path, leading double slash), a scheme downgrade

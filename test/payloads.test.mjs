@@ -51,6 +51,13 @@ test('the LDAP / XPath / GraphQL / redirect / email / format sets are registered
   }
 });
 
+test('the prototype-pollution / mass-assignment / cors / unicode sets are registered', () => {
+  for (const key of ['prototype-pollution', 'mass-assignment', 'cors-origins', 'unicode-bypass']) {
+    assert.ok(SETS[key], `${key} not registered`);
+    assert.ok(getSet(key).length > 0);
+  }
+});
+
 test('GraphQL set includes an introspection query', () => {
   assert.ok(getSet('graphql').some((p) => /__schema/.test(p)));
 });
