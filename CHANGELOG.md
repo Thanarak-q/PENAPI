@@ -6,6 +6,13 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## 1.13.0
 
 ### Added
+- **Deeper passive response analysis** — each response is now also checked for
+  weak HSTS max-age, `unsafe-inline`/`unsafe-eval` CSP, the `null` CORS origin,
+  `SameSite=None` cookies without `Secure`, cacheable sensitive responses
+  (Set-Cookie/auth without `no-store`), missing `Permissions-Policy`,
+  `WWW-Authenticate` disclosure, 5xx server errors, and verbose stack
+  traces / leaked private keys / AWS keys in the body. The analyzer
+  (`analyze.js`) is now unit-tested.
 - **Deeper Attack Surface analysis** — the passive spec analyzer gained rules
   for credential-like values carried in the URL, authentication over plaintext
   HTTP, API keys in the query string, discouraged OAuth2 grants (implicit /
