@@ -6,6 +6,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## 1.12.0
 
 ### Added
+- **GraphQL Toolkit** (`Attack → Payloads → GraphQL Toolkit…`) — six copyable
+  probe queries (full introspection, typename, root name, all type names,
+  field-suggestion typo, batch) plus a client-side introspection JSON parser
+  that surfaces root types, available query/mutation operations, and all named
+  types. Logic is DOM-free and unit-tested.
 - **Attack menu with nested flyouts** — payload generation, spoofing helpers,
   Match & Replace, Content Discovery, and Quick Attacks now live under a
   top-level **Attack** menu. Payloads and header/spoofing tools are grouped in

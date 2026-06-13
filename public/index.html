@@ -66,6 +66,7 @@
               <button class="menu-item" data-act="payloadlib" title="Browse copy-only injection payloads">Injection Payloads…</button>
               <button class="menu-item" data-act="redirect" title="Generate redirect and SSRF bypass strings">Redirect &amp; SSRF Payloads…</button>
               <button class="menu-item" data-act="wordlist" title="Generate fuzzing wordlists from ranges or mutations">Wordlist Generator…</button>
+              <button class="menu-item" data-act="graphql" title="Browse GraphQL probe queries and parse introspection responses">GraphQL Toolkit…</button>
             </div>
           </div>
           <div class="menu-sub">
@@ -870,6 +871,21 @@
       <div class="ck-out" id="plOut"></div>
       <div class="modal-actions">
         <button class="btn ghost" id="closePl">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="gqlModal" hidden>
+    <div class="modal modal-wide">
+      <h2>GraphQL Toolkit <span class="muted">— probes &amp; introspection parser</span></h2>
+      <p class="hint">Authorized testing only. Copy a probe query into the request body, then paste a full introspection response below to map the schema — root types, available operations, and all named types.</p>
+      <div class="rd-group-title">Probe Queries</div>
+      <div class="ck-out" id="gqlProbes"></div>
+      <div class="rd-group-title">Parse Introspection Response</div>
+      <textarea id="gqlIn" class="code code-out" spellcheck="false" placeholder='{"data":{"__schema":{"queryType":{"name":"Query"},...}}}'></textarea>
+      <div class="ck-out" id="gqlOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeGql">Close</button>
       </div>
     </div>
   </div>

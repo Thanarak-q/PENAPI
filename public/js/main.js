@@ -31,6 +31,7 @@ import { initBodyConv, openBodyConv } from './bodyconv.js';
 import { initPayloadLib, openPayloadLib } from './payloads-lib.js';
 import { initWaf, openWaf } from './waf.js';
 import { initStatus, openStatus } from './status.js';
+import { initGraphql, openGraphql } from './graphql.js';
 import { initWordlist, openWordlist } from './wordlist.js';
 import { initIpObf, openIpObf } from './ipobf.js';
 import { initAttackHdr, openAttackHdr } from './attackhdr.js';
@@ -79,6 +80,7 @@ async function boot() {
   initPayloadLib();
   initWaf();
   initStatus();
+  initGraphql();
   initWordlist();
   initIpObf();
   initAttackHdr();
@@ -120,6 +122,7 @@ async function boot() {
     payloadlib: openPayloadLib,
     waf: openWaf,
     status: openStatus,
+    graphql: openGraphql,
     wordlist: openWordlist,
     ipobf: openIpObf,
     attackhdr: openAttackHdr,
