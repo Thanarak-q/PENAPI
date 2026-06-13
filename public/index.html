@@ -53,6 +53,8 @@
           <button class="menu-item" data-act="sitemap" title="Browse endpoints grouped by URL path">Site Map…</button>
           <button class="menu-item" data-act="tags" title="Rename or remove custom focus tags">Tag Manager…</button>
           <button class="menu-item" data-act="palette" title="Open the command palette">Command Palette <span class="menu-key">⌘K</span></button>
+          <div class="menu-sep"></div>
+          <button class="menu-item" data-act="settings" title="Edit application preferences">Settings…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -1191,6 +1193,29 @@
       <p class="hint">Pentest-oriented API workbench — loads an OpenAPI/Swagger spec and adds offensive testing tooling (repeater, fuzzer, access-control matrix, auth sweep, JWT toolkit).</p>
       <p class="muted about-note">Runs entirely on your machine. No telemetry and no external calls — requests go only to the targets you choose, and JWT decode/sign/brute-force all happen locally in your browser.</p>
       <div class="modal-actions"><button class="btn ghost" id="closeAbout">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal-backdrop" id="settingsModal" hidden>
+    <div class="modal">
+      <h2>Settings</h2>
+      <div class="settings-fields">
+        <label>Fuzzer concurrency
+          <input id="settingsConcurrency" type="number" min="1" max="50" />
+        </label>
+        <label>Fuzzer delay (ms)
+          <input id="settingsDelay" type="number" min="0" max="10000" />
+        </label>
+        <label>History limit
+          <input id="settingsHistoryLimit" type="number" min="10" max="2000" />
+        </label>
+        <label class="check"><input id="settingsConfirmRisky" type="checkbox" /> Confirm risky runs</label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" id="settingsSave">Save</button>
+        <button class="btn ghost" id="closeSettings">Close</button>
+      </div>
     </div>
   </div>
 

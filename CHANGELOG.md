@@ -6,6 +6,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## 1.12.0
 
 ### Added
+- **Settings panel** (`View → Settings…`) — localStorage-backed preferences for
+  fuzzer default concurrency and delay, history limit, and a confirm-before-risky
+  toggle. Pure normalise/clamp logic lives in `settings-core.js` and is
+  unit-tested; the Fuzzer's concurrency and delay inputs initialise from saved
+  defaults on load.
 - **GraphQL Toolkit** (`Attack → Payloads → GraphQL Toolkit…`) — six copyable
   probe queries (full introspection, typename, root name, all type names,
   field-suggestion typo, batch) plus a client-side introspection JSON parser

@@ -46,6 +46,7 @@ import { initRecon, renderRecon } from './recon.js';
 import { initPalette, openPalette } from './palette.js';
 import { initMenubar } from './menubar.js';
 import { initTheme } from './theme.js';
+import { initSettings, openSettings } from './settings.js';
 import {
   initSession, updateProfileLabel,
   saveSession, openSessions, exportSession, importSession,
@@ -55,6 +56,7 @@ async function boot() {
   initTheme();
   initRequest();
   await initFuzzer();
+  initSettings();
   initMatrix();
   initSequence();
   initDecoder();
@@ -96,6 +98,7 @@ async function boot() {
   initSpecLoader(applySpec);
   initSession(onProfileChange);
   initMenubar({
+    settings: openSettings,
     'session-save': saveSession,
     'session-open': openSessions,
     'session-export': exportSession,
