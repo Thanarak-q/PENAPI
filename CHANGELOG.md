@@ -6,6 +6,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## 1.13.0
 
 ### Added
+- **Deeper Attack Surface analysis** — the passive spec analyzer gained rules
+  for credential-like values carried in the URL, authentication over plaintext
+  HTTP, API keys in the query string, discouraged OAuth2 grants (implicit /
+  password), and detection of GraphQL, file-upload, and management/debug
+  (`/actuator`, `/internal`, `/debug`, `.git`, …) surfaces.
 - **Payload sets greatly deepened** — the built-in Fuzzer sets grew from a
   handful of probes each to ~430 payloads total. Notably: **SQLi** (error-based
   extractvalue/updatexml, UNION extraction, engine-specific, GBK/IFS bypasses,

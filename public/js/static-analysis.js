@@ -9,6 +9,13 @@ const SENSITIVE_PATH_RE = /\b(admin|account|accounts|billing|credential|credenti
 const IDENTIFIER_RE = /(^id$|id$|uuid|guid|slug|user|account|tenant|org|organization|project|order|invoice|file|owner|customer|member)/i;
 const RISKY_PARAM_RE = /(redirect|return|next|callback|continue|url|uri|host|domain|path|file|filename|template|debug|trace|role|admin|permission|scope|filter|query|search|include|expand|sort|sql|where)/i;
 const SENSITIVE_FIELD_RE = /(password|passwd|pwd|token|secret|api[_-]?key|key|credential|auth|authorization|session|cookie|role|roles|admin|permission|permissions|scope|scopes|owner|ownerId|userId|accountId|tenantId|orgId|organizationId|isAdmin|is_admin|enabled|disabled|verified|balance|credit|price|plan|ssn|socialSecurity)/i;
+// Credential-like names that leak when carried in a URL (logs, history, Referer, caches).
+const CREDENTIAL_PARAM_RE = /(password|passwd|pwd|^token$|_token|access[_-]?token|api[_-]?key|apikey|secret|access[_-]?key|session[_-]?id|sessionid)/i;
+// Management / debug / internal surfaces that should not be publicly reachable.
+const MGMT_PATH_RE = /(actuator|internal|debug|metrics|heapdump|swagger|openapi|console|trace|\benv\b|\.git|backup)/i;
+// File-upload-ish endpoints worth checking for type/size/extension controls.
+const UPLOAD_PATH_RE = /(upload|attachment|avatar|\bfile\b|image|media|import)/i;
+const GRAPHQL_PATH_RE = /graphql|graphiql/i;
 
 const CATEGORY_LABELS = {
   security: 'Security',
@@ -92,8 +99,96 @@ function addSpecFindings(findings, spec, endpoints, securitySchemes) {
     }
   }
 
+  addAuthTransportFindings(findings, spec, securitySchemes);
   addDuplicateOperationIdFindings(findings, endpoints);
   addRouteAmbiguityFindings(findings, endpoints);
+}
+
+// Auth-scheme transport risks derived from the spec's security schemes + base URL.
+function addAuthTransportFindings(findings, spec, securitySchemes) {
+  const baseUrls = Array.isArray(spec?.baseUrls) ? spec.baseUrls : [];
+  const plaintext = baseUrls.some((url) => /^http:\/\//i.test(String(url || '')));
+  const usesAuth = Object.keys(securitySchemes).length > 0;
+  if (plaintext && usesAuth) {
+    findings.push(makeFinding({
+      sev: 'high',
+      category: 'security',
+      title: 'Credentials may be sent over plaintext HTTP',
+      evidence: baseUrls.filter((url) => /^http:\/\//i.test(String(url || ''))).join(', '),
+      action: 'A non-HTTPS base URL with authentication exposes credentials/tokens to network interception — require TLS.',
+    }));
+  }
+  for (const [name, scheme] of Object.entries(securitySchemes)) {
+    if (scheme?.type === 'apiKey' && scheme?.in === 'query') {
+      findings.push(makeFinding({
+        sev: 'medium',
+        category: 'security',
+        title: 'API key transmitted in the query string',
+        evidence: `${name} (in: query, name: ${scheme.name || '?'})`,
+        action: 'Query-string keys leak via access logs, browser history, and Referer headers — prefer a header.',
+      }));
+    }
+    if (scheme?.type === 'oauth2' && scheme?.flows && (scheme.flows.implicit || scheme.flows.password)) {
+      findings.push(makeFinding({
+        sev: 'medium',
+        category: 'security',
+        title: 'OAuth2 uses a discouraged grant (implicit/password)',
+        evidence: `${name}: ${Object.keys(scheme.flows).join(', ')}`,
+        action: 'Implicit and resource-owner-password grants are deprecated — prefer authorization code with PKCE.',
+      }));
+    }
+  }
+}
+
+// Modern attack-surface hints: credentials in URL, GraphQL, file upload, and
+// management/debug endpoints.
+function addModernSurfaceFindings(findings, endpoint) {
+  const urlParams = [...(endpoint.params?.query || []), ...(endpoint.params?.path || [])];
+  const creds = urlParams.filter((param) => CREDENTIAL_PARAM_RE.test(param.name || ''));
+  if (creds.length) {
+    findings.push(makeFinding({
+      sev: 'high',
+      category: 'security',
+      title: 'Credential-like value carried in the URL',
+      endpoint,
+      evidence: creds.map((param) => param.name).join(', '),
+      action: 'Secrets in URLs leak via server logs, browser history, Referer, and shared caches — move them to a header or body.',
+    }));
+  }
+
+  if (GRAPHQL_PATH_RE.test(endpoint.path)) {
+    findings.push(makeFinding({
+      sev: 'medium',
+      category: 'injection',
+      title: 'GraphQL endpoint detected',
+      endpoint,
+      evidence: endpoint.path,
+      action: 'Test introspection, field suggestions, query batching/DoS, and per-field authorization (see the GraphQL Toolkit).',
+    }));
+  }
+
+  const multipart = /multipart\/form-data/i.test(endpoint.body?.contentType || '');
+  if (MUTATING.has(endpoint.method) && (multipart || UPLOAD_PATH_RE.test(endpoint.path))) {
+    findings.push(makeFinding({
+      sev: 'medium',
+      category: 'data',
+      title: 'File-upload surface',
+      endpoint,
+      evidence: multipart ? 'multipart/form-data body' : endpoint.path,
+      action: 'Verify extension/content-type/magic-byte validation, size limits, and storage path — test the File Upload payload set.',
+    }));
+  }
+
+  if (MGMT_PATH_RE.test(endpoint.path)) {
+    findings.push(makeFinding({
+      sev: 'medium',
+      category: 'security',
+      title: 'Management or debug surface exposed',
+      endpoint,
+      evidence: endpoint.path,
+      action: 'Confirm this admin/debug/internal route is not reachable by untrusted users.',
+    }));
+  }
 }
 
 function addEndpointFindings(findings, endpoints, securitySchemes) {
@@ -151,6 +246,7 @@ function addEndpointFindings(findings, endpoints, securitySchemes) {
     addIdorFindings(findings, endpoint, auth);
     addBodyFindings(findings, endpoint);
     addParameterFindings(findings, endpoint);
+    addModernSurfaceFindings(findings, endpoint);
     addQualityFindings(findings, endpoint);
   }
 }
