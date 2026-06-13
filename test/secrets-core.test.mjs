@@ -41,6 +41,16 @@ test('detects a GitHub fine-grained PAT (github_pat_)', () => {
   assert.ok(findings.some((f) => f.type === 'GitHub Fine-grained PAT'), 'found fine-grained PAT');
 });
 
+test('detects npm / GitLab / Twilio tokens', () => {
+  const npm = 'npm_' + 'aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789';
+  const glpat = 'glpat-' + 'aBcDeF1234567890_xYz';
+  const twilio = 'SK' + '0123456789abcdef0123456789abcdef';
+  const findings = scanSecrets(`a=${npm} b=${glpat} c=${twilio}`);
+  assert.ok(findings.some((f) => f.type === 'npm Token'), 'found npm token');
+  assert.ok(findings.some((f) => f.type === 'GitLab PAT'), 'found GitLab PAT');
+  assert.ok(findings.some((f) => f.type === 'Twilio API Key'), 'found Twilio key');
+});
+
 test('detects a private key header block', () => {
   const findings = scanSecrets('-----BEGIN RSA PRIVATE KEY-----\nMIIE...\n-----END RSA PRIVATE KEY-----');
   assert.ok(findings.some((f) => f.type === 'Private Key Block'), 'found private key block');

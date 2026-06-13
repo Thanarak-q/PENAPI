@@ -25,6 +25,21 @@ const DETECTORS = [
     re: /\bgithub_pat_[0-9A-Za-z_]{20,}\b/g,
   },
   {
+    type: 'npm Token',
+    severity: 'high',
+    re: /\bnpm_[0-9A-Za-z]{36}\b/g,
+  },
+  {
+    type: 'GitLab PAT',
+    severity: 'high',
+    re: /\bglpat-[0-9A-Za-z_-]{20,}\b/g,
+  },
+  {
+    type: 'Twilio API Key',
+    severity: 'high',
+    re: /\bSK[0-9a-fA-F]{32}\b/g,
+  },
+  {
     type: 'Slack Token',
     severity: 'high',
     re: /\bxox[baprs]-[0-9A-Za-z-]{10,}\b/g,
