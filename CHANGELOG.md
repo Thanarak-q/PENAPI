@@ -6,6 +6,15 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## 1.13.0
 
 ### Added
+- **Payload sets greatly deepened** — the built-in Fuzzer sets grew from a
+  handful of probes each to ~430 payloads total. Notably: **SQLi** (error-based
+  extractvalue/updatexml, UNION extraction, engine-specific, GBK/IFS bypasses,
+  OOB DNS), **XSS** (broad event-handler/tag variety, exfil, base64-eval),
+  **Command Injection** (`${IFS}`/brace/backslash bypasses, OOB, Windows),
+  **SSTI** (Jinja2/Twig/Freemarker/Smarty/ERB/Mako/SpEL/Nunjucks/Pug RCE
+  gadgets), **SSRF** (AWS/GCP/Azure/Alibaba metadata, decimal/hex/octal IP
+  obfuscation, gopher/dict/ftp), **NoSQLi**, **Path Traversal**, **LFI/RFI**
+  wrappers, **Prototype Pollution**, **LDAP**, **XPath**, and **Open Redirect**.
 - **Clickjacking PoC generator** (`Attack → Clickjacking PoC…`) — build a
   clickjacking proof-of-concept page (decoy overlay + near-invisible iframe of a
   target URL) and open a live preview via a Blob URL. URL and decoy text are
