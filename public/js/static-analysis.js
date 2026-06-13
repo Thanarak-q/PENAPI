@@ -16,6 +16,10 @@ const MGMT_PATH_RE = /(actuator|internal|debug|metrics|heapdump|swagger|openapi|
 // File-upload-ish endpoints worth checking for type/size/extension controls.
 const UPLOAD_PATH_RE = /(upload|attachment|avatar|\bfile\b|image|media|import)/i;
 const GRAPHQL_PATH_RE = /graphql|graphiql/i;
+// Authentication / account endpoints worth brute-force & enumeration testing.
+const AUTH_ENDPOINT_RE = /(login|signin|sign-in|authenticate|\btoken\b|\botp\b|verify|2fa|mfa|reset|forgot|password|register|signup|sign-up)/i;
+// Pagination-ish query parameter names.
+const PAGINATION_RE = /(limit|page|offset|per[_-]?page|page[_-]?size|cursor|\bsize\b|skip|top)/i;
 
 const CATEGORY_LABELS = {
   security: 'Security',
@@ -187,6 +191,32 @@ function addModernSurfaceFindings(findings, endpoint) {
       endpoint,
       evidence: endpoint.path,
       action: 'Confirm this admin/debug/internal route is not reachable by untrusted users.',
+    }));
+  }
+
+  if (MUTATING.has(endpoint.method) && AUTH_ENDPOINT_RE.test(endpoint.path)) {
+    findings.push(makeFinding({
+      sev: 'medium',
+      category: 'security',
+      title: 'Authentication / account endpoint — brute-force surface',
+      endpoint,
+      evidence: endpoint.path,
+      action: 'Test rate limiting, credential stuffing, OTP/2FA brute force, and username enumeration.',
+    }));
+  }
+
+  // Collection GET with no object id and no pagination → excessive data exposure.
+  const hasPathParam = (endpoint.params?.path || []).length > 0;
+  const queryNames = (endpoint.params?.query || []).map((param) => param.name || '').join(' ');
+  const lastSegment = String(endpoint.path || '').split('/').filter(Boolean).pop() || '';
+  if (endpoint.method === 'GET' && !hasPathParam && !/\{/.test(endpoint.path) && /s$/i.test(lastSegment) && !PAGINATION_RE.test(queryNames)) {
+    findings.push(makeFinding({
+      sev: 'info',
+      category: 'data',
+      title: 'Collection endpoint without pagination parameters',
+      endpoint,
+      evidence: endpoint.path,
+      action: 'Confirm pagination and per-object authorization to avoid excessive data exposure.',
     }));
   }
 }

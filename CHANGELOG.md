@@ -17,7 +17,10 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   for credential-like values carried in the URL, authentication over plaintext
   HTTP, API keys in the query string, discouraged OAuth2 grants (implicit /
   password), and detection of GraphQL, file-upload, and management/debug
-  (`/actuator`, `/internal`, `/debug`, `.git`, …) surfaces.
+  (`/actuator`, `/internal`, `/debug`, `.git`, …) surfaces. It also flags
+  authentication/account endpoints (login, reset, OTP, …) as brute-force
+  surfaces and collection `GET`s without pagination as excessive-data-exposure
+  candidates.
 - **Payload sets greatly deepened** — the built-in Fuzzer sets grew from a
   handful of probes each to ~460 payloads total. Notably: **SQLi** (error-based
   extractvalue/updatexml, UNION extraction, engine-specific, GBK/IFS bypasses,
