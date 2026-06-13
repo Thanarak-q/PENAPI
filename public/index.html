@@ -82,6 +82,7 @@
           <div class="menu-sep"></div>
           <button class="menu-item" data-act="matchreplace" title="Rewrite outgoing requests before they are sent">Match &amp; Replace…</button>
           <button class="menu-item" data-act="discovery" title="Probe common paths with real GET requests">Content Discovery…</button>
+          <button class="menu-item" data-act="secrets" title="Scan pasted text for leaked credentials and secrets">Secret Scanner…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -984,6 +985,20 @@
       <div class="ck-out" id="uaOut"></div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeUa">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secret Scanner modal -->
+  <div class="modal-backdrop" id="secModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Secret Scanner <span class="muted">— detect leaked credentials</span></h2>
+      <p class="hint">Paste a response body, JS bundle, config file, or any text to scan for leaked secrets — AWS/Google/GitHub/Slack/Stripe/SendGrid keys, JWTs, private-key blocks, basic-auth in URLs, bearer tokens, and generic assigned secrets. Runs fully client-side; nothing is sent.</p>
+      <textarea id="secIn" class="code code-out" spellcheck="false" placeholder="paste response body, JS bundle, config…"></textarea>
+      <div class="ck-out" id="secOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="secRun">Scan</button>
+        <button class="btn ghost" id="closeSec">Close</button>
       </div>
     </div>
   </div>

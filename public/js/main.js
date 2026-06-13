@@ -30,6 +30,7 @@ import { initJsonFlat, openJsonFlat } from './jsonflat.js';
 import { initBodyConv, openBodyConv } from './bodyconv.js';
 import { initPayloadLib, openPayloadLib } from './payloads-lib.js';
 import { initWaf, openWaf } from './waf.js';
+import { initSecrets, openSecrets } from './secrets.js';
 import { initStatus, openStatus } from './status.js';
 import { initGraphql, openGraphql } from './graphql.js';
 import { initWordlist, openWordlist } from './wordlist.js';
@@ -81,6 +82,7 @@ async function boot() {
   initBodyConv();
   initPayloadLib();
   initWaf();
+  initSecrets();
   initStatus();
   initGraphql();
   initWordlist();
@@ -124,6 +126,7 @@ async function boot() {
     bodyconv: openBodyConv,
     payloadlib: openPayloadLib,
     waf: openWaf,
+    secrets: openSecrets,
     status: openStatus,
     graphql: openGraphql,
     wordlist: openWordlist,

@@ -8,6 +8,8 @@ node_modules/
 *.pem
 *.key
 secrets.*
+!public/js/secrets.js
+!public/js/secrets-core.js
 tokens.*
 
 # API specs and engagement data — keep client material out of the repo
