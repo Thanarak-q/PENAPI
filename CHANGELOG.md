@@ -3,6 +3,26 @@
 All notable changes to Swaggernaut are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## 1.13.0
+
+### Added
+- **Clickjacking PoC generator** (`Attack → Clickjacking PoC…`) — build a
+  clickjacking proof-of-concept page (decoy overlay + near-invisible iframe of a
+  target URL) and open a live preview via a Blob URL. URL and decoy text are
+  HTML-escaped; opacity is clamped and offsets coerced. Pure HTML builder is
+  DOM-free and unit-tested.
+- **Three more Fuzzer payload sets** (30 total) — **Insecure Deserialization**
+  (Java/PHP/JSON/SnakeYAML/pickle markers), **File Upload** (extension,
+  null-byte, and traversal filename bypasses), and **Web LLM / Prompt
+  Injection** — closing PortSwigger topic gaps. All surface via `/api/payloads`.
+- **Secret Scanner detectors** — added npm, GitLab, and Twilio token detectors
+  (on top of the GitHub fine-grained PAT and `alg:none` JWT additions).
+
+### Changed
+- **Injection Payloads cheat sheet** — a per-category **Copy all** button, plus
+  new **Deserialization**, **File upload**, and **Prompt injection** categories
+  to mirror the new Fuzzer sets.
+
 ## 1.12.0
 
 ### Changed
