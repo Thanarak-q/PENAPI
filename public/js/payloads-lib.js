@@ -14,7 +14,12 @@ function render() {
   host.innerHTML = '';
   const groups = allPayloads(currentMarker());
   for (const [cat, list] of Object.entries(groups)) {
-    host.appendChild(el('div', { class: 'rd-group-title', text: cat }));
+    const copyAll = el('button', { class: 'btn tiny ghost', text: 'copy all', title: `Copy all ${cat} payloads` });
+    copyAll.addEventListener('click', () => { copy(list.join('\n')); toast(`Copied ${list.length} ${cat} payloads`); });
+    host.appendChild(el('div', { class: 'rd-group-title' }, [
+      el('span', { text: cat }),
+      copyAll,
+    ]));
     for (const p of list) {
       const btn = el('button', { class: 'btn tiny ghost', text: 'copy', title: 'Copy this payload' });
       btn.addEventListener('click', () => { copy(p); toast('Copied'); });

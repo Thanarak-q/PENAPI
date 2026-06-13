@@ -184,3 +184,78 @@ test('analyzes request history without requiring active requests', () => {
   assert.ok(titles(report).includes('Server error observed in request log'));
   assert.equal(report.findings.some((finding) => finding.action?.includes('replay')), false);
 });
+
+test('flags a credential-like value carried in the URL', () => {
+  const report = analyzeSpec(makeSpec({
+    endpoints: [
+      endpoint({
+        method: 'GET',
+        path: '/reset',
+        params: { query: [{ name: 'token', required: true }] },
+      }),
+    ],
+  }));
+  assert.ok(titles(report).includes('Credential-like value carried in the URL'));
+});
+
+test('detects GraphQL, file-upload, and management surfaces', () => {
+  const report = analyzeSpec(makeSpec({
+    endpoints: [
+      endpoint({ method: 'POST', path: '/graphql', operationId: 'gql' }),
+      endpoint({
+        method: 'POST',
+        path: '/avatar/upload',
+        operationId: 'upload',
+        body: { contentType: 'multipart/form-data', required: true, example: {} },
+      }),
+      endpoint({ method: 'GET', path: '/actuator/env', operationId: 'env' }),
+    ],
+  }));
+  const t = titles(report);
+  assert.ok(t.includes('GraphQL endpoint detected'));
+  assert.ok(t.includes('File-upload surface'));
+  assert.ok(t.includes('Management or debug surface exposed'));
+});
+
+test('flags authentication carried over plaintext HTTP', () => {
+  const report = analyzeSpec(makeSpec({
+    baseUrls: ['http://api.example.test'],
+    endpoints: [endpoint({})],
+  }));
+  assert.ok(titles(report).includes('Credentials may be sent over plaintext HTTP'));
+});
+
+test('flags an API key transmitted in the query string', () => {
+  const report = analyzeSpec(makeSpec({
+    securitySchemes: { apiKeyAuth: { type: 'apiKey', in: 'query', name: 'api_key' } },
+    endpoints: [endpoint({ security: [{ apiKeyAuth: [] }] })],
+  }));
+  assert.ok(titles(report).includes('API key transmitted in the query string'));
+});
+
+test('flags auth/brute-force surfaces and unpaginated collections', () => {
+  const report = analyzeSpec(makeSpec({
+    endpoints: [
+      endpoint({ method: 'POST', path: '/auth/login', operationId: 'login' }),
+      endpoint({ method: 'GET', path: '/orders', operationId: 'listOrders', params: { query: [] } }),
+    ],
+  }));
+  const t = titles(report);
+  assert.ok(t.includes('Authentication / account endpoint — brute-force surface'));
+  assert.ok(t.includes('Collection endpoint without pagination parameters'));
+});
+
+test('a paginated collection is not flagged for excessive data exposure', () => {
+  const report = analyzeSpec(makeSpec({
+    endpoints: [endpoint({ method: 'GET', path: '/orders', operationId: 'listOrders', params: { query: [{ name: 'limit' }, { name: 'page' }] } })],
+  }));
+  assert.ok(!titles(report).includes('Collection endpoint without pagination parameters'));
+});
+
+test('flags a discouraged OAuth2 grant', () => {
+  const report = analyzeSpec(makeSpec({
+    securitySchemes: { oauth: { type: 'oauth2', flows: { implicit: { authorizationUrl: 'x' } } } },
+    endpoints: [endpoint({ security: [{ oauth: [] }] })],
+  }));
+  assert.ok(titles(report).includes('OAuth2 uses a discouraged grant (implicit/password)'));
+});

@@ -30,7 +30,9 @@ import { initJsonFlat, openJsonFlat } from './jsonflat.js';
 import { initBodyConv, openBodyConv } from './bodyconv.js';
 import { initPayloadLib, openPayloadLib } from './payloads-lib.js';
 import { initWaf, openWaf } from './waf.js';
+import { initSecrets, openSecrets } from './secrets.js';
 import { initStatus, openStatus } from './status.js';
+import { initGraphql, openGraphql } from './graphql.js';
 import { initWordlist, openWordlist } from './wordlist.js';
 import { initIpObf, openIpObf } from './ipobf.js';
 import { initAttackHdr, openAttackHdr } from './attackhdr.js';
@@ -45,6 +47,8 @@ import { initRecon, renderRecon } from './recon.js';
 import { initPalette, openPalette } from './palette.js';
 import { initMenubar } from './menubar.js';
 import { initTheme } from './theme.js';
+import { initSettings, openSettings } from './settings.js';
+import { initClickjacking, openClickjacking } from './clickjacking.js';
 import {
   initSession, updateProfileLabel,
   saveSession, openSessions, exportSession, importSession,
@@ -54,6 +58,8 @@ async function boot() {
   initTheme();
   initRequest();
   await initFuzzer();
+  initSettings();
+  initClickjacking();
   initMatrix();
   initSequence();
   initDecoder();
@@ -78,7 +84,9 @@ async function boot() {
   initBodyConv();
   initPayloadLib();
   initWaf();
+  initSecrets();
   initStatus();
+  initGraphql();
   initWordlist();
   initIpObf();
   initAttackHdr();
@@ -94,6 +102,7 @@ async function boot() {
   initSpecLoader(applySpec);
   initSession(onProfileChange);
   initMenubar({
+    settings: openSettings,
     'session-save': saveSession,
     'session-open': openSessions,
     'session-export': exportSession,
@@ -119,7 +128,10 @@ async function boot() {
     bodyconv: openBodyConv,
     payloadlib: openPayloadLib,
     waf: openWaf,
+    secrets: openSecrets,
+    clickjacking: openClickjacking,
     status: openStatus,
+    graphql: openGraphql,
     wordlist: openWordlist,
     ipobf: openIpObf,
     attackhdr: openAttackHdr,
@@ -139,6 +151,7 @@ async function boot() {
   wireCurlModal();
   wireCrossTab();
   wireShortcuts();
+  wireModalDismiss();
 
   await loadSpec();
   populateSelect();
@@ -223,6 +236,29 @@ function wireCrossTab() {
   $('#toFuzzerBtn').addEventListener('click', sendToFuzzer);
   $('#toMatrixBtn').addEventListener('click', sendToMatrix);
   $('#toSequenceBtn').addEventListener('click', sendToSequence);
+}
+
+// One boot-time pass over every modal: (1) give the dialog ARIA semantics so
+// screen readers announce it as a labelled modal dialog, and (2) wire
+// click-outside-to-close — clicking the dark backdrop (but not the modal
+// itself) dismisses it, matching the command palette and the global Esc
+// handler. The palette manages its own backdrop (it resets state on close).
+function wireModalDismiss() {
+  $$('.modal-backdrop').forEach((backdrop) => {
+    const dialog = backdrop.querySelector('.modal');
+    if (dialog) {
+      dialog.setAttribute('role', 'dialog');
+      dialog.setAttribute('aria-modal', 'true');
+      const heading = dialog.querySelector('h2');
+      if (heading && !dialog.hasAttribute('aria-label')) {
+        dialog.setAttribute('aria-label', heading.textContent.trim());
+      }
+    }
+    if (backdrop.id === 'paletteBackdrop') return;
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) backdrop.hidden = true;
+    });
+  });
 }
 
 // Keyboard shortcuts for a faster workflow.

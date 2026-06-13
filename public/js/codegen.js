@@ -2,11 +2,22 @@
 // finding can be reproduced outside Swaggernaut.
 
 function pyStr(s) {
-  return "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+  // Escape control characters too — a literal newline inside a single-quoted
+  // Python string is a syntax error, which breaks multi-line JSON bodies.
+  return (
+    "'" +
+    String(s)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t') +
+    "'"
+  );
 }
 
 export function toFetch(req) {
-  const opts = { method: req.method, headers: req.headers || {} };
+  const opts = { method: req.method || 'GET', headers: req.headers || {} };
   if (req.body) opts.body = req.body;
   return (
     `fetch(${JSON.stringify(req.url)}, ${JSON.stringify(opts, null, 2)})\n` +
@@ -26,14 +37,14 @@ export function toPython(req) {
     dataArg = ', data=data';
   }
   lines.push(
-    `resp = requests.request(${pyStr(req.method)}, ${pyStr(req.url)}, headers=headers${dataArg}, verify=False)`
+    `resp = requests.request(${pyStr(req.method || 'GET')}, ${pyStr(req.url)}, headers=headers${dataArg}, verify=False)`
   );
   lines.push('print(resp.status_code)', 'print(resp.text)');
   return lines.join('\n');
 }
 
 export function toHttpie(req) {
-  const parts = ['http', '--verify=no', req.method, shell(req.url)];
+  const parts = ['http', '--verify=no', req.method || 'GET', shell(req.url)];
   for (const [k, v] of Object.entries(req.headers || {})) parts.push(shell(`${k}:${v}`));
   let cmd = parts.join(' ');
   if (req.body) cmd = `echo ${shell(req.body)} | ${cmd}`;

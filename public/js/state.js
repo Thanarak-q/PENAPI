@@ -7,12 +7,12 @@
 // Swaggernaut/PenAPI blobs are migrated to `profiles.default`.
 
 import { textToHeaders } from './util.js';
+import { getSettings } from './settings.js';
 
 const SESSION_KEY = 'swaggernaut.session.v2';
 const LEGACY_KEY = 'swaggernaut.state.v1';
 const PENAPI_SESSION_KEY = 'penapi.session.v2';
 const PENAPI_LEGACY_KEY = 'penapi.state.v1';
-const HISTORY_CAP = 200;
 
 // Fields that belong to a profile (everything persisted per session).
 const PROFILE_FIELDS = [
@@ -88,7 +88,7 @@ export const state = {
 function snapshot() {
   const out = {};
   for (const f of PROFILE_FIELDS) out[f] = state[f];
-  out.history = (out.history || []).slice(0, HISTORY_CAP);
+  out.history = (out.history || []).slice(0, getSettings().historyLimit);
   return structuredClone(out);
 }
 
@@ -98,9 +98,10 @@ function applyProfileData(data) {
 }
 
 function persist() {
+  const limit = getSettings().historyLimit;
   const profiles = {};
   for (const [name, data] of Object.entries(state.profiles)) {
-    profiles[name] = { ...data, history: (data.history || []).slice(0, HISTORY_CAP) };
+    profiles[name] = { ...data, history: (data.history || []).slice(0, limit) };
   }
   localStorage.setItem(
     SESSION_KEY,
@@ -304,6 +305,6 @@ export function identityHeaders() {
 
 export function pushHistory(entry) {
   state.history.unshift({ ...entry, at: Date.now() });
-  state.history = state.history.slice(0, HISTORY_CAP);
+  state.history = state.history.slice(0, getSettings().historyLimit);
   save();
 }

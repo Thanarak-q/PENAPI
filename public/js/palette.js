@@ -5,11 +5,13 @@ import { state } from './state.js';
 import { loadEndpoint, sendCurrent } from './request.js';
 import { sendToFuzzer } from './fuzzer.js';
 import { sendToMatrix } from './matrix.js';
+import { filterCommands } from './palette-core.js';
 
 let items = [];
 let filtered = [];
 let cursor = 0;
 
+// Static entries for actions that are not wired via a menubar data-act value.
 const ACTIONS = [
   { kind: 'action', label: 'Send current request', hint: 'Ctrl+Enter', run: () => { goTab('request'); sendCurrent(); } },
   { kind: 'action', label: 'Send to Fuzzer', run: () => sendToFuzzer() },
@@ -23,9 +25,45 @@ const ACTIONS = [
   { kind: 'tab', label: 'Go to: Fuzzer / Brute', run: () => goTab('fuzzer') },
   { kind: 'tab', label: 'Go to: Attack Surface', run: () => goTab('recon') },
   { kind: 'tab', label: 'Go to: Access Matrix', run: () => goTab('matrix') },
+  { kind: 'tab', label: 'Go to: Sequence Runner', run: () => goTab('sequence') },
   { kind: 'tab', label: 'Go to: Auth Sweep', run: () => goTab('sweep') },
+  { kind: 'tab', label: 'Go to: Decoder', run: () => goTab('decoder') },
   { kind: 'tab', label: 'Go to: History', run: () => goTab('history') },
 ];
+
+/**
+ * Derive palette entries from every `.menu-item[data-act]` element in the
+ * menubar.  Skips `palette` (recursive) and `click:quickAttackBtn` (already
+ * covered by the static ACTIONS entry above).  Clicking the derived entry
+ * reuses the same event handler the menubar itself would fire, so there is
+ * only one place to maintain open-modal logic.
+ */
+function buildMenuItems() {
+  // Skip `palette` (recursive) and any data-act the static ACTIONS list already
+  // covers (Quick Attacks, Send to Fuzzer/Matrix) so re-adding those to a menu
+  // can never produce duplicate palette entries.
+  const SKIP = new Set([
+    'palette',
+    'click:quickAttackBtn',
+    'click:toFuzzerBtn',
+    'click:toMatrixBtn',
+  ]);
+  return $$('#menubar .menu-item[data-act]').reduce((acc, item) => {
+    const act = item.dataset.act;
+    if (SKIP.has(act)) return acc;
+    // Build a clean label by stripping shortcut-key and submenu-caret spans.
+    const clone = item.cloneNode(true);
+    clone.querySelectorAll('.menu-key, .submenu-caret').forEach((s) => s.remove());
+    const label = clone.textContent.trim();
+    acc.push({
+      kind: 'action',
+      label,
+      hint: item.title || '',
+      run: () => item.click(),
+    });
+    return acc;
+  }, []);
+}
 
 export function initPalette() {
   $('#paletteInput').addEventListener('input', () => {
@@ -59,16 +97,11 @@ function buildItems() {
     method: ep.method,
     run: () => loadEndpoint(ep),
   }));
-  items = [...ACTIONS, ...eps];
+  items = [...ACTIONS, ...buildMenuItems(), ...eps];
 }
 
 function filter() {
-  const q = $('#paletteInput').value.trim().toLowerCase();
-  filtered = !q
-    ? items.slice(0, 50)
-    : items
-        .filter((it) => (it.label + ' ' + (it.hint || '')).toLowerCase().includes(q))
-        .slice(0, 80);
+  filtered = filterCommands(items, $('#paletteInput').value);
   render();
 }
 

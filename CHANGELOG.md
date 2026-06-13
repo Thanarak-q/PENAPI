@@ -3,9 +3,112 @@
 All notable changes to Swaggernaut are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
-## 1.12.0
+## 1.13.0
 
 ### Added
+- **Deeper passive response analysis** — each response is now also checked for
+  weak HSTS max-age, `unsafe-inline`/`unsafe-eval` CSP, the `null` CORS origin,
+  `SameSite=None` cookies without `Secure`, cacheable sensitive responses
+  (Set-Cookie/auth without `no-store`), missing `Permissions-Policy`,
+  `WWW-Authenticate` disclosure, 5xx server errors, and verbose stack
+  traces / leaked private keys / AWS keys in the body. The analyzer
+  (`analyze.js`) is now unit-tested.
+- **Deeper Attack Surface analysis** — the passive spec analyzer gained rules
+  for credential-like values carried in the URL, authentication over plaintext
+  HTTP, API keys in the query string, discouraged OAuth2 grants (implicit /
+  password), and detection of GraphQL, file-upload, and management/debug
+  (`/actuator`, `/internal`, `/debug`, `.git`, …) surfaces. It also flags
+  authentication/account endpoints (login, reset, OTP, …) as brute-force
+  surfaces and collection `GET`s without pagination as excessive-data-exposure
+  candidates.
+- **Payload sets greatly deepened** — the built-in Fuzzer sets grew from a
+  handful of probes each to ~485 payloads total. Notably: **SQLi** (error-based
+  extractvalue/updatexml, UNION extraction, engine-specific, GBK/IFS bypasses,
+  OOB DNS), **XSS** (broad event-handler/tag variety, exfil, base64-eval),
+  **Command Injection** (`${IFS}`/brace/backslash bypasses, OOB, Windows),
+  **SSTI** (Jinja2/Twig/Freemarker/Smarty/ERB/Mako/SpEL/Nunjucks/Pug RCE
+  gadgets), **SSRF** (AWS/GCP/Azure/Alibaba metadata, decimal/hex/octal IP
+  obfuscation, gopher/dict/ftp), **NoSQLi**, **Path Traversal**, **LFI/RFI**
+  wrappers, **Prototype Pollution**, **LDAP**, **XPath**, **Open Redirect**,
+  **XXE** (OOB exfil, XInclude, billion-laughs, SVG), **CRLF** (response
+  splitting), **JWT** (kid traversal, embedded jwk, alg confusion), **File
+  Upload**, and **Web LLM** prompt injection.
+- **Clickjacking PoC generator** (`Attack → Clickjacking PoC…`) — build a
+  clickjacking proof-of-concept page (decoy overlay + near-invisible iframe of a
+  target URL) and open a live preview via a Blob URL. URL and decoy text are
+  HTML-escaped; opacity is clamped and offsets coerced. Pure HTML builder is
+  DOM-free and unit-tested.
+- **Three more Fuzzer payload sets** (30 total) — **Insecure Deserialization**
+  (Java/PHP/JSON/SnakeYAML/pickle markers), **File Upload** (extension,
+  null-byte, and traversal filename bypasses), and **Web LLM / Prompt
+  Injection** — closing PortSwigger topic gaps. All surface via `/api/payloads`.
+- **Secret Scanner detectors** — added npm, GitLab, and Twilio token detectors
+  (on top of the GitHub fine-grained PAT and `alg:none` JWT additions).
+
+### Changed
+- **Fuzzer payload-set picker grouped into submenus** — the set dropdown is now
+  organized into `<optgroup>` categories (Injection · Path & files · SSRF &
+  redirect · Access & auth · API & modern · Wordlists & fuzz) instead of one
+  long flat list. Each set carries a `category` exposed via `/api/payloads`.
+- **Injection Payloads cheat sheet** — a per-category **Copy all** button, plus
+  new **Deserialization**, **File upload**, and **Prompt injection** categories
+  to mirror the new Fuzzer sets.
+
+## 1.12.0
+
+### Changed
+- **Click-outside-to-close on every modal** — clicking the dark backdrop now
+  dismisses any tool modal (previously only the command palette did this),
+  matching the global Esc-to-close behavior.
+- **Modal accessibility** — every modal now carries `role="dialog"`,
+  `aria-modal="true"`, and an `aria-label` derived from its heading, so screen
+  readers announce it correctly.
+
+### Fixed
+- **Utility hardening (with new test coverage)** — patched real bugs in the
+  shared helpers and added `node --test` suites for previously untested modules:
+  - **Clipboard copy** now falls back to a hidden-textarea `execCommand` path
+    when the async Clipboard API is unavailable (non-secure context, e.g. the
+    tool served over plain HTTP on a LAN via `--host`), so copy buttons work
+    everywhere; `toast()` no longer throws if its element is missing.
+  - **Copy-as-code → Python** produced invalid code for multi-line bodies (a
+    literal newline inside a single-quoted string); newlines/tabs are now
+    escaped.
+  - **cURL import** no longer crashes on malformed input (a trailing `-H` or
+    `-u` threw); value reads are guarded.
+  - **Set-Cookie** response headers are kept one-per-line instead of being
+    comma-joined (which corrupted cookies whose values contain commas and broke
+    the Cookie Inspector).
+  - Added test suites for `util`, `codegen`, `curl`, `httpClient` (with local
+    integration tests), and `specParser` (which also now surfaces `TRACE`).
+- **History Limit now persists correctly** — a hard-coded 200-entry cap in
+  `state.js` silently overrode the configured limit when saving to localStorage,
+  so values above 200 had no effect after a reload. Persistence now honors the
+  History Limit setting.
+- **Secret Scanner never leaks a credential in the preview** — short basic-auth
+  URLs (e.g. `http://u:p@host`) were previewed verbatim; the credential portion
+  is now masked (`https://••••@`), and other short matches are fully masked.
+- **Secret Scanner coverage** — added a GitHub fine-grained PAT (`github_pat_`)
+  detector and the JWT detector now also catches `alg:none` unsigned tokens
+  (empty signature segment).
+- **Command Palette** — hardened against duplicate entries if request-action
+  menu items are ever re-added (defensive skip list).
+
+### Added
+- **Three more Fuzzer payload sets** — JWT Attack Tokens, OAuth redirect_uri Bypass, and Web Cache Deception.
+- **Secret Scanner** (`Attack → Secret Scanner…`) — paste a response body, JS bundle, or config file to scan for leaked credentials using 12 regex-based detectors: AWS Access Key IDs, Google API Keys, GitHub tokens, Slack tokens, Stripe live secret keys, SendGrid API keys, JWTs, private-key header blocks, basic-auth credentials in URLs, bearer tokens, generic assigned `api_key`/`secret`/`token`/`password` assignments, and email addresses. Matched secrets are previewed with the middle redacted. Runs fully client-side. DOM-free detectors are unit-tested.
+- **Settings panel** (`View → Settings…`) — localStorage-backed preferences for
+  fuzzer default concurrency and delay, history limit, and a confirm-before-risky
+  toggle. Pure normalise/clamp logic lives in `settings-core.js` and is
+  unit-tested; the Fuzzer's concurrency and delay inputs initialise from saved
+  defaults on load. History recording now trims to the configured **History Limit**
+  on every push; the **Confirm risky runs** toggle gates the confirmation prompts
+  in Fuzzer, Access Matrix, and Auth Sweep (disabled = skip prompt and proceed).
+- **GraphQL Toolkit** (`Attack → Payloads → GraphQL Toolkit…`) — six copyable
+  probe queries (full introspection, typename, root name, all type names,
+  field-suggestion typo, batch) plus a client-side introspection JSON parser
+  that surfaces root types, available query/mutation operations, and all named
+  types. Logic is DOM-free and unit-tested.
 - **Attack menu with nested flyouts** — payload generation, spoofing helpers,
   Match & Replace, Content Discovery, and Quick Attacks now live under a
   top-level **Attack** menu. Payloads and header/spoofing tools are grouped in
@@ -21,6 +124,15 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   hints so their purpose is visible on hover.
 
 ### Changed
+- **Command Palette** (`Ctrl/Cmd+K`) now lists every tool, including those nested
+  in the Attack and Tools flyout submenus (Injection Payloads, Redirect & SSRF
+  Payloads, GraphQL Toolkit, Attack Headers, User-Agent Library, IP Obfuscator,
+  Token Sequencer, Entropy Analyzer, Hash Identifier, Auth Builder, Random
+  Generator, Body Converter, JSON Flattener, Timestamp Converter, Header Auditor,
+  Cookie Inspector, WAF Fingerprint, Param Analyzer, Timing Analysis, Comparer,
+  Status Reference, and more). The Sequence Runner and Decoder tab shortcuts are
+  also surfaced. Palette entries are derived directly from the menubar DOM so any
+  future tool added to the menu is automatically included.
 - Removed the unused request-header endpoint strip that displayed
   "Pick an endpoint" before a request was selected.
 
@@ -89,6 +201,13 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   standalone tool) moved into *Tokens & crypto*.
 
 ### Added
+- **Four more Fuzzer payload sets** — **Prototype Pollution** (`__proto__` /
+  `constructor` gadgets in JSON and query-string form), **Mass Assignment
+  Fields** (candidate privilege-escalation field names), **CORS Test Origins**
+  (ACAO-reflection probes using a `TARGET` placeholder host), and **Unicode /
+  Encoding Bypass** (overlong UTF-8, `%u` / double-encoding, fullwidth, RTL, and
+  null-byte filter evasions). All surface automatically in the Fuzzer dropdown
+  and are covered by the `lib/payloads.js` integrity tests.
 - **More Quick Attack variants** — the one-click attack runner now also tries
   path-normalization ACL bypasses (`/.` trailing dot, `%2f` encoded slash,
   case-swapped path, leading double slash), a scheme downgrade

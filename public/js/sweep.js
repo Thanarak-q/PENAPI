@@ -2,6 +2,7 @@
 // can reach what. Flags endpoints reachable by a low-privilege identity.
 
 import { $, $$, el, statusClass, toast, textToHeaders } from './util.js';
+import { getSettings } from './settings.js';
 import { state } from './state.js';
 import { startSweep } from './api.js';
 import { attachExport } from './export.js';
@@ -80,7 +81,8 @@ function start() {
       : 'Safe methods can still be expensive on some APIs.',
     'Continue?',
   ].join('\n');
-  if (!confirm(warning)) return;
+  const ok = !getSettings().confirmRisky || confirm(warning);
+  if (!ok) return;
 
   rows = [];
   identityNames = identities.map((i) => i.name);

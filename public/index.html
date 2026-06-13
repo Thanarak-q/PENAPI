@@ -53,6 +53,8 @@
           <button class="menu-item" data-act="sitemap" title="Browse endpoints grouped by URL path">Site Map…</button>
           <button class="menu-item" data-act="tags" title="Rename or remove custom focus tags">Tag Manager…</button>
           <button class="menu-item" data-act="palette" title="Open the command palette">Command Palette <span class="menu-key">⌘K</span></button>
+          <div class="menu-sep"></div>
+          <button class="menu-item" data-act="settings" title="Edit application preferences">Settings…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -66,6 +68,7 @@
               <button class="menu-item" data-act="payloadlib" title="Browse copy-only injection payloads">Injection Payloads…</button>
               <button class="menu-item" data-act="redirect" title="Generate redirect and SSRF bypass strings">Redirect &amp; SSRF Payloads…</button>
               <button class="menu-item" data-act="wordlist" title="Generate fuzzing wordlists from ranges or mutations">Wordlist Generator…</button>
+              <button class="menu-item" data-act="graphql" title="Browse GraphQL probe queries and parse introspection responses">GraphQL Toolkit…</button>
             </div>
           </div>
           <div class="menu-sub">
@@ -79,6 +82,8 @@
           <div class="menu-sep"></div>
           <button class="menu-item" data-act="matchreplace" title="Rewrite outgoing requests before they are sent">Match &amp; Replace…</button>
           <button class="menu-item" data-act="discovery" title="Probe common paths with real GET requests">Content Discovery…</button>
+          <button class="menu-item" data-act="secrets" title="Scan pasted text for leaked credentials and secrets">Secret Scanner…</button>
+          <button class="menu-item" data-act="clickjacking" title="Generate a clickjacking proof-of-concept iframe overlay page">Clickjacking PoC…</button>
         </div>
       </div>
       <div class="menu-root">
@@ -874,6 +879,21 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="gqlModal" hidden>
+    <div class="modal modal-wide">
+      <h2>GraphQL Toolkit <span class="muted">— probes &amp; introspection parser</span></h2>
+      <p class="hint">Authorized testing only. Copy a probe query into the request body, then paste a full introspection response below to map the schema — root types, available operations, and all named types.</p>
+      <div class="rd-group-title">Probe Queries</div>
+      <div class="ck-out" id="gqlProbes"></div>
+      <div class="rd-group-title">Parse Introspection Response</div>
+      <textarea id="gqlIn" class="code code-out" spellcheck="false" placeholder='{"data":{"__schema":{"queryType":{"name":"Query"},...}}}'></textarea>
+      <div class="ck-out" id="gqlOut"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="closeGql">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="wfModal" hidden>
     <div class="modal modal-wide">
       <h2>WAF Fingerprint <span class="muted">— what's in front of the API</span></h2>
@@ -966,6 +986,48 @@
       <div class="ck-out" id="uaOut"></div>
       <div class="modal-actions">
         <button class="btn ghost" id="closeUa">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secret Scanner modal -->
+  <div class="modal-backdrop" id="secModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Secret Scanner <span class="muted">— detect leaked credentials</span></h2>
+      <p class="hint">Paste a response body, JS bundle, config file, or any text to scan for leaked secrets — AWS/Google/GitHub/Slack/Stripe/SendGrid keys, JWTs, private-key blocks, basic-auth in URLs, bearer tokens, and generic assigned secrets. Runs fully client-side; nothing is sent.</p>
+      <textarea id="secIn" class="code code-out" spellcheck="false" placeholder="paste response body, JS bundle, config…"></textarea>
+      <div class="ck-out" id="secOut"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="secRun">Scan</button>
+        <button class="btn ghost" id="closeSec">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clickjacking PoC modal -->
+  <div class="modal-backdrop" id="cjModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Clickjacking PoC <span class="muted">— iframe overlay</span></h2>
+      <p class="hint">Generates a proof-of-concept page: a near-invisible iframe over a decoy element. <strong>Authorized testing only.</strong> Only works if the target lacks <code>X-Frame-Options</code> or <code>CSP frame-ancestors</code> — check with the Header Auditor first.</p>
+      <div class="inline-row">
+        <input id="cjUrl" type="text" class="url-input" spellcheck="false" placeholder="https://target/page" />
+      </div>
+      <div class="inline-row">
+        <input id="cjDecoy" type="text" class="url-input" spellcheck="false" placeholder="Decoy button text" />
+      </div>
+      <div class="inline-row">
+        <label style="font-size:var(--text-sm);color:var(--ink-soft);align-self:center;">Opacity (0–1)</label>
+        <input id="cjOpacity" type="number" min="0" max="1" step="0.0001" value="0.0001" style="width:90px;" />
+        <label style="font-size:var(--text-sm);color:var(--ink-soft);align-self:center;">Top (px)</label>
+        <input id="cjTop" type="number" value="0" style="width:70px;" />
+        <label style="font-size:var(--text-sm);color:var(--ink-soft);align-self:center;">Left (px)</label>
+        <input id="cjLeft" type="number" value="0" style="width:70px;" />
+      </div>
+      <textarea id="cjOut" class="code code-out" spellcheck="false" readonly></textarea>
+      <div class="modal-actions">
+        <button class="btn primary" id="cjCopy">Copy</button>
+        <button class="btn ghost" id="cjPreview">Open preview</button>
+        <button class="btn ghost" id="closeCj">Close</button>
       </div>
     </div>
   </div>
@@ -1175,6 +1237,29 @@
       <p class="hint">Pentest-oriented API workbench — loads an OpenAPI/Swagger spec and adds offensive testing tooling (repeater, fuzzer, access-control matrix, auth sweep, JWT toolkit).</p>
       <p class="muted about-note">Runs entirely on your machine. No telemetry and no external calls — requests go only to the targets you choose, and JWT decode/sign/brute-force all happen locally in your browser.</p>
       <div class="modal-actions"><button class="btn ghost" id="closeAbout">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal-backdrop" id="settingsModal" hidden>
+    <div class="modal">
+      <h2>Settings</h2>
+      <div class="settings-fields">
+        <label>Fuzzer concurrency
+          <input id="settingsConcurrency" type="number" min="1" max="50" />
+        </label>
+        <label>Fuzzer delay (ms)
+          <input id="settingsDelay" type="number" min="0" max="10000" />
+        </label>
+        <label>History limit
+          <input id="settingsHistoryLimit" type="number" min="10" max="2000" />
+        </label>
+        <label class="check"><input id="settingsConfirmRisky" type="checkbox" /> Confirm risky runs</label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" id="settingsSave">Save</button>
+        <button class="btn ghost" id="closeSettings">Close</button>
+      </div>
     </div>
   </div>
 
