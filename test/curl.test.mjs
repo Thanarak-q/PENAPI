@@ -54,6 +54,13 @@ test('parseCurl does not throw on a trailing -u (malformed input)', () => {
   assert.doesNotThrow(() => parseCurl('curl https://api.test -u'));
 });
 
+test('parseCurl url-encodes --data-urlencode values', () => {
+  const req = parseCurl(`curl https://api.test -X POST --data-urlencode 'q=hello world & more'`);
+  assert.equal(req.body, 'q=hello%20world%20%26%20more');
+  const bare = parseCurl(`curl https://api.test --data-urlencode 'a b'`);
+  assert.equal(bare.body, 'a%20b');
+});
+
 test('toCurl serializes method, headers, and body with shell quoting', () => {
   const out = toCurl({ method: 'POST', url: 'https://api.test/u', headers: { 'X-A': 'b c' }, body: '{"a":1}' });
   assert.ok(out.startsWith('curl -i'));
