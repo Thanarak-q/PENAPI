@@ -65,6 +65,13 @@ test('the jwt-attacks / oauth-redirect / cache-deception sets are registered', (
   }
 });
 
+test('the deserialization / file-upload / web-llm sets are registered', () => {
+  for (const key of ['deserialization', 'file-upload', 'web-llm']) {
+    assert.ok(SETS[key], `${key} not registered`);
+    assert.ok(getSet(key).length > 0);
+  }
+});
+
 test('GraphQL set includes an introspection query', () => {
   assert.ok(getSet('graphql').some((p) => /__schema/.test(p)));
 });
