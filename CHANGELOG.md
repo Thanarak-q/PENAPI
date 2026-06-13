@@ -6,6 +6,7 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 ## 1.12.0
 
 ### Added
+- **Three more Fuzzer payload sets** — JWT Attack Tokens, OAuth redirect_uri Bypass, and Web Cache Deception.
 - **Secret Scanner** (`Attack → Secret Scanner…`) — paste a response body, JS bundle, or config file to scan for leaked credentials using 12 regex-based detectors: AWS Access Key IDs, Google API Keys, GitHub tokens, Slack tokens, Stripe live secret keys, SendGrid API keys, JWTs, private-key header blocks, basic-auth credentials in URLs, bearer tokens, generic assigned `api_key`/`secret`/`token`/`password` assignments, and email addresses. Matched secrets are previewed with the middle redacted. Runs fully client-side. DOM-free detectors are unit-tested.
 - **Settings panel** (`View → Settings…`) — localStorage-backed preferences for
   fuzzer default concurrency and delay, history limit, and a confirm-before-risky
