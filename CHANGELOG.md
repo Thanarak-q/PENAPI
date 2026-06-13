@@ -5,6 +5,11 @@ All notable changes to Swaggernaut are documented here. This project adheres to
 
 ## 1.12.0
 
+### Changed
+- **Click-outside-to-close on every modal** — clicking the dark backdrop now
+  dismisses any tool modal (previously only the command palette did this),
+  matching the global Esc-to-close behavior.
+
 ### Fixed
 - **History Limit now persists correctly** — a hard-coded 200-entry cap in
   `state.js` silently overrode the configured limit when saving to localStorage,

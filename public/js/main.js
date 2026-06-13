@@ -148,6 +148,7 @@ async function boot() {
   wireCurlModal();
   wireCrossTab();
   wireShortcuts();
+  wireModalDismiss();
 
   await loadSpec();
   populateSelect();
@@ -232,6 +233,19 @@ function wireCrossTab() {
   $('#toFuzzerBtn').addEventListener('click', sendToFuzzer);
   $('#toMatrixBtn').addEventListener('click', sendToMatrix);
   $('#toSequenceBtn').addEventListener('click', sendToSequence);
+}
+
+// Click-outside-to-close for every modal: clicking the dark backdrop (but not
+// the modal itself) dismisses it, matching the command palette's behavior and
+// the global Esc handler. The palette manages its own backdrop (it resets
+// state on close), so it is left to its own handler.
+function wireModalDismiss() {
+  $$('.modal-backdrop').forEach((backdrop) => {
+    if (backdrop.id === 'paletteBackdrop') return;
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) backdrop.hidden = true;
+    });
+  });
 }
 
 // Keyboard shortcuts for a faster workflow.
