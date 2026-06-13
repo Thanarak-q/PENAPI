@@ -34,6 +34,15 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   hints so their purpose is visible on hover.
 
 ### Changed
+- **Command Palette** (`Ctrl/Cmd+K`) now lists every tool, including those nested
+  in the Attack and Tools flyout submenus (Injection Payloads, Redirect & SSRF
+  Payloads, GraphQL Toolkit, Attack Headers, User-Agent Library, IP Obfuscator,
+  Token Sequencer, Entropy Analyzer, Hash Identifier, Auth Builder, Random
+  Generator, Body Converter, JSON Flattener, Timestamp Converter, Header Auditor,
+  Cookie Inspector, WAF Fingerprint, Param Analyzer, Timing Analysis, Comparer,
+  Status Reference, and more). The Sequence Runner and Decoder tab shortcuts are
+  also surfaced. Palette entries are derived directly from the menubar DOM so any
+  future tool added to the menu is automatically included.
 - Removed the unused request-header endpoint strip that displayed
   "Pick an endpoint" before a request was selected.
 
