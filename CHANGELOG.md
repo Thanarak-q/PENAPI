@@ -22,7 +22,7 @@ All notable changes to Swaggernaut are documented here. This project adheres to
   surfaces and collection `GET`s without pagination as excessive-data-exposure
   candidates.
 - **Payload sets greatly deepened** — the built-in Fuzzer sets grew from a
-  handful of probes each to ~460 payloads total. Notably: **SQLi** (error-based
+  handful of probes each to ~485 payloads total. Notably: **SQLi** (error-based
   extractvalue/updatexml, UNION extraction, engine-specific, GBK/IFS bypasses,
   OOB DNS), **XSS** (broad event-handler/tag variety, exfil, base64-eval),
   **Command Injection** (`${IFS}`/brace/backslash bypasses, OOB, Windows),
