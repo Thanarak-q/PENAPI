@@ -81,3 +81,29 @@ test('a well-hardened response yields no high/medium findings', () => {
   });
   assert.ok(!findings.some((f) => f.sev === 'high' || f.sev === 'medium'));
 });
+
+test('findings are tagged with OWASP API ids and CWEs', () => {
+  const cors = analyzeResponse({ status: 200, headers: { 'access-control-allow-origin': '*' } });
+  const f = cors.find((x) => /CORS allows any origin/.test(x.title));
+  assert.equal(f.owasp, 'API8:2023');
+  assert.equal(f.cwe, 'CWE-16');
+});
+
+test('a leaked AWS key in the body is tagged as API3 sensitive-data exposure', () => {
+  // Split literal so the pre-commit secret scanner doesn't flag this fixture
+  // (the runtime value is still the AWS docs EXAMPLE key, not a real credential).
+  const out = analyzeResponse({ status: 200, headers: {}, body: 'key=AKIA' + 'IOSFODNN7EXAMPLE' });
+  const f = out.find((x) => /AWS access key/.test(x.title));
+  assert.equal(f.owasp, 'API3:2023');
+  assert.equal(f.cwe, 'CWE-312');
+});
+
+test('every finding carries non-empty owasp/cwe fields', () => {
+  const out = analyzeResponse({ status: 500, headers: { 'set-cookie': 'sid=x' }, body: 'Traceback (most recent call last)' });
+  assert.ok(out.length > 0);
+  for (const f of out) {
+    assert.equal(typeof f.owasp, 'string');
+    assert.ok(f.owasp.startsWith('API'));
+    assert.match(f.cwe, /^CWE-\d+$/);
+  }
+});

@@ -4,8 +4,10 @@
 import { $, el, methodClass } from './util.js';
 import { state } from './state.js';
 import { loadEndpoint } from './request.js';
-import { attachExport } from './export.js';
-import { analyzeSpec } from './static-analysis.js';
+import { attachExport, download } from './export.js';
+import { getReport } from './report.js';
+import { toMarkdownReport } from './report-md.js';
+import { owaspLabel } from './analyzers/owasp.js';
 
 const SEV_ORDER = { high: 0, medium: 1, low: 2, info: 3 };
 let visibleFindings = [];
@@ -17,10 +19,13 @@ export function initRecon() {
   if (!exportReady) {
     attachExport(document.querySelector('[data-panel="recon"] .results-toolbar'), () => ({
       name: 'static-analysis',
-      headers: ['Severity', 'Category', 'Source', 'Method', 'Path', 'Finding', 'Evidence', 'Action'],
+      headers: ['Severity', 'Category', 'OWASP', 'CWE', 'Confidence', 'Source', 'Method', 'Path', 'Finding', 'Evidence', 'Action'],
       rows: visibleFindings.map((finding) => ({
         Severity: finding.sev,
         Category: finding.category,
+        OWASP: finding.owasp,
+        CWE: finding.cwe,
+        Confidence: finding.confidence,
         Source: finding.source,
         Method: finding.method,
         Path: finding.path,
@@ -29,13 +34,29 @@ export function initRecon() {
         Action: finding.action,
       })),
     }));
+    addReportButton(document.querySelector('[data-panel="recon"] .results-toolbar .export-group'));
     exportReady = true;
   }
 }
 
+// Adds a structured-Markdown report download next to the table-export buttons.
+function addReportButton(group) {
+  if (!group) return;
+  const btn = document.createElement('button');
+  btn.className = 'btn ghost tiny';
+  btn.textContent = 'Report';
+  btn.title = 'Download a structured Markdown security report (summary, OWASP coverage, findings)';
+  btn.addEventListener('click', () => {
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const target = state.spec?.baseUrls?.[0] || state.spec?.title || '';
+    download(`swaggernaut-report-${stamp}.md`, toMarkdownReport(getReport(), { target }), 'text/markdown');
+  });
+  group.appendChild(btn);
+}
+
 export function renderRecon() {
   if (!state.spec) return;
-  const report = analyzeSpec(state.spec, state.history);
+  const report = getReport();
   renderCards(report.summary);
   visibleFindings = applyFilters(report.findings);
   renderList(visibleFindings);
@@ -49,17 +70,26 @@ function renderCards(summary) {
     ['idor', 'idor'],
     ['injection', 'injection'],
     ['data', 'data'],
+    ['config', 'config'],
+    ['resource', 'resource'],
+    ['inventory', 'inventory'],
     ['quality', 'quality'],
     ['logs', 'logs'],
   ]
     .map(([key, label]) => `${label} ${summary.categories[key] || 0}`)
     .join('  ');
+  const riskKind = summary.severities.high ? 'vuln' : summary.severities.medium ? 'warn' : '';
+  const cov = summary.authCoverage || { mutating: 0, mutatingUnauth: 0, pct: 0 };
+  const covKind = cov.pct >= 50 ? 'vuln' : cov.pct > 0 ? 'warn' : '';
   const cards = [
+    ['Risk score', `${summary.riskScore} · ${summary.grade}`, riskKind],
     ['Findings', summary.total, summary.total ? 'warn' : ''],
     ['High', summary.severities.high, summary.severities.high ? 'vuln' : ''],
     ['Medium', summary.severities.medium, summary.severities.medium ? 'warn' : ''],
     ['Low', summary.severities.low, ''],
     ['Info', summary.severities.info, ''],
+    ['Unauth writes', `${cov.mutatingUnauth}/${cov.mutating} · ${cov.pct}%`, covKind],
+    ['OWASP cats', `${summary.owaspCategories || 0}/10`, summary.owaspCategories ? 'warn' : ''],
     ['Spec findings', summary.endpointFindings, ''],
     ['Log findings', summary.logFindings, summary.logFindings ? 'warn' : ''],
     ['Inputs', `${summary.operations} ops · ${summary.historyCount} logs`, ''],
@@ -111,7 +141,7 @@ function renderList(list) {
   if (!list.length) {
     tbody.appendChild(
       el('tr', {}, [
-        el('td', { colspan: '7', text: 'No findings match the current filters.' }),
+        el('td', { colspan: '8', text: 'No findings match the current filters.' }),
       ])
     );
     return;
@@ -119,6 +149,8 @@ function renderList(list) {
 
   for (const finding of list) {
     const endpoint = endpointFor(finding);
+    const owasp = finding.owasp ? owaspLabel(finding.owasp) : '';
+    const owaspTitle = [finding.owasp, finding.cwe, finding.confidence].filter(Boolean).join(' · ');
 
     const tr = el('tr', {}, [
       el('td', {}, [el('span', { class: `sev-tag sev-${finding.sev}`, text: finding.sev })]),
@@ -128,6 +160,7 @@ function renderList(list) {
         : [el('span', { text: '—' })]),
       el('td', { text: finding.path || '—', title: finding.path || '' }),
       el('td', { text: finding.title, title: finding.action || finding.title }),
+      el('td', owasp ? [el('span', { class: 'flag-tag', text: owasp, title: owaspTitle })] : [el('span', { class: 'muted', text: '—' })]),
       el('td', { text: finding.evidence || '', title: finding.evidence || '' }),
       el('td', {}, endpoint
         ? [el('span', { class: 'del', text: '→', title: 'open endpoint in Request tab', onclick: () => loadEndpoint(endpoint) })]

@@ -71,6 +71,31 @@ test('content-type variants only appear with a body', () => {
   assert.ok(!noBody.includes('content-type → xml'));
 });
 
+test('framework ACL-bypass path variants are present and rewrite the path', () => {
+  const vs = buildVariants(base());
+  const map = Object.fromEntries(vs.map((v) => [v.name, v.request.url]));
+  assert.ok(map['matrix param'].includes(';x=1'));
+  assert.ok(map['semicolon traversal'].includes('/..;/1'));
+  assert.ok(map['extension append'].endsWith('/users/1.json'));
+});
+
+test('mass-assignment body variant injects privileged fields into a JSON object body', () => {
+  const vs = buildVariants(base());
+  const ma = vs.find((v) => v.name === 'mass-assignment body');
+  assert.ok(ma, 'mass-assignment body variant missing');
+  const body = JSON.parse(ma.request.body);
+  assert.equal(body.a, 1);
+  assert.equal(body.isAdmin, true);
+  assert.equal(body.role, 'admin');
+});
+
+test('mass-assignment body variant is omitted for non-JSON-object bodies', () => {
+  const arr = names(buildVariants({ ...base(), body: '[1,2,3]' }));
+  assert.ok(!arr.includes('mass-assignment body'));
+  const plain = names(buildVariants({ ...base(), body: 'not json' }));
+  assert.ok(!plain.includes('mass-assignment body'));
+});
+
 test('every variant carries a name, note, and request', () => {
   for (const v of buildVariants(base())) {
     assert.ok(v.name && v.note && v.request);

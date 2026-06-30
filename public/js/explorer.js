@@ -6,6 +6,7 @@ import {
   state, isPinned, togglePin, tagsFor, addEndpointTag, removeEndpointTag,
   allTags, tagUsage, renameTag, deleteTag,
 } from './state.js';
+import { getReport, endpointRiskMap } from './report.js';
 
 let onSelect = () => {};
 let collapsed = new Set();
@@ -129,6 +130,11 @@ function render() {
   const filter = ($('#endpointSearch').value || '').trim().toLowerCase();
   $('#filterBar')?.classList.toggle('has-active', activeFilterCount() > 0);
 
+  // Per-endpoint passive-risk badges (reuses the shared memoized report).
+  const report = getReport();
+  const riskMap = endpointRiskMap(report);
+  updateReconBadge(report);
+
   const groups = {};
   let shown = 0;
   for (const ep of state.spec.endpoints) {
@@ -154,7 +160,7 @@ function render() {
         el('span', { class: 'count', text: String(pinnedEps.length) }),
       ])
     );
-    for (const ep of pinnedEps) list.appendChild(makeRow(ep));
+    for (const ep of pinnedEps) list.appendChild(makeRow(ep, riskMap));
   }
 
   for (const tag of Object.keys(groups).sort()) {
@@ -166,8 +172,44 @@ function render() {
     ]);
     list.appendChild(head);
     if (isCollapsed) continue;
-    for (const ep of eps) list.appendChild(makeRow(ep));
+    for (const ep of eps) list.appendChild(makeRow(ep, riskMap));
   }
+}
+
+// Update the count badge on the Attack Surface tab so high-risk results are
+// visible without opening the tab. Accepts an optional precomputed report.
+export function updateReconBadge(report) {
+  const badge = $('#reconTabBadge');
+  if (!badge) return;
+  const summary = (report || getReport()).summary;
+  const high = summary?.severities?.high || 0;
+  const total = summary?.total || 0;
+  if (!total) {
+    badge.hidden = true;
+    return;
+  }
+  badge.hidden = false;
+  badge.textContent = high ? String(high) : String(total);
+  badge.className = 'tab-badge ' + (high ? 'tb-high' : 'tb-warn');
+  badge.title = high
+    ? `${high} high-severity finding${high > 1 ? 's' : ''} · ${total} total`
+    : `${total} passive finding${total > 1 ? 's' : ''}`;
+}
+
+// Compact severity-tinted risk pill for an endpoint row. Returns null when the
+// passive analysis produced no findings for this endpoint.
+function riskBadge(ep, riskMap) {
+  const risk = riskMap && riskMap.get(ep.id);
+  if (!risk) return null;
+  const parts = [];
+  if (risk.high) parts.push(`${risk.high} high`);
+  if (risk.medium) parts.push(`${risk.medium} medium`);
+  const head = parts.length ? parts.join(', ') : `${risk.count} finding${risk.count > 1 ? 's' : ''}`;
+  return el('span', {
+    class: `risk-pill risk-${risk.worst}`,
+    text: String(risk.count),
+    title: `${head}\n${risk.titles.join('\n')}`,
+  });
 }
 
 // Deterministic color from a tag name (for the focus-tag dot).
@@ -177,7 +219,7 @@ function tagColor(tag) {
   return `hsl(${h} 55% 42%)`;
 }
 
-function makeRow(ep) {
+function makeRow(ep, riskMap) {
   const pinned = isPinned(ep.id);
   const customTags = tagsFor(ep.id);
   const row = el('div', {
@@ -185,6 +227,7 @@ function makeRow(ep) {
     onclick: () => { onSelect(ep); render(); },
   }, [
     el('span', { class: 'method-badge ' + methodClass(ep.method), text: ep.method }),
+    riskBadge(ep, riskMap),
     el('div', { class: 'ep-main' }, [
       el('div', { class: 'path', text: ep.path, title: ep.path }),
       ep.summary ? el('div', { class: 'summ', text: ep.summary }) : null,

@@ -112,7 +112,11 @@
         <div class="guide-panels">
           <article>
             <h3>Passive first</h3>
-            <p>Start in Explorer and Attack Surface. Look for unauthenticated operations, optional auth, ID-like path tokens, risky parameter names, and sensitive response fields.</p>
+            <p>Start in Explorer and Attack Surface. Every finding is mapped to the OWASP API Security Top 10 (2023) with a CWE and a confidence, and the view shows an overall risk score, posture grade, an <em>Unauth writes</em> ratio, and per-endpoint risk pills in the sidebar. Triage High findings first, then export a Markdown report.</p>
+          </article>
+          <article>
+            <h3>Send a few requests, then re-check</h3>
+            <p>The Attack Surface also mines your saved request log: permissive/credentialed CORS, weak cookie flags, tech-fingerprint banners, verbose stack traces, JWT <code>alg=none</code>/no-<code>exp</code> tokens, PII/secrets in responses (masked), reflected input, open redirects, GraphQL introspection, and cookie-auth requests missing CSRF tokens. Send a handful of authenticated requests, then revisit the tab.</p>
           </article>
           <article>
             <h3>Repeat before testing</h3>
@@ -133,7 +137,7 @@
         <div class="guide-tool-list">
           <div>
             <h3>Fuzzer</h3>
-            <p>Mark one injection point with <code>§value§</code> or <code>FUZZ</code>. Start with low concurrency and a small payload set.</p>
+            <p>Mark one injection point with <code>§value§</code> or <code>FUZZ</code> — or use <strong>Insert §§</strong> / <strong>Auto-mark</strong> to place one. Load the current request and the Fuzzer suggests the most relevant payload sets for its shape (click a chip to select one). Start with low concurrency and a small set, then click 🔍 on any result to inspect its full response in a popup.</p>
           </div>
           <div>
             <h3>Access Matrix</h3>
@@ -149,7 +153,7 @@
           </div>
           <div>
             <h3>Quick Attacks</h3>
-            <p>Tries controlled mutation variants such as missing auth, method override, path normalization, and spoofed forwarding headers.</p>
+            <p>Tries controlled mutation variants: missing auth, method override, path normalization, framework ACL bypasses (<code>;</code> matrix param, <code>/..;/</code>, <code>.json</code>), content-type confusion, spoofed forwarding headers, and a mass-assignment body probe.</p>
           </div>
           <div>
             <h3>Auth Sweep</h3>

@@ -1,9 +1,21 @@
 // Passive static analysis for the loaded Swaggernaut spec and local request log.
 // This module is intentionally pure: it never fetches, sends, or mutates.
 
+import {
+  makeFinding,
+  lowerHeaders,
+  pathFromUrl,
+  matchEndpoint,
+  pathPattern,
+  objectPaths,
+  SEV_WEIGHT,
+} from './analyzers/shared.js';
+import { runExtraAnalyzers } from './analyzers/index.js';
+import { enrich } from './analyzers/owasp.js';
+
 const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 const SEVERITIES = ['high', 'medium', 'low', 'info'];
-const CATEGORIES = ['security', 'idor', 'injection', 'data', 'quality', 'logs'];
+const CATEGORIES = ['security', 'idor', 'injection', 'data', 'config', 'resource', 'inventory', 'quality', 'logs'];
 
 const SENSITIVE_PATH_RE = /\b(admin|account|accounts|billing|credential|credentials|file|files|key|keys|payment|payments|secret|secrets|session|sessions|token|tokens|user|users|webhook|webhooks)\b/i;
 const IDENTIFIER_RE = /(^id$|id$|uuid|guid|slug|user|account|tenant|org|organization|project|order|invoice|file|owner|customer|member)/i;
@@ -26,6 +38,9 @@ const CATEGORY_LABELS = {
   idor: 'IDOR/BOLA',
   injection: 'Injection/SSRF',
   data: 'Sensitive Data',
+  config: 'Misconfiguration',
+  resource: 'Resource Use',
+  inventory: 'Inventory/Versioning',
   quality: 'Spec Quality',
   logs: 'Request Logs',
 };
@@ -39,7 +54,13 @@ export function analyzeSpec(spec, history = []) {
   addEndpointFindings(findings, endpoints, securitySchemes);
   addHistoryFindings(findings, endpoints, history);
 
+  // Pluggable analyzer layer (response hygiene, PII, inventory, resource use).
+  for (const extra of runExtraAnalyzers({ spec, endpoints, securitySchemes, history })) {
+    findings.push(makeFinding(extra));
+  }
+
   const sorted = findings
+    .map(enrich)
     .map((finding, idx) => ({ id: finding.id || `finding-${idx + 1}`, ...finding }))
     .sort(compareFindings);
 
@@ -447,6 +468,7 @@ function addHistoryFindings(findings, endpoints, history) {
   if (!Array.isArray(history) || !history.length) return;
 
   for (const entry of history.slice(0, 200)) {
+    if (!entry || typeof entry !== 'object') continue;
     const method = (entry.request?.method || entry.method || 'GET').toUpperCase();
     const url = entry.request?.url || entry.url || '';
     const path = pathFromUrl(url);
@@ -550,29 +572,19 @@ function addRouteAmbiguityFindings(findings, endpoints) {
   }
 }
 
-function makeFinding({ sev, category, title, endpoint, evidence, action, source = 'spec' }) {
-  return {
-    sev,
-    category,
-    title,
-    source,
-    method: endpoint?.method || '',
-    path: endpoint?.path || '',
-    endpointId: endpoint?.id || '',
-    evidence: evidence || '',
-    action: action || '',
-  };
-}
-
 function summarize(findings, endpoints, history) {
   const severities = Object.fromEntries(SEVERITIES.map((sev) => [sev, 0]));
   const categories = Object.fromEntries(CATEGORIES.map((category) => [category, 0]));
+  const owasp = {};
   let endpointFindings = 0;
   let logFindings = 0;
+  let riskScore = 0;
 
   for (const finding of findings) {
     if (severities[finding.sev] != null) severities[finding.sev]++;
     if (categories[finding.category] != null) categories[finding.category]++;
+    if (finding.owasp) owasp[finding.owasp] = (owasp[finding.owasp] || 0) + 1;
+    riskScore += SEV_WEIGHT[finding.sev] || 0;
     if (finding.source === 'history') logFindings++;
     else endpointFindings++;
   }
@@ -581,11 +593,47 @@ function summarize(findings, endpoints, history) {
     total: findings.length,
     severities,
     categories,
+    owasp,
+    owaspCategories: Object.keys(owasp).length,
+    authCoverage: computeAuthCoverage(endpoints),
+    riskScore,
+    grade: gradeFor(severities),
     endpointFindings,
     logFindings,
     operations: endpoints.length,
     historyCount: Array.isArray(history) ? history.length : 0,
   };
+}
+
+// Authentication coverage across the loaded operations: how many are reachable
+// without required auth, with emphasis on mutating (write) operations.
+function computeAuthCoverage(endpoints) {
+  let total = 0;
+  let unauth = 0;
+  let mutating = 0;
+  let mutatingUnauth = 0;
+  for (const endpoint of endpoints || []) {
+    total++;
+    const auth = authState(endpoint);
+    const open = auth.none || auth.optional;
+    if (open) unauth++;
+    if (MUTATING.has(endpoint.method)) {
+      mutating++;
+      if (open) mutatingUnauth++;
+    }
+  }
+  const pct = mutating ? Math.round((mutatingUnauth / mutating) * 100) : 0;
+  return { total, unauth, mutating, mutatingUnauth, pct };
+}
+
+// Coarse posture label derived from the worst observed severities.
+function gradeFor(severities) {
+  if (severities.high >= 3) return 'critical';
+  if (severities.high >= 1) return 'high-risk';
+  if (severities.medium >= 5) return 'elevated';
+  if (severities.medium >= 1) return 'moderate';
+  if (severities.low >= 1) return 'low-risk';
+  return 'clean';
 }
 
 function authState(endpoint) {
@@ -611,18 +659,6 @@ function pathTokens(path) {
   return [...String(path || '').matchAll(/\{([^}/]+)\}/g)].map((match) => match[1]);
 }
 
-function objectPaths(value, prefix = '') {
-  if (!value || typeof value !== 'object') return [];
-  if (Array.isArray(value)) return value.flatMap((item) => objectPaths(item, prefix));
-  const out = [];
-  for (const [key, next] of Object.entries(value)) {
-    const path = prefix ? `${prefix}.${key}` : key;
-    out.push(path);
-    out.push(...objectPaths(next, path));
-  }
-  return out;
-}
-
 function splitWords(value) {
   return String(value || '')
     .replace(/[{}._-]/g, '/')
@@ -643,33 +679,6 @@ function compareFindings(a, b) {
   const cat = CATEGORIES.indexOf(a.category) - CATEGORIES.indexOf(b.category);
   if (cat) return cat;
   return `${a.method} ${a.path} ${a.title}`.localeCompare(`${b.method} ${b.path} ${b.title}`);
-}
-
-function pathFromUrl(url) {
-  try {
-    return new URL(url).pathname || '/';
-  } catch {
-    const raw = String(url || '');
-    const noQuery = raw.split(/[?#]/)[0];
-    return noQuery || '/';
-  }
-}
-
-function matchEndpoint(endpoints, method, path) {
-  return endpoints.find((endpoint) => endpoint.method === method && pathPattern(endpoint.path).test(path));
-}
-
-function pathPattern(path) {
-  const escaped = String(path || '/')
-    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    .replace(/\\\{[^}]+\\\}/g, '[^/]+');
-  return new RegExp(`^${escaped}/?$`);
-}
-
-function lowerHeaders(headers) {
-  const out = {};
-  for (const [key, value] of Object.entries(headers || {})) out[key.toLowerCase()] = value;
-  return out;
 }
 
 function hasAuthHeader(headers) {
