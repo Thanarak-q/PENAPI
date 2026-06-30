@@ -304,11 +304,17 @@ async function handleApi(req, res, pathname) {
   if (pathname === '/api/proxy' && req.method === 'POST') {
     try {
       const r = await parseJsonBody(req);
+      // Binary-safe bodies (e.g. file uploads) arrive base64-encoded; decode to
+      // a Buffer so httpClient sends the raw bytes intact instead of UTF-8.
+      const proxyBody =
+        r.body != null && r.bodyEncoding === 'base64'
+          ? Buffer.from(r.body, 'base64')
+          : r.body || null;
       const result = await sendRequest({
         method: r.method || 'GET',
         url: r.url,
         headers: r.headers || {},
-        body: r.body || null,
+        body: proxyBody,
         timeout: r.timeout || 20000,
         followRedirects: !!r.followRedirects,
         insecureTLS: r.insecureTLS !== false,

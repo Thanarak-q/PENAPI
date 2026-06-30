@@ -19,6 +19,7 @@ const PROFILE_FIELDS = [
   'baseUrl',
   'activeIdentity',
   'identities',
+  'defaultHeaders',
   'history',
   'pinned',
   'endpointTags',
@@ -35,6 +36,7 @@ function blankProfile() {
       { name: 'User', headers: 'Authorization: Bearer REPLACE_USER_TOKEN' },
       { name: 'Unauth', headers: 'Authorization: null' },
     ],
+    defaultHeaders: '', // persistent pentest headers, always merged into requests
     history: [],
     pinned: [], // endpoint ids the user has bookmarked
     endpointTags: {}, // endpoint id -> user-defined focus tags
@@ -296,6 +298,18 @@ export function identityHeaders() {
   const id = state.identities.find((i) => i.name === state.activeIdentity);
   if (!id) return {};
   const parsed = textToHeaders(id.headers);
+  const out = {};
+  for (const [k, v] of Object.entries(parsed)) {
+    out[k] = v === 'null' ? null : v;
+  }
+  return out;
+}
+
+// Resolve the persistent default-header set (parsed). Like identityHeaders(),
+// a literal "null" value means strip that header. These are always merged into
+// the Request tab so pentest headers survive endpoint switches.
+export function defaultHeadersObj() {
+  const parsed = textToHeaders(state.defaultHeaders || '');
   const out = {};
   for (const [k, v] of Object.entries(parsed)) {
     out[k] = v === 'null' ? null : v;

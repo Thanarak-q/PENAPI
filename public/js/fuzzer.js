@@ -1,23 +1,33 @@
 // Fuzzer / brute-force tab. Streams results from the backend and flags
 // anomalies (status or response-length deviating from the baseline).
 
-import { $, $$, el, statusClass, toast, headersToText } from './util.js';
+import { $, $$, el, statusClass, toast, headersToText, fmtBytes, prettyJson } from './util.js';
 import { getCurrentRequest, currentUrl } from './request.js';
 import { textToHeaders } from './util.js';
-import { fetchPayloadSets, startFuzz } from './api.js';
+import { fetchPayloadSets, startFuzz, sendProxy } from './api.js';
 import { attachExport } from './export.js';
 import { goTab } from './util.js';
 import { getSettings } from './settings.js';
+import { suggestSets } from './analyzers/suggest.js';
+import { wrapMarker, autoMarkUrl, autoMarkBody } from './fuzzmark-core.js';
+import { analyzeResponse } from './analyze.js';
+import { owaspLabel } from './analyzers/owasp.js';
 
 let results = [];
+let lastTemplateField = null;
+let currentFuzzResult = null;
 let abortFn = null;
 let sortKey = 'idx';
 let sortDir = 1;
 const payloadSetCounts = {};
+const payloadSetLabels = {};
 
 export async function initFuzzer() {
   const data = await fetchPayloadSets();
-  for (const s of data.sets || []) payloadSetCounts[s.key] = s.count || 0;
+  for (const s of data.sets || []) {
+    payloadSetCounts[s.key] = s.count || 0;
+    payloadSetLabels[s.key] = s.label || s.key;
+  }
   const sel = $('#payloadSet');
   // Group sets into <optgroup>s by category, preserving server order.
   const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -35,10 +45,33 @@ export async function initFuzzer() {
   sel.innerHTML = '<option value="">— none —</option>' + optgroups;
 
   $('#loadFromRequest').addEventListener('click', loadFromRequest);
+  // Track which template field was last focused so Insert §§ targets it.
+  ['#fuzzUrl', '#fuzzBody', '#fuzzHeaders'].forEach((sel) =>
+    $(sel).addEventListener('focus', () => (lastTemplateField = $(sel)))
+  );
+  $('#fuzzInsertMarker').addEventListener('click', insertMarker);
+  $('#fuzzAutoMark').addEventListener('click', autoMark);
   $('#fuzzStart').addEventListener('click', start);
+
+  // Fuzz response popup wiring.
+  $('#closeFuzzResp').addEventListener('click', () => ($('#fuzzRespModal').hidden = true));
+  $('#fuzzRespToRequest').addEventListener('click', () => {
+    if (currentFuzzResult) replay(currentFuzzResult);
+    $('#fuzzRespModal').hidden = true;
+  });
+  $$('#fuzzRespTabs .subtab').forEach((tab) =>
+    tab.addEventListener('click', () => {
+      $$('#fuzzRespTabs .subtab').forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+      $$('[data-frpanel]').forEach((p) => p.classList.toggle('active', p.dataset.frpanel === tab.dataset.frtab));
+    })
+  );
   $('#fuzzStop').addEventListener('click', stop);
   $('#fuzzFilter').addEventListener('input', renderTable);
   $('#anomalyOnly').addEventListener('change', renderTable);
+  $('#fuzzUrl').addEventListener('input', renderSuggestions);
+  $('#fuzzBody').addEventListener('input', renderSuggestions);
+  renderSuggestions();
 
   $$('#fuzzTable thead th[data-sort]').forEach((th) => {
     th.addEventListener('click', () => {
@@ -63,7 +96,82 @@ function loadFromRequest() {
   $('#fuzzUrl').value = req.url;
   $('#fuzzHeaders').value = headersToText(req.headers);
   $('#fuzzBody').value = req.body || '';
+  renderSuggestions();
   toast('Loaded current request — add §§ or FUZZ to mark injection points');
+}
+
+// Wrap the selection in the last-focused template field with §…§, or insert an
+// empty §§ at the caret.
+function insertMarker() {
+  const f = lastTemplateField || $('#fuzzUrl');
+  f.focus();
+  const start = f.selectionStart ?? f.value.length;
+  const end = f.selectionEnd ?? f.value.length;
+  const { value, caret } = wrapMarker(f.value, start, end);
+  f.value = value;
+  f.selectionStart = f.selectionEnd = caret;
+  f.dispatchEvent(new Event('input'));
+  renderSuggestions();
+}
+
+// Auto-mark a single likely injection point: prefer a body value, else the URL.
+function autoMark() {
+  const body = $('#fuzzBody').value;
+  if (body.trim()) {
+    const marked = autoMarkBody(body);
+    if (marked) {
+      $('#fuzzBody').value = marked;
+      $('#fuzzBody').dispatchEvent(new Event('input'));
+      renderSuggestions();
+      return toast('Marked a body value — adjust if needed');
+    }
+  }
+  const url = $('#fuzzUrl').value;
+  const markedUrl = autoMarkUrl(url);
+  if (markedUrl !== url) {
+    $('#fuzzUrl').value = markedUrl;
+    renderSuggestions();
+    return toast('Marked a URL injection point');
+  }
+  toast('Nothing obvious to mark — select text and click Insert §§', true);
+}
+
+// Suggest the most relevant payload sets for the current request shape and let
+// the tester pick one with a click instead of scrolling the whole picker.
+function renderSuggestions() {
+  const host = $('#fuzzSuggest');
+  if (!host) return;
+  const url = $('#fuzzUrl').value || '';
+  const body = $('#fuzzBody').value || '';
+  const headers = textToHeaders($('#fuzzHeaders').value || '');
+  const contentType = headers['Content-Type'] || headers['content-type'] || '';
+  const method = body ? 'POST' : 'GET';
+  host.innerHTML = '';
+  if (!url && !body) {
+    host.hidden = true;
+    return;
+  }
+  const suggestions = suggestSets({ url, body, method, contentType });
+  if (!suggestions.length) {
+    host.hidden = true;
+    return;
+  }
+  host.hidden = false;
+  host.appendChild(el('span', { class: 'meta', text: 'suggested:' }));
+  for (const { key, why } of suggestions) {
+    if (!payloadSetLabels[key]) continue;
+    host.appendChild(
+      el('button', {
+        class: 'btn ghost tiny',
+        text: payloadSetLabels[key],
+        title: `${why} — click to select this set`,
+        onclick: () => {
+          $('#payloadSet').value = key;
+          toast(`Selected ${payloadSetLabels[key]}`);
+        },
+      })
+    );
+  }
 }
 
 function buildTemplate() {
@@ -227,10 +335,79 @@ function renderTable() {
       el('td', { text: r.timeMs == null ? '–' : r.timeMs + 'ms' }),
       el('td', { text: r.error || r.location || '', title: r.error || r.location || '' }),
       el('td', {}, [
+        el('span', { class: 'del', text: '🔍', title: 'show response (popup)', onclick: () => showResponse(r) }),
         el('span', { class: 'del', text: '↪', title: 'open in Request tab', onclick: () => replay(r) }),
       ]),
     ]);
     tbody.appendChild(tr);
+  }
+}
+
+// Re-issue a single fuzz result and show its full response in a popup, so the
+// tester can inspect body/headers/findings without leaving the Fuzzer tab.
+async function showResponse(r) {
+  currentFuzzResult = r;
+  const template = buildTemplate();
+  const inject = (s) => (s || '').replace(/§[^§]*§/g, r.payload).replace(/\bFUZZ\b/g, r.payload);
+  const headers = {};
+  for (const [k, v] of Object.entries(template.headers)) headers[k] = inject(v);
+  const req = {
+    method: template.method,
+    url: inject(template.url),
+    headers,
+    body: template.body != null ? inject(template.body) : null,
+    followRedirects: $('#fuzzRedirects').checked,
+  };
+  $('#fuzzRespTitle').textContent = `#${r.idx} · ${r.payload}`;
+  $('#fuzzRespStatus').innerHTML = '<span class="muted">Sending…</span>';
+  $('#fuzzRespBody').textContent = '';
+  $('#fuzzRespHeaders').textContent = '';
+  $('#fuzzRespAnalysis').innerHTML = '';
+  $('#fuzzRespModal').hidden = false;
+  const data = await sendProxy(req);
+  renderFuzzResponse(data.result || { error: data.error || 'Request failed' });
+}
+
+const SEV_ORDER = { high: 0, medium: 1, low: 2, info: 3 };
+
+function renderFuzzResponse(result) {
+  if (result.error) {
+    $('#fuzzRespStatus').innerHTML = `<span class="code-num s-5xx">ERR</span> <span class="pill">${result.error}</span>`;
+    renderFuzzFindings([]);
+    return;
+  }
+  $('#fuzzRespStatus').innerHTML =
+    `<span class="code-num ${statusClass(result.status)}">${result.status} ${result.statusText || ''}</span>` +
+    `<span class="pill">${result.timeMs} ms</span>` +
+    `<span class="pill">${fmtBytes(result.size)}${result.truncated ? ' (truncated)' : ''}</span>` +
+    (result.redirected ? `<span class="pill">redirected → ${result.finalUrl}</span>` : '');
+  const headers = result.headers || {};
+  const ct = headers['content-type'] || headers['Content-Type'] || '';
+  $('#fuzzRespBody').textContent = ct.includes('json') ? prettyJson(result.body) : (result.body || '');
+  $('#fuzzRespHeaders').textContent = headersToText(headers);
+  renderFuzzFindings(analyzeResponse(result));
+}
+
+function renderFuzzFindings(findings) {
+  const host = $('#fuzzRespAnalysis');
+  const badge = $('#fuzzRespAnalysisCount');
+  host.innerHTML = '';
+  if (!findings.length) {
+    badge.textContent = '';
+    host.innerHTML = '<span class="muted">No passive findings.</span>';
+    return;
+  }
+  findings.sort((a, b) => SEV_ORDER[a.sev] - SEV_ORDER[b.sev]);
+  badge.textContent = String(findings.length);
+  for (const f of findings) {
+    host.appendChild(
+      el('div', { class: 'finding f-' + f.sev }, [
+        el('span', { class: 'sev-tag sev-' + f.sev, text: f.sev }),
+        el('span', { class: 'finding-title', text: f.title }),
+        f.owasp ? el('span', { class: 'flag-tag', text: owaspLabel(f.owasp), title: [f.owasp, f.cwe].filter(Boolean).join(' · ') }) : null,
+        el('span', { class: 'finding-note', text: f.note }),
+      ])
+    );
   }
 }
 

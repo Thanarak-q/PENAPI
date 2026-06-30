@@ -1,12 +1,27 @@
 // Request tab: builder + repeater + response viewer.
 
 import { $, $$, el, statusClass, fmtBytes, prettyJson, headersToText, copy } from './util.js';
-import { state, identityHeaders, pushHistory } from './state.js';
+import { state, identityHeaders, defaultHeadersObj, pushHistory } from './state.js';
 import { sendProxy, buildCurl } from './api.js';
 import { applyRules } from './matchreplace-core.js';
 import { analyzeResponse } from './analyze.js';
+import { owaspLabel } from './analyzers/owasp.js';
 import { goTab } from './util.js';
 import { toFetch, toPython, toHttpie } from './codegen.js';
+import { renderFormData, addBlankFormRow, buildFormDataBody } from './multipart.js';
+
+// Request-body editor mode: 'raw' textarea or 'form' form-data builder.
+let bodyMode = 'raw';
+
+function setBodyMode(mode) {
+  bodyMode = mode === 'form' ? 'form' : 'raw';
+  const form = bodyMode === 'form';
+  $('#rawBodyWrap').hidden = form;
+  $('#formDataWrap').hidden = !form;
+  $$('#bodyMode .subtab').forEach((b) =>
+    b.classList.toggle('active', b.dataset.bodymode === bodyMode)
+  );
+}
 
 // --- URL helpers (shared) ----------------------------------------------
 
@@ -59,11 +74,15 @@ export function getCurrentRequest({ withIdentity = true } = {}) {
   }
   let headers = tableHeaders;
   if (withIdentity) {
+    // Precedence: table > identity > persistent default (pentest) headers.
     const merged = {};
+    for (const [k, v] of Object.entries(defaultHeadersObj())) {
+      if (v !== null) merged[k] = v;
+    }
     for (const [k, v] of Object.entries(identityHeaders())) {
       if (v !== null) merged[k] = v;
     }
-    Object.assign(merged, tableHeaders); // table overrides identity
+    Object.assign(merged, tableHeaders);
     headers = merged;
   }
   return {
@@ -100,22 +119,39 @@ export function loadEndpoint(ep) {
     })),
   ]);
 
-  // Headers table: spec header params + content-type
-  const headerRows = ep.params.header.map((p) => ({
-    enabled: p.required,
-    k: p.name,
-    v: p.example == null ? '' : String(p.example),
-  }));
-  if (ep.body && ep.body.contentType) {
-    headerRows.unshift({ enabled: true, k: 'Content-Type', v: ep.body.contentType });
+  // Headers table: persistent default (pentest) headers always come first so
+  // they survive endpoint switches, then Content-Type, then spec header params.
+  // De-dupe by lowercased name so a spec header doesn't shadow a default twice.
+  const headerRows = [];
+  const seen = new Set();
+  for (const [k, v] of Object.entries(defaultHeadersObj())) {
+    if (v === null) continue;
+    headerRows.push({ enabled: true, k, v: String(v) });
+    seen.add(k.toLowerCase());
+  }
+  if (ep.body && ep.body.contentType && !seen.has('content-type')) {
+    headerRows.push({ enabled: true, k: 'Content-Type', v: ep.body.contentType });
+    seen.add('content-type');
+  }
+  for (const p of ep.params.header) {
+    if (seen.has(p.name.toLowerCase())) continue;
+    headerRows.push({ enabled: p.required, k: p.name, v: p.example == null ? '' : String(p.example) });
   }
   renderKv('#headersTable', headerRows);
 
-  // Body
+  // Body. Multipart/file endpoints default to the form-data builder; everything
+  // else uses the raw editor. The raw textarea is still seeded so a tester can
+  // switch to Raw and tweak by hand.
   $('#reqBody').value = ep.body && ep.body.example != null
     ? JSON.stringify(ep.body.example, null, 2)
     : '';
   syncReqBodyHighlight();
+  if (ep.body && ep.body.multipart) {
+    renderFormData(ep.body.fields || []);
+    setBodyMode('form');
+  } else {
+    setBodyMode('raw');
+  }
 
   renderSummary(ep);
   goTab('request');
@@ -142,6 +178,7 @@ export function clearRequest() {
   renderKv('#paramsTable', []);
   $('#reqBody').value = '';
   syncReqBodyHighlight();
+  setBodyMode('raw');
   $('#reqSummary').innerHTML = '';
   $('#reqUrl').focus();
 }
@@ -191,9 +228,23 @@ export async function sendCurrent() {
   if (!built.url) return;
   // Apply session Match & Replace rules to the outgoing request.
   const req = applyRules(built, state.matchReplace);
+  // Form-data mode: read files and ship a binary-safe base64 multipart body,
+  // overriding the spec's boundary-less Content-Type with the generated one.
+  let bodyEncoding;
+  if (bodyMode === 'form') {
+    const fd = await buildFormDataBody();
+    if (fd) {
+      for (const k of Object.keys(req.headers)) {
+        if (k.toLowerCase() === 'content-type') delete req.headers[k];
+      }
+      req.headers['Content-Type'] = fd.contentType;
+      req.body = fd.base64Body;
+      bodyEncoding = 'base64';
+    }
+  }
   $('#sendBtn').disabled = true;
   $('#resStatus').innerHTML = '<span class="muted">Sending…</span>';
-  const data = await sendProxy({ ...req, followRedirects: false });
+  const data = await sendProxy({ ...req, bodyEncoding, followRedirects: false });
   const result = data.result || { error: data.error || 'Request failed' };
   $('#sendBtn').disabled = false;
   renderResponse(result);
@@ -349,6 +400,7 @@ function renderAnalysis(findings) {
       el('div', { class: 'finding f-' + f.sev }, [
         el('span', { class: 'sev-tag sev-' + f.sev, text: f.sev }),
         el('span', { class: 'finding-title', text: f.title }),
+        f.owasp ? el('span', { class: 'flag-tag', text: owaspLabel(f.owasp), title: [f.owasp, f.cwe].filter(Boolean).join(' · ') }) : null,
         el('span', { class: 'finding-note', text: f.note }),
       ])
     );
@@ -370,6 +422,10 @@ export function initRequest() {
   });
   $('#addHeader').addEventListener('click', () => addKvRow($('#headersTable')));
   $('#addParam').addEventListener('click', () => addKvRow($('#paramsTable')));
+  $$('#bodyMode .subtab').forEach((b) =>
+    b.addEventListener('click', () => setBodyMode(b.dataset.bodymode))
+  );
+  $('#addFormField').addEventListener('click', addBlankFormRow);
   $('#prettyBody').addEventListener('click', () => {
     $('#reqBody').value = prettyJson($('#reqBody').value);
     syncReqBodyHighlight();

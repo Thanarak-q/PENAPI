@@ -76,6 +76,22 @@ test('GraphQL set includes an introspection query', () => {
   assert.ok(getSet('graphql').some((p) => /__schema/.test(p)));
 });
 
+test('the new graphql-injection / csv / param-pollution / type-juggling sets are registered', () => {
+  for (const key of ['graphql-injection', 'csv-injection', 'param-pollution', 'type-juggling']) {
+    assert.ok(SETS[key], `${key} not registered`);
+    assert.ok(getSet(key).length > 0);
+  }
+});
+
+test('CSV injection set includes a leading-equals formula', () => {
+  assert.ok(getSet('csv-injection').some((p) => p.startsWith('=')));
+});
+
+test('type-juggling set includes array and object shapes', () => {
+  const set = getSet('type-juggling');
+  assert.ok(set.includes('[]') && set.includes('{}'));
+});
+
 test('SQLi set includes a cross-engine time-based payload', () => {
   assert.ok(getSet('sqli').some((p) => /pg_sleep/i.test(p)));
 });

@@ -3,7 +3,7 @@
 import { $, $$, toast, goTab } from './util.js';
 import { state, save } from './state.js';
 import { fetchSpec, parseCurl } from './api.js';
-import { initExplorer, renderExplorer, clearFilters, openTagManager } from './explorer.js';
+import { initExplorer, renderExplorer, clearFilters, openTagManager, updateReconBadge } from './explorer.js';
 import { initRequest, loadEndpoint, sendCurrent } from './request.js';
 import { initFuzzer, sendToFuzzer } from './fuzzer.js';
 import { initMatrix, sendToMatrix } from './matrix.js';
@@ -36,6 +36,7 @@ import { initGraphql, openGraphql } from './graphql.js';
 import { initWordlist, openWordlist } from './wordlist.js';
 import { initIpObf, openIpObf } from './ipobf.js';
 import { initAttackHdr, openAttackHdr } from './attackhdr.js';
+import { initDefaultHdr, openDefaultHdr } from './default-headers.js';
 import { initUserAgent, openUserAgent } from './useragent.js';
 import { initHistory, renderHistory } from './history.js';
 import { initIdentities, populateSelect } from './identities.js';
@@ -90,6 +91,7 @@ async function boot() {
   initWordlist();
   initIpObf();
   initAttackHdr();
+  initDefaultHdr();
   initUserAgent();
   initHistory();
   initExplorer(loadEndpoint);
@@ -135,6 +137,7 @@ async function boot() {
     wordlist: openWordlist,
     ipobf: openIpObf,
     attackhdr: openAttackHdr,
+    defaulthdr: openDefaultHdr,
     useragent: openUserAgent,
     'clear-filters': clearFilters,
     guide: () => window.open('/guide.html', '_blank', 'noopener'),
@@ -228,6 +231,7 @@ function wireTabs() {
       $('.workbar')?.classList.toggle('request-active', tab.dataset.tab === 'request');
       if (tab.dataset.tab === 'history') renderHistory();
       if (tab.dataset.tab === 'recon') renderRecon();
+      updateReconBadge();
     });
   });
 }

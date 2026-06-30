@@ -1,6 +1,17 @@
 // Passive response analysis: surfaces missing/weak security headers, permissive
 // CORS, info-leak banners, weak cookie flags, cacheable secrets, verbose errors,
 // and secrets leaked in the body. Pure and client-side (DOM-free for tests).
+//
+// Findings are tagged with an OWASP API Top 10 (2023) id and CWE via the shared
+// classifier so the live Response panel uses the same taxonomy as the Recon view.
+
+import { enrich } from './analyzers/owasp.js';
+
+// Body-secret findings are sensitive-data exposure; everything else here is a
+// security misconfiguration. Used only to steer the OWASP classifier.
+function categoryFor(title) {
+  return /response body|private key|access key/i.test(title) ? 'data' : 'config';
+}
 
 const SECURITY_HEADERS = [
   ['strict-transport-security', 'HSTS not set', 'medium', 'no HSTS — connection can be downgraded'],
@@ -103,7 +114,7 @@ export function analyzeResponse(result) {
     }
   }
 
-  return findings;
+  return findings.map((finding) => enrich({ ...finding, category: categoryFor(finding.title) }));
 }
 
 function lower(obj) {

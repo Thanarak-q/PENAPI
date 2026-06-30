@@ -3,6 +3,131 @@
 All notable changes to Swaggernaut are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## 1.14.0
+
+### Added
+- **Pluggable passive-analyzer layer** (`public/js/analyzers/`) — the Attack
+  Surface / Recon engine is now an aggregator that merges the existing spec
+  checks with four new, independently unit-tested analyzers. Each finding is
+  classified against the **OWASP API Security Top 10 (2023)** with a
+  representative **CWE id** and a **confidence** (`firm`/`tentative`), and the
+  report now carries an overall **risk score** and **posture grade**
+  (`clean` → `critical`).
+  - **Response hygiene** (`response-hygiene.js`, API8) — mines the saved request
+    log for permissive/credentialed CORS, missing security headers
+    (HSTS/CSP/X-Content-Type-Options/clickjacking/Referrer-Policy), weak cookie
+    flags (HttpOnly/Secure/SameSite), technology-fingerprint banners, verbose
+    error/stack-trace bodies, JSON-vs-Content-Type mismatch, and missing
+    rate-limit headers on authentication responses. The recon-aggregated
+    counterpart of the per-response `analyze.js`.
+  - **PII / secret scan** (`pii-scan.js`, API3) — flags Luhn-validated card
+    numbers, US SSNs, emails, JWTs, AWS/Google/Slack keys, private-key blocks,
+    and secret-like JSON fields observed in responses (and credentials carried in
+    request URLs). All evidence is **masked** — raw secrets are never emitted.
+  - **Inventory / versioning** (`inventory.js`, API9) — detects multiple, older,
+    and pre-release API versions in paths, internal/private routes published in
+    the spec, non-production and plaintext base URLs, and mixed schemes.
+  - **Resource consumption** (`resource-consumption.js`, API4) — flags
+    bulk/batch operations, expensive export/report/aggregate endpoints,
+    free-text/ReDoS-prone search params, unbounded array request bodies,
+    client-controlled result-size params, GraphQL DoS surface, and outbound-work
+    (webhook/callback) registration.
+  - **Auth intelligence** (`auth-intelligence.js`, API2) — flags HTTP Basic
+    schemes, API keys in cookies, and (from the request log) Basic credentials,
+    JWTs with `alg=none`, symmetric (`HS*`) signing, missing `exp`, or >1-year
+    lifetimes, credentials submitted over plaintext HTTP, and session cookies set
+    without HttpOnly on auth responses. JWTs are decoded for inspection only;
+    tokens/credentials are never emitted.
+  - **Sensitive business flows** (`business-flows.js`, API6) — flags
+    payment/money-movement, promo/coupon, reservation/inventory,
+    account-security (re-auth), engagement/voting, and quantity-bearing purchase
+    flows for anti-automation review.
+  - **Runtime intelligence** (`runtime-intel.js`) — mines observed behavior in
+    the request log: request input reflected verbatim in a response (XSS
+    candidate, CWE-79), open-redirect confirmation when a query param flows into
+    a 3xx `Location` (CWE-601), GraphQL introspection responses, enumerable
+    small/sequential numeric object ids (BOLA, CWE-639), and error responses
+    that leak internal diagnostic fields (stack/SQL/file, CWE-209).
+  - **CSRF risk** (`csrf-risk.js`, CWE-352) — flags cookie-authenticated,
+    state-changing requests in the log that carry no anti-CSRF token, escalating
+    when a no-preflight (simple) content-type makes them cross-site submittable,
+    and notes when the only defense is `X-Requested-With`.
+- **Suggested payload sets in the Fuzzer** — clickable chips recommend the most
+  relevant built-in sets for the current request shape (e.g. a `url`/`redirect`
+  param → SSRF + Open Redirect, a `file` param → Path Traversal + LFI, a GraphQL
+  path → GraphQL sets, a JSON object body on a write → Mass Assignment + Type
+  Juggling), via the pure `analyzers/suggest.js`.
+- **Attack-surface metrics** — the Recon summary adds an *Unauth writes* card
+  (share of mutating operations reachable without required auth) and an
+  *OWASP cats* card (distinct OWASP API categories triggered), also included in
+  the Markdown report.
+- **Per-endpoint risk badges** — the Explorer sidebar now shows a severity-tinted
+  pill on each endpoint with its passive-finding count and a hover breakdown,
+  surfacing risk where you actually work.
+- **Attack Surface tab badge** — the tab shows a live count (high-severity count,
+  or total) so findings are visible without opening the tab.
+- **Markdown security report** — a *Report* button in the Recon toolbar downloads
+  a structured report (executive summary, risk score, OWASP coverage table, and
+  findings grouped by severity with evidence + actions) via `report-md.js`.
+- **Recon UI** — new *Risk score* card with posture grade, an **OWASP** column,
+  category filters for Misconfiguration / Resource use / Inventory, and CSV
+  export now includes the OWASP/CWE/Confidence columns.
+- **OWASP tags in the live Response panel** — `analyze.js` findings now carry the
+  same OWASP-API/CWE tags as the Recon view (shown as a badge per finding).
+- **Four new Fuzzer payload sets** — GraphQL Injection / DoS (alias & field
+  amplification, batching, mutation/field-suggestion probing), CSV / Formula
+  Injection, HTTP Parameter Pollution, and Type Juggling / JSON Shape confusion.
+- **New one-click quick-attack variants** — framework ACL bypasses (`;` matrix
+  param, `/..;/` semicolon traversal, `.json` extension append),
+  form-urlencoded content-type confusion, and a mass-assignment body probe that
+  injects `role`/`isAdmin`/`admin` into a JSON object body.
+- **File-upload request bodies** — `multipart/form-data` operations (OpenAPI 3
+  `format: binary`/`byte` fields and Swagger 2 `in: formData` file params) now
+  render a **Raw / Form-data** toggle in the Request editor with a form-data
+  builder and per-field **text/file** pickers. Chosen files are read as raw
+  bytes, assembled into a proper multipart body (`multipart-core.js` /
+  `multipart.js`), and shipped to the proxy **base64-encoded** so binary content
+  survives intact (the `/api/proxy` handler decodes `bodyEncoding: "base64"` to a
+  Buffer).
+- **Persistent default (pentest) headers** — a new **Default Headers** editor
+  (Tools → Headers & spoofing, with a one-click "common pentest headers" seed)
+  stores a header set on the active profile that is always merged into outgoing
+  requests (precedence: table > identity > defaults) and re-shown in the Headers
+  table on every endpoint switch, so headers like `X-Forwarded-For` no longer get
+  wiped when you change operations.
+- **Fuzzer marker helpers** — **Insert §§** wraps the current selection (or
+  inserts an empty marker at the caret) in the focused template field, and
+  **Auto-mark** marks a single likely injection point (a body value, else a query
+  value, else the last path segment) via the pure `fuzzmark-core.js`.
+- **Fuzzer response popup** — each result row gets a 🔍 action that re-issues
+  that payload's request and shows the full response (body, headers, passive
+  analysis) in a modal, without leaving the Fuzzer tab. The existing
+  "open in Request tab" (↪) remains as a secondary action.
+- **JWT RSA & ECDSA + RS→HS confusion** — the JWT inspector now signs and
+  verifies `RS256/384/512` and `ES256/384` with pasted PEM keys (private to
+  sign, public to verify) alongside the existing HMAC support, and adds a
+  one-click **RS→HS algorithm-confusion** forgery that signs an `HS256` token
+  using the RSA public key as the HMAC secret. Crypto primitives were extracted
+  to a DOM-free `jwt-crypto.js`.
+- **Friendlier Identity manager** — a ⚙ button next to the top-right identity
+  dropdown opens the manager directly, and each identity is now edited as a card
+  with a dedicated **Bearer token** field, an **unauth** toggle (strips
+  `Authorization`), and a key/value list for extra headers (still serialized to
+  the same `Name: value` text the matrix and request builder consume).
+
+### Fixed
+- The passive analyzer no longer throws on malformed request-log entries
+  (e.g. a `null` entry or an unparseable URL) — surfaced by a new analyzer
+  robustness suite that runs every analyzer against adversarial input.
+
+### Changed
+- The analysis report is **memoized and shared** (`report.js`) — the Recon view
+  and the Explorer sidebar reuse a single analysis pass per spec/history change
+  instead of each re-walking every endpoint and log entry on every render or
+  keystroke. Shared analyzer helpers were extracted to `analyzers/shared.js`
+  (de-duplicating header/URL/object helpers previously inlined in
+  `static-analysis.js`).
+
 ## 1.13.0
 
 ### Added
